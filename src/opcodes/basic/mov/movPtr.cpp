@@ -339,7 +339,7 @@ void mov_mmww_c64(Thread& t){
 	dst&=0x0000FFFFFFFFFFFF;
 	*(uint64*)&t.mem[dst]=val;
 }
-
+/*
 void mov_m_mmww8(Thread& t);
 void mov_m_mmww16(Thread& t);
 void mov_m_mmww32(Thread& t);
@@ -363,5 +363,5 @@ void mov_mmw_mmww16(Thread& t);
 void mov_mmw_mmww32(Thread& t);
 void mov_mmw_mmww48(Thread& t);
 void mov_mmw_mmww64(Thread& t);
-
+*/
 
