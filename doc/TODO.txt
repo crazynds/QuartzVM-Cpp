@@ -1,9 +1,0 @@
-
-===Tarefas para fazer===
-
-
-Implementar: XOR,OR,AND
-Implementar no JIT: DIV,MOD,MUL_DUPLO,DIV_DUPLO
-
-
-Implementar no JIT: call
