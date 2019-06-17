@@ -23,7 +23,7 @@
 
 	#define OK_JIT_STATE 0x00
 	#define ERROR_JMP_ENTER_JIT_STATE 0x20
-	#define LIXO_REG 0x1FA9E225
+	#define LIXO_REG 0xAF001FA9E22500A1
 
 	struct JitContentsAuxiliar{
 		uint16 opcode;

@@ -61,10 +61,12 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 		a.jne(l);
 		if(mem<8){
 			uint64 aux=t.getNext48().toInt();
-			a.mov(rcx,0xFFFF000000000000);
+			a.mov(rcx,0x0000FFFFFFFFFFFF);
 			a.mov(rax,aux);
-			a.and_(qreg[mem],rcx);
+			a.andn(qreg[mem],rcx,qreg[mem]);
 			a.add(qreg[mem],rax);
+			jcontent.val_rax=LIXO_REG;
+			jcontent.val_rcx=0x0000FFFFFFFFFFFF;
 		}else {
 			uint32 val1=t.getNext32();
 			uint16 val2=t.getNext16();
@@ -94,8 +96,7 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(val<8){
 				a.cmove(breg[mem],breg[val]);
 			}else{
-				a.mov(al,ptr(workspace,8*val));
-				a.cmove(breg[mem],al);
+				a.cmove(breg[mem],ptr(workspace,8*val));
 			}
 		}else{
 			Label l=a.newLabel();
@@ -103,8 +104,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(val<8){
 				a.mov(ptr(workspace,8*mem),breg[val]);
 			}else{
-				a.mov(bl,ptr(workspace,8*val));
-				a.mov(ptr(workspace,8*mem),bl);
+				a.mov(al,ptr(workspace,8*val));
+				a.mov(ptr(workspace,8*mem),al);
+				jcontent.val_rax=LIXO_REG;
 			}
 			a.bind(l);
 		}
@@ -117,8 +119,7 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(val<8){
 				a.cmove(wreg[mem],wreg[val]);
 			}else{
-				a.mov(ax,ptr(workspace,8*val));
-				a.cmove(wreg[mem],ax);
+				a.cmove(wreg[mem],ptr(workspace,8*val));
 			}
 		}else{
 			Label l=a.newLabel();
@@ -126,8 +127,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(val<8){
 				a.mov(ptr(workspace,8*mem),wreg[val]);
 			}else{
-				a.mov(bx,ptr(workspace,8*val));
-				a.mov(ptr(workspace,8*mem),bx);
+				a.mov(ax,ptr(workspace,8*val));
+				a.mov(ptr(workspace,8*mem),ax);
+				jcontent.val_rax=LIXO_REG;
 			}
 			a.bind(l);
 		}
@@ -140,8 +142,7 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(val<8){
 				a.cmove(dreg[mem],dreg[val]);
 			}else{
-				a.mov(eax,ptr(workspace,8*val));
-				a.cmove(dreg[mem],eax);
+				a.cmove(dreg[mem],ptr(workspace,8*val));
 			}
 		}else{
 			Label l=a.newLabel();
@@ -149,8 +150,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(val<8){
 				a.mov(ptr(workspace,8*mem),dreg[val]);
 			}else{
-				a.mov(ebx,ptr(workspace,8*val));
-				a.mov(ptr(workspace,8*mem),ebx);
+				a.mov(eax,ptr(workspace,8*val));
+				a.mov(ptr(workspace,8*mem),eax);
+				jcontent.val_rax=LIXO_REG;
 			}
 			a.bind(l);
 		}
@@ -170,8 +172,7 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 		a.and_(rax,rcx);
 	
 		if(mem<8){
-			a.not_(rcx);
-			a.and_(qreg[mem],rcx);
+			a.andn(qreg[mem],rcx,qreg[mem]);
 			a.add(qreg[mem],rax);
 		}else{
 			a.mov(dword_ptr(workspace,mem*8),eax);
@@ -179,6 +180,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			a.mov(word_ptr(workspace,(mem*8)+4),ax);
 		}
 		a.bind(l);
+
+		jcontent.val_rax=LIXO_REG;
+		jcontent.val_rcx=0x0000FFFFFFFFFFFF;
 	}break;
 	case CMOV_IG_W_W+P_UINT64:
 	case CMOV_IG_W_W+P_INT64:{
@@ -188,8 +192,7 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(val<8){
 				a.cmove(qreg[mem],qreg[val]);
 			}else{
-				a.mov(rax,ptr(workspace,8*val));
-				a.cmove(qreg[mem],rax);
+				a.cmove(qreg[mem],ptr(workspace,8*val));
 			}
 		}else{
 			Label l=a.newLabel();
@@ -197,8 +200,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(val<8){
 				a.mov(ptr(workspace,8*mem),qreg[val]);
 			}else{
-				a.mov(rbx,ptr(workspace,8*val));
-				a.mov(ptr(workspace,8*mem),rbx);
+				a.mov(rax,ptr(workspace,8*val));
+				a.mov(ptr(workspace,8*mem),rax);
+				jcontent.val_rax=LIXO_REG;
 			}
 			a.bind(l);
 		}
@@ -249,8 +253,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 		a.je(l);
 		if(mem<8){
 			uint64 aux=t.getNext48().toInt();
+			a.mov(rcx,0x0000FFFFFFFFFFFF);
 			a.mov(rax,aux);
-			a.and_(qreg[mem],0xFFFF000000000000);
+			a.andn(qreg[mem],rcx,qreg[mem]);
 			a.add(rax,qreg[mem]);
 			a.mov(qreg[mem],rax);
 		}else {
@@ -260,6 +265,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			a.mov(word_ptr(workspace,(mem*8)+4),val2);
 		}
 		a.bind(l);
+
+		jcontent.val_rax=LIXO_REG;
+		jcontent.val_rcx=0x0000FFFFFFFFFFFF;
 	}break;
 	case CMOV_DI_W_C+P_UINT64:
 	case CMOV_DI_W_C+P_INT64:{
@@ -282,8 +290,7 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(val<8){
 				a.cmovne(breg[mem],breg[val]);
 			}else{
-				a.mov(al,ptr(workspace,8*val));
-				a.cmovne(breg[mem],al);
+				a.cmovne(breg[mem],ptr(workspace,8*val));
 			}
 		}else{
 			Label l=a.newLabel();
@@ -291,8 +298,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(val<8){
 				a.mov(ptr(workspace,8*mem),breg[val]);
 			}else{
-				a.mov(bl,ptr(workspace,8*val));
-				a.mov(ptr(workspace,8*mem),bl);
+				a.mov(al,ptr(workspace,8*val));
+				a.mov(ptr(workspace,8*mem),al);
+				jcontent.val_rax=LIXO_REG;
 			}
 			a.bind(l);
 		}
@@ -305,8 +313,7 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(val<8){
 				a.cmovne(wreg[mem],wreg[val]);
 			}else{
-				a.mov(ax,ptr(workspace,8*val));
-				a.cmovne(wreg[mem],ax);
+				a.cmovne(wreg[mem],ptr(workspace,8*val));
 			}
 		}else{
 			Label l=a.newLabel();
@@ -314,8 +321,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(val<8){
 				a.mov(ptr(workspace,8*mem),wreg[val]);
 			}else{
-				a.mov(bx,ptr(workspace,8*val));
-				a.mov(ptr(workspace,8*mem),bx);
+				a.mov(ax,ptr(workspace,8*val));
+				a.mov(ptr(workspace,8*mem),ax);
+				jcontent.val_rax=LIXO_REG;
 			}
 			a.bind(l);
 		}
@@ -328,8 +336,7 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(val<8){
 				a.cmovne(dreg[mem],dreg[val]);
 			}else{
-				a.mov(eax,ptr(workspace,8*val));
-				a.cmovne(dreg[mem],eax);
+				a.cmovne(dreg[mem],ptr(workspace,8*val));
 			}
 		}else{
 			Label l=a.newLabel();
@@ -337,8 +344,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(val<8){
 				a.mov(ptr(workspace,8*mem),dreg[val]);
 			}else{
-				a.mov(ebx,ptr(workspace,8*val));
-				a.mov(ptr(workspace,8*mem),ebx);
+				a.mov(eax,ptr(workspace,8*val));
+				a.mov(ptr(workspace,8*mem),eax);
+				jcontent.val_rax=LIXO_REG;
 			}
 			a.bind(l);
 		}
@@ -349,14 +357,15 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 		uint8 val=t.getNext8();
 		Label l=a.newLabel();
 		a.je(l);
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 		if(val<8){
 			a.mov(rax,qreg[val]);
 		}else{
 			a.mov(rax,qword_ptr(workspace,val*8));
 		}
-		a.and_(rax,0x0000FFFFFFFFFFFF);
+		a.and_(rax,rcx);
 		if(mem<8){
-			a.and_(qreg[mem],0xFFFF000000000000);
+			a.andn(qreg[mem],rcx,qreg[mem]);
 			a.add(qreg[mem],rax);
 		}else{
 			a.mov(dword_ptr(workspace,mem*8),eax);
@@ -364,6 +373,8 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			a.mov(word_ptr(workspace,(mem*8)+4),ax);
 		}
 		a.bind(l);
+		jcontent.val_rcx=0x0000FFFFFFFFFFFF;
+		jcontent.val_rax=LIXO_REG;
 	}break;
 	case CMOV_DI_W_W+P_UINT64:
 	case CMOV_DI_W_W+P_INT64:{
@@ -373,8 +384,7 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(val<8){
 				a.cmovne(qreg[mem],qreg[val]);
 			}else{
-				a.mov(rax,ptr(workspace,8*val));
-				a.cmovne(qreg[mem],rax);
+				a.cmovne(qreg[mem],ptr(workspace,8*val));
 			}
 		}else{
 			Label l=a.newLabel();
@@ -382,8 +392,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(val<8){
 				a.mov(ptr(workspace,8*mem),qreg[val]);
 			}else{
-				a.mov(rbx,ptr(workspace,8*val));
-				a.mov(ptr(workspace,8*mem),rbx);
+				a.mov(rax,ptr(workspace,8*val));
+				a.mov(ptr(workspace,8*mem),rax);
+				jcontent.val_rax=LIXO_REG;
 			}
 			a.bind(l);
 		}
@@ -400,6 +411,7 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(jcontent.type=='u')a.cmova(al,val);
 			else a.cmovg(al,val);
 			a.mov(ptr(workspace,8*mem),al);
+			jcontent.val_rax=LIXO_REG;
 		}
 	}break;
 	case CMOV_MA_W_C+P_UINT16:
@@ -414,6 +426,7 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(jcontent.type=='u')a.cmova(ax,val);
 			else a.cmovg(ax,val);
 			a.mov(ptr(workspace,8*mem),ax);
+			jcontent.val_rax=LIXO_REG;
 		}
 	}break;
 	case CMOV_MA_W_C+P_UINT32:
@@ -428,6 +441,7 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(jcontent.type=='u')a.cmova(eax,val);
 			else a.cmovg(eax,val);
 			a.mov(ptr(workspace,8*mem),eax);
+			jcontent.val_rax=LIXO_REG;
 		}
 	}break;
 	case CMOV_MA_W_C+P_UINT48:
@@ -438,10 +452,13 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 		else a.jle(l);
 		if(mem<8){
 			uint64 aux=t.getNext48().toInt();
+			a.mov(rcx,0x0000FFFFFFFFFFFF);
 			a.mov(rax,aux);
-			a.and_(qreg[mem],0xFFFF000000000000);
+			a.andn(qreg[mem],rcx,qreg[mem]);
 			a.add(rax,qreg[mem]);
 			a.mov(qreg[mem],rax);
+			jcontent.val_rax=LIXO_REG;
+			jcontent.val_rcx=0x0000FFFFFFFFFFFF;
 		}else {
 			uint32 val1=t.getNext32();
 			uint16 val2=t.getNext16();
@@ -462,6 +479,7 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(jcontent.type=='u')a.cmova(rax,val);
 			else a.cmovg(rax,val);
 			a.mov(ptr(workspace,8*mem),rax);
+			jcontent.val_rax=LIXO_REG;
 		}
 	}break;
 	case CMOV_MA_W_W+P_UINT8:
@@ -473,9 +491,8 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 				if(jcontent.type=='u')a.cmova(breg[mem],breg[val]);
 				else a.cmovg(breg[mem],breg[val]);
 			}else{
-				a.mov(al,ptr(workspace,8*val));
-				if(jcontent.type=='u')a.cmova(breg[mem],al);
-				else a.cmovg(breg[mem],al);
+				if(jcontent.type=='u')a.cmova(breg[mem],ptr(workspace,8*val));
+				else a.cmovg(breg[mem],ptr(workspace,8*val));
 			}
 		}else{
 			Label l=a.newLabel();
@@ -484,8 +501,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(val<8){
 				a.mov(ptr(workspace,8*mem),breg[val]);
 			}else{
-				a.mov(bl,ptr(workspace,8*val));
-				a.mov(ptr(workspace,8*mem),bl);
+				a.mov(al,ptr(workspace,8*val));
+				a.mov(ptr(workspace,8*mem),al);
+				jcontent.val_rax=LIXO_REG;
 			}
 			a.bind(l);
 		}
@@ -499,9 +517,8 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 				if(jcontent.type=='u')a.cmova(wreg[mem],wreg[val]);
 				else a.cmovg(wreg[mem],wreg[val]);
 			}else{
-				a.mov(ax,ptr(workspace,8*val));
-				if(jcontent.type=='u')a.cmova(wreg[mem],ax);
-				else a.cmovg(wreg[mem],ax);
+				if(jcontent.type=='u')a.cmova(wreg[mem],ptr(workspace,8*val));
+				else a.cmovg(wreg[mem],ptr(workspace,8*val));
 			}
 		}else{
 			Label l=a.newLabel();
@@ -510,8 +527,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(val<8){
 				a.mov(ptr(workspace,8*mem),wreg[val]);
 			}else{
-				a.mov(bx,ptr(workspace,8*val));
-				a.mov(ptr(workspace,8*mem),bx);
+				a.mov(ax,ptr(workspace,8*val));
+				a.mov(ptr(workspace,8*mem),ax);
+				jcontent.val_rax=LIXO_REG;
 			}
 			a.bind(l);
 		}
@@ -525,9 +543,8 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 				if(jcontent.type=='u')a.cmova(dreg[mem],dreg[val]);
 				else a.cmovg(dreg[mem],dreg[val]);
 			}else{
-				a.mov(eax,ptr(workspace,8*val));
-				if(jcontent.type=='u')a.cmova(dreg[mem],eax);
-				else a.cmovg(dreg[mem],eax);
+				if(jcontent.type=='u')a.cmova(dreg[mem],ptr(workspace,8*val));
+				else a.cmovg(dreg[mem],ptr(workspace,8*val));
 			}
 		}else{
 			Label l=a.newLabel();
@@ -536,8 +553,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(val<8){
 				a.mov(ptr(workspace,8*mem),dreg[val]);
 			}else{
-				a.mov(ebx,ptr(workspace,8*val));
-				a.mov(ptr(workspace,8*mem),ebx);
+				a.mov(eax,ptr(workspace,8*val));
+				a.mov(ptr(workspace,8*mem),eax);
+				jcontent.val_rax=LIXO_REG;
 			}
 			a.bind(l);
 		}
@@ -549,15 +567,16 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 		Label l=a.newLabel();
 		if(jcontent.type=='u')a.jbe(l);
 		else a.jle(l);
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 		if(val<8){
 			a.mov(rax,qreg[val]);
 		}else{
 			a.mov(rax,qword_ptr(workspace,val*8));
 		}
-		a.and_(rax,0x0000FFFFFFFFFFFF);
+		a.and_(rax,rcx);
 	
 		if(mem<8){
-			a.and_(qreg[mem],0xFFFF000000000000);
+			a.andn(qreg[mem],rcx,qreg[mem]);
 			a.add(qreg[mem],rax);
 		}else{
 			a.mov(dword_ptr(workspace,mem*8),eax);
@@ -565,6 +584,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			a.mov(word_ptr(workspace,(mem*8)+4),ax);
 		}
 		a.bind(l);
+
+		jcontent.val_rcx=0x0000FFFFFFFFFFFF;
+		jcontent.val_rax=LIXO_REG;
 	}break;
 	case CMOV_MA_W_W+P_UINT64:
 	case CMOV_MA_W_W+P_INT64:{
@@ -575,9 +597,8 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 				if(jcontent.type=='u')a.cmova(qreg[mem],qreg[val]);
 				else a.cmovg(qreg[mem],qreg[val]);
 			}else{
-				a.mov(rax,ptr(workspace,8*val));
-				if(jcontent.type=='u')a.cmova(qreg[mem],rax);
-				else a.cmovg(qreg[mem],rax);
+				if(jcontent.type=='u')a.cmova(qreg[mem],ptr(workspace,8*val));
+				else a.cmovg(qreg[mem],ptr(workspace,8*val));
 			}
 		}else{
 			Label l=a.newLabel();
@@ -586,8 +607,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(val<8){
 				a.mov(ptr(workspace,8*mem),qreg[val]);
 			}else{
-				a.mov(rbx,ptr(workspace,8*val));
-				a.mov(ptr(workspace,8*mem),rbx);
+				a.mov(rax,ptr(workspace,8*val));
+				a.mov(ptr(workspace,8*mem),rax);
+				jcontent.val_rax=LIXO_REG;
 			}
 			a.bind(l);
 		}
@@ -604,6 +626,7 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(jcontent.type=='u')a.cmovb(al,val);
 			else a.cmovl(al,val);
 			a.mov(ptr(workspace,8*mem),al);
+			jcontent.val_rax=LIXO_REG;
 		}
 	}break;
 	case CMOV_ME_W_C+P_UINT16:
@@ -618,6 +641,7 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(jcontent.type=='u')a.cmovb(ax,val);
 			else a.cmovl(ax,val);
 			a.mov(ptr(workspace,8*mem),ax);
+			jcontent.val_rax=LIXO_REG;
 		}
 	}break;
 	case CMOV_ME_W_C+P_UINT32:
@@ -632,6 +656,7 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(jcontent.type=='u')a.cmovb(eax,val);
 			else a.cmovl(eax,val);
 			a.mov(ptr(workspace,8*mem),eax);
+			jcontent.val_rax=LIXO_REG;
 		}
 	}break;
 	case CMOV_ME_W_C+P_UINT48:
@@ -642,10 +667,14 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 		else a.jge(l);
 		if(mem<8){
 			uint64 aux=t.getNext48().toInt();
+			a.mov(rcx,0x0000FFFFFFFFFFFF);
 			a.mov(rax,aux);
-			a.and_(qreg[mem],0xFFFF000000000000);
+			a.andn(qreg[mem],rcx,qreg[mem]);
 			a.add(rax,qreg[mem]);
 			a.mov(qreg[mem],rax);
+
+			jcontent.val_rax=LIXO_REG;
+			jcontent.val_rcx=0x0000FFFFFFFFFFFF;
 		}else {
 			uint32 val1=t.getNext32();
 			uint16 val2=t.getNext16();
@@ -666,6 +695,7 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(jcontent.type=='u')a.cmovb(rax,val);
 			else a.cmovl(rax,val);
 			a.mov(ptr(workspace,8*mem),rax);
+			jcontent.val_rax=LIXO_REG;
 		}
 	}break;
 	case CMOV_ME_W_W+P_UINT8:
@@ -677,9 +707,8 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 				if(jcontent.type=='u')a.cmovb(breg[mem],breg[val]);
 				else a.cmovl(breg[mem],breg[val]);
 			}else{
-				a.mov(al,ptr(workspace,8*val));
-				if(jcontent.type=='u')a.cmovb(breg[mem],al);
-				else a.cmovl(breg[mem],al);
+				if(jcontent.type=='u')a.cmovb(breg[mem],ptr(workspace,8*val));
+				else a.cmovl(breg[mem],ptr(workspace,8*val));
 			}
 		}else{
 			Label l=a.newLabel();
@@ -688,8 +717,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(val<8){
 				a.mov(ptr(workspace,8*mem),breg[val]);
 			}else{
-				a.mov(bl,ptr(workspace,8*val));
-				a.mov(ptr(workspace,8*mem),bl);
+				a.mov(al,ptr(workspace,8*val));
+				a.mov(ptr(workspace,8*mem),al);
+				jcontent.val_rax=LIXO_REG;
 			}
 			a.bind(l);
 		}
@@ -703,9 +733,8 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 				if(jcontent.type=='u')a.cmovb(wreg[mem],wreg[val]);
 				else a.cmovl(wreg[mem],wreg[val]);
 			}else{
-				a.mov(ax,ptr(workspace,8*val));
-				if(jcontent.type=='u')a.cmovb(wreg[mem],ax);
-				else a.cmovl(wreg[mem],ax);
+				if(jcontent.type=='u')a.cmovb(wreg[mem],ptr(workspace,8*val));
+				else a.cmovl(wreg[mem],ptr(workspace,8*val));
 			}
 		}else{
 			Label l=a.newLabel();
@@ -714,8 +743,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(val<8){
 				a.mov(ptr(workspace,8*mem),wreg[val]);
 			}else{
-				a.mov(bx,ptr(workspace,8*val));
-				a.mov(ptr(workspace,8*mem),bx);
+				a.mov(ax,ptr(workspace,8*val));
+				a.mov(ptr(workspace,8*mem),ax);
+				jcontent.val_rax=LIXO_REG;
 			}
 			a.bind(l);
 		}
@@ -729,9 +759,8 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 				if(jcontent.type=='u')a.cmovb(dreg[mem],dreg[val]);
 				else a.cmovl(dreg[mem],dreg[val]);
 			}else{
-				a.mov(eax,ptr(workspace,8*val));
-				if(jcontent.type=='u')a.cmovb(dreg[mem],eax);
-				else a.cmovl(dreg[mem],eax);
+				if(jcontent.type=='u')a.cmovb(dreg[mem],ptr(workspace,8*val));
+				else a.cmovl(dreg[mem],ptr(workspace,8*val));
 			}
 		}else{
 			Label l=a.newLabel();
@@ -740,8 +769,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(val<8){
 				a.mov(ptr(workspace,8*mem),dreg[val]);
 			}else{
-				a.mov(ebx,ptr(workspace,8*val));
-				a.mov(ptr(workspace,8*mem),ebx);
+				a.mov(eax,ptr(workspace,8*val));
+				a.mov(ptr(workspace,8*mem),eax);
+				jcontent.val_rax=LIXO_REG;
 			}
 			a.bind(l);
 		}
@@ -753,15 +783,16 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 		Label l=a.newLabel();
 		if(jcontent.type=='u')a.jae(l);
 		else a.jge(l);
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 		if(val<8){
 			a.mov(rax,qreg[val]);
 		}else{
 			a.mov(rax,qword_ptr(workspace,val*8));
 		}
-		a.and_(rax,0x0000FFFFFFFFFFFF);
+		a.and_(rax,rcx);
 	
 		if(mem<8){
-			a.and_(qreg[mem],0xFFFF000000000000);
+			a.andn(qreg[mem],rcx,qreg[mem]);
 			a.add(qreg[mem],rax);
 		}else{
 			a.mov(dword_ptr(workspace,mem*8),eax);
@@ -769,6 +800,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			a.mov(word_ptr(workspace,(mem*8)+4),ax);
 		}
 		a.bind(l);
+
+		jcontent.val_rax=LIXO_REG;
+		jcontent.val_rcx=0x0000FFFFFFFFFFFF;
 	}break;
 	case CMOV_ME_W_W+P_UINT64:
 	case CMOV_ME_W_W+P_INT64:{
@@ -779,9 +813,8 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 				if(jcontent.type=='u')a.cmovb(qreg[mem],qreg[val]);
 				else a.cmovl(qreg[mem],qreg[val]);
 			}else{
-				a.mov(rax,ptr(workspace,8*val));
-				if(jcontent.type=='u')a.cmovb(qreg[mem],rax);
-				else a.cmovl(qreg[mem],rax);
+				if(jcontent.type=='u')a.cmovb(qreg[mem],ptr(workspace,8*val));
+				else a.cmovl(qreg[mem],ptr(workspace,8*val));
 			}
 		}else{
 			Label l=a.newLabel();
@@ -790,8 +823,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(val<8){
 				a.mov(ptr(workspace,8*mem),qreg[val]);
 			}else{
-				a.mov(rbx,ptr(workspace,8*val));
-				a.mov(ptr(workspace,8*mem),rbx);
+				a.mov(rax,ptr(workspace,8*val));
+				a.mov(ptr(workspace,8*mem),rax);
+				jcontent.val_rax=LIXO_REG;
 			}
 			a.bind(l);
 		}
@@ -808,6 +842,7 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(jcontent.type=='u')a.cmovbe(al,val);
 			else a.cmovle(al,val);
 			a.mov(ptr(workspace,8*mem),al);
+			jcontent.val_rax=LIXO_REG;
 		}
 	}break;
 	case CMOV_ME_IG_W_C+P_UINT16:
@@ -822,6 +857,7 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(jcontent.type=='u')a.cmovbe(ax,val);
 			else a.cmovle(ax,val);
 			a.mov(ptr(workspace,8*mem),ax);
+			jcontent.val_rax=LIXO_REG;
 		}
 	}break;
 	case CMOV_ME_IG_W_C+P_UINT32:
@@ -836,6 +872,7 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(jcontent.type=='u')a.cmovbe(eax,val);
 			else a.cmovle(eax,val);
 			a.mov(ptr(workspace,8*mem),eax);
+			jcontent.val_rax=LIXO_REG;
 		}
 	}break;
 	case CMOV_ME_IG_W_C+P_UINT48:
@@ -846,10 +883,13 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 		else a.jg(l);
 		if(mem<8){
 			uint64 aux=t.getNext48().toInt();
+			a.mov(rcx,0x0000FFFFFFFFFFFF);
 			a.mov(rax,aux);
-			a.and_(qreg[mem],0xFFFF000000000000);
+			a.andn(qreg[mem],rcx,qreg[mem]);
 			a.add(rax,qreg[mem]);
 			a.mov(qreg[mem],rax);
+			jcontent.val_rcx=0x0000FFFFFFFFFFFF;
+			jcontent.val_rax=LIXO_REG;
 		}else {
 			uint32 val1=t.getNext32();
 			uint16 val2=t.getNext16();
@@ -870,6 +910,7 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(jcontent.type=='u')a.cmovbe(rax,val);
 			else a.cmovle(rax,val);
 			a.mov(ptr(workspace,8*mem),rax);
+			jcontent.val_rax=LIXO_REG;
 		}
 	}break;
 	case CMOV_ME_IG_W_W+P_UINT8:
@@ -881,9 +922,8 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 				if(jcontent.type=='u')a.cmovbe(breg[mem],breg[val]);
 				else a.cmovle(breg[mem],breg[val]);
 			}else{
-				a.mov(al,ptr(workspace,8*val));
-				if(jcontent.type=='u')a.cmovbe(breg[mem],al);
-				else a.cmovle(breg[mem],al);
+				if(jcontent.type=='u')a.cmovbe(breg[mem],ptr(workspace,8*val));
+				else a.cmovle(breg[mem],ptr(workspace,8*val));
 			}
 		}else{
 			Label l=a.newLabel();
@@ -892,8 +932,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(val<8){
 				a.mov(ptr(workspace,8*mem),breg[val]);
 			}else{
-				a.mov(bl,ptr(workspace,8*val));
-				a.mov(ptr(workspace,8*mem),bl);
+				a.mov(al,ptr(workspace,8*val));
+				a.mov(ptr(workspace,8*mem),al);
+				jcontent.val_rax=LIXO_REG;
 			}
 			a.bind(l);
 		}
@@ -907,9 +948,8 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 				if(jcontent.type=='u')a.cmovbe(wreg[mem],wreg[val]);
 				else a.cmovle(wreg[mem],wreg[val]);
 			}else{
-				a.mov(ax,ptr(workspace,8*val));
-				if(jcontent.type=='u')a.cmovbe(wreg[mem],ax);
-				else a.cmovle(wreg[mem],ax);
+				if(jcontent.type=='u')a.cmovbe(wreg[mem],ptr(workspace,8*val));
+				else a.cmovle(wreg[mem],ptr(workspace,8*val));
 			}
 		}else{
 			Label l=a.newLabel();
@@ -918,8 +958,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(val<8){
 				a.mov(ptr(workspace,8*mem),wreg[val]);
 			}else{
-				a.mov(bx,ptr(workspace,8*val));
-				a.mov(ptr(workspace,8*mem),bx);
+				a.mov(ax,ptr(workspace,8*val));
+				a.mov(ptr(workspace,8*mem),ax);
+				jcontent.val_rax=LIXO_REG;
 			}
 			a.bind(l);
 		}
@@ -933,9 +974,8 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 				if(jcontent.type=='u')a.cmovbe(dreg[mem],dreg[val]);
 				else a.cmovle(dreg[mem],dreg[val]);
 			}else{
-				a.mov(eax,ptr(workspace,8*val));
-				if(jcontent.type=='u')a.cmovbe(dreg[mem],eax);
-				else a.cmovle(dreg[mem],eax);
+				if(jcontent.type=='u')a.cmovbe(dreg[mem],ptr(workspace,8*val));
+				else a.cmovle(dreg[mem],ptr(workspace,8*val));
 			}
 		}else{
 			Label l=a.newLabel();
@@ -944,8 +984,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(val<8){
 				a.mov(ptr(workspace,8*mem),dreg[val]);
 			}else{
-				a.mov(ebx,ptr(workspace,8*val));
-				a.mov(ptr(workspace,8*mem),ebx);
+				a.mov(eax,ptr(workspace,8*val));
+				a.mov(ptr(workspace,8*mem),eax);
+				jcontent.val_rax=LIXO_REG;
 			}
 			a.bind(l);
 		}
@@ -957,15 +998,16 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 		Label l=a.newLabel();
 		if(jcontent.type=='u')a.ja(l);
 		else a.jg(l);
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 		if(val<8){
 			a.mov(rax,qreg[val]);
 		}else{
 			a.mov(rax,qword_ptr(workspace,val*8));
 		}
-		a.and_(rax,0x0000FFFFFFFFFFFF);
+		a.and_(rax,rcx);
 	
 		if(mem<8){
-			a.and_(qreg[mem],0xFFFF000000000000);
+			a.andn(qreg[mem],rcx,qreg[mem]);
 			a.add(qreg[mem],rax);
 		}else{
 			a.mov(dword_ptr(workspace,mem*8),eax);
@@ -973,6 +1015,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			a.mov(word_ptr(workspace,(mem*8)+4),ax);
 		}
 		a.bind(l);
+
+		jcontent.val_rax=LIXO_REG;
+		jcontent.val_rcx=0x0000FFFFFFFFFFFF;
 	}break;
 	case CMOV_ME_IG_W_W+P_UINT64:
 	case CMOV_ME_IG_W_W+P_INT64:{
@@ -983,9 +1028,8 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 				if(jcontent.type=='u')a.cmovbe(qreg[mem],qreg[val]);
 				else a.cmovle(qreg[mem],qreg[val]);
 			}else{
-				a.mov(rax,ptr(workspace,8*val));
-				if(jcontent.type=='u')a.cmovbe(qreg[mem],rax);
-				else a.cmovle(qreg[mem],rax);
+				if(jcontent.type=='u')a.cmovbe(qreg[mem],ptr(workspace,8*val));
+				else a.cmovle(qreg[mem],ptr(workspace,8*val));
 			}
 		}else{
 			Label l=a.newLabel();
@@ -994,8 +1038,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(val<8){
 				a.mov(ptr(workspace,8*mem),qreg[val]);
 			}else{
-				a.mov(rbx,ptr(workspace,8*val));
-				a.mov(ptr(workspace,8*mem),rbx);
+				a.mov(rax,ptr(workspace,8*val));
+				a.mov(ptr(workspace,8*mem),rax);
+				jcontent.val_rax=LIXO_REG;
 			}
 			a.bind(l);
 		}
@@ -1012,6 +1057,7 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(jcontent.type=='u')a.cmovae(al,val);
 			else a.cmovge(al,val);
 			a.mov(ptr(workspace,8*mem),al);
+			jcontent.val_rax=LIXO_REG;
 		}
 	}break;
 	case CMOV_MA_IG_W_C+P_UINT16:
@@ -1026,6 +1072,7 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(jcontent.type=='u')a.cmovae(ax,val);
 			else a.cmovge(ax,val);
 			a.mov(ptr(workspace,8*mem),ax);
+			jcontent.val_rax=LIXO_REG;
 		}
 	}break;
 	case CMOV_MA_IG_W_C+P_UINT32:
@@ -1040,6 +1087,7 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(jcontent.type=='u')a.cmovae(eax,val);
 			else a.cmovge(eax,val);
 			a.mov(ptr(workspace,8*mem),eax);
+			jcontent.val_rax=LIXO_REG;
 		}
 	}break;
 	case CMOV_MA_IG_W_C+P_UINT48:
@@ -1050,10 +1098,12 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 		else a.jl(l);
 		if(mem<8){
 			uint64 aux=t.getNext48().toInt();
+			a.mov(rcx,0x0000FFFFFFFFFFFF);
 			a.mov(rax,aux);
-			a.and_(qreg[mem],0xFFFF000000000000);
+			a.andn(qreg[mem],rcx,qreg[mem]);
 			a.add(rax,qreg[mem]);
 			a.mov(qreg[mem],rax);
+			jcontent.val_rax=LIXO_REG;
 		}else {
 			uint32 val1=t.getNext32();
 			uint16 val2=t.getNext16();
@@ -1074,6 +1124,7 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(jcontent.type=='u')a.cmovae(rax,val);
 			else a.cmovge(rax,val);
 			a.mov(ptr(workspace,8*mem),rax);
+			jcontent.val_rax=LIXO_REG;
 		}
 	}break;
 	case CMOV_MA_IG_W_W+P_UINT8:
@@ -1085,9 +1136,8 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 				if(jcontent.type=='u')a.cmovae(breg[mem],breg[val]);
 				else a.cmovge(breg[mem],breg[val]);
 			}else{
-				a.mov(al,ptr(workspace,8*val));
-				if(jcontent.type=='u')a.cmovae(breg[mem],al);
-				else a.cmovge(breg[mem],al);
+				if(jcontent.type=='u')a.cmovae(breg[mem],ptr(workspace,8*val));
+				else a.cmovge(breg[mem],ptr(workspace,8*val));
 			}
 		}else{
 			Label l=a.newLabel();
@@ -1096,8 +1146,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(val<8){
 				a.mov(ptr(workspace,8*mem),breg[val]);
 			}else{
-				a.mov(bl,ptr(workspace,8*val));
-				a.mov(ptr(workspace,8*mem),bl);
+				a.mov(al,ptr(workspace,8*val));
+				a.mov(ptr(workspace,8*mem),al);
+				jcontent.val_rax=LIXO_REG;
 			}
 			a.bind(l);
 		}
@@ -1111,9 +1162,8 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 				if(jcontent.type=='u')a.cmovae(wreg[mem],wreg[val]);
 				else a.cmovge(wreg[mem],wreg[val]);
 			}else{
-				a.mov(ax,ptr(workspace,8*val));
-				if(jcontent.type=='u')a.cmovae(wreg[mem],ax);
-				else a.cmovge(wreg[mem],ax);
+				if(jcontent.type=='u')a.cmovae(wreg[mem],ptr(workspace,8*val));
+				else a.cmovge(wreg[mem],ptr(workspace,8*val));
 			}
 		}else{
 			Label l=a.newLabel();
@@ -1122,8 +1172,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(val<8){
 				a.mov(ptr(workspace,8*mem),wreg[val]);
 			}else{
-				a.mov(bx,ptr(workspace,8*val));
-				a.mov(ptr(workspace,8*mem),bx);
+				a.mov(ax,ptr(workspace,8*val));
+				a.mov(ptr(workspace,8*mem),ax);
+				jcontent.val_rax=LIXO_REG;
 			}
 			a.bind(l);
 		}
@@ -1137,9 +1188,8 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 				if(jcontent.type=='u')a.cmovae(dreg[mem],dreg[val]);
 				else a.cmovge(dreg[mem],dreg[val]);
 			}else{
-				a.mov(eax,ptr(workspace,8*val));
-				if(jcontent.type=='u')a.cmovae(dreg[mem],eax);
-				else a.cmovge(dreg[mem],eax);
+				if(jcontent.type=='u')a.cmovae(dreg[mem],ptr(workspace,8*val));
+				else a.cmovge(dreg[mem],ptr(workspace,8*val));
 			}
 		}else{
 			Label l=a.newLabel();
@@ -1148,8 +1198,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(val<8){
 				a.mov(ptr(workspace,8*mem),dreg[val]);
 			}else{
-				a.mov(ebx,ptr(workspace,8*val));
-				a.mov(ptr(workspace,8*mem),ebx);
+				a.mov(eax,ptr(workspace,8*val));
+				a.mov(ptr(workspace,8*mem),eax);
+				jcontent.val_rax=LIXO_REG;
 			}
 			a.bind(l);
 		}
@@ -1161,15 +1212,16 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 		Label l=a.newLabel();
 		if(jcontent.type=='u')a.jb(l);
 		else a.jl(l);
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 		if(val<8){
 			a.mov(rax,qreg[val]);
 		}else{
 			a.mov(rax,qword_ptr(workspace,val*8));
 		}
-		a.and_(rax,0x0000FFFFFFFFFFFF);
+		a.and_(rax,rcx);
 	
 		if(mem<8){
-			a.and_(qreg[mem],0xFFFF000000000000);
+			a.andn(qreg[mem],rcx,qreg[mem]);
 			a.add(qreg[mem],rax);
 		}else{
 			a.mov(dword_ptr(workspace,mem*8),eax);
@@ -1177,6 +1229,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			a.mov(word_ptr(workspace,(mem*8)+4),ax);
 		}
 		a.bind(l);
+
+		jcontent.val_rax=LIXO_REG;
+		jcontent.val_rcx=0x0000FFFFFFFFFFFF;
 	}break;
 	case CMOV_MA_IG_W_W+P_UINT64:
 	case CMOV_MA_IG_W_W+P_INT64:{
@@ -1187,9 +1242,8 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 				if(jcontent.type=='u')a.cmovae(qreg[mem],qreg[val]);
 				else a.cmovge(qreg[mem],qreg[val]);
 			}else{
-				a.mov(rax,ptr(workspace,8*val));
-				if(jcontent.type=='u')a.cmovae(qreg[mem],rax);
-				else a.cmovge(qreg[mem],rax);
+				if(jcontent.type=='u')a.cmovae(qreg[mem],ptr(workspace,8*val));
+				else a.cmovge(qreg[mem],ptr(workspace,8*val));
 			}
 		}else{
 			Label l=a.newLabel();
@@ -1198,8 +1252,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std:
 			if(val<8){
 				a.mov(ptr(workspace,8*mem),qreg[val]);
 			}else{
-				a.mov(rbx,ptr(workspace,8*val));
-				a.mov(ptr(workspace,8*mem),rbx);
+				a.mov(rax,ptr(workspace,8*val));
+				a.mov(ptr(workspace,8*mem),rax);
+				jcontent.val_rax=LIXO_REG;
 			}
 			a.bind(l);
 		}
