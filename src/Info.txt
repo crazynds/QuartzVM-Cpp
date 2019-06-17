@@ -1,0 +1,100 @@
+Linguagem:
+
+Variaveis suportadas:
+	8 bits
+	16 bits - ponteiros para contextos são apenas de 16 bits
+	32 bits - ponteiros para o código serão usaedos apenas 32 bits
+	48 bits - ponteiros para a memoria serão usados apenas 48 bits
+	
+	Curiosidade:
+	48 bits permite dar ids para- 
+	1 rede social com
+	7.53 bilhões de usuarios que postam
+	10 posts por dia durante 
+	30 dias por mes durante
+	12 messes por ano durante
+	10 anos sem faltar id.
+	274.845.000.000.000 de posts ao final.
+		  7.530.000.000 de usuarios.
+		              1 de redes sociais.
+	281.474.976.710.656 de ids disponiveis.
+	  6.622.446.710.655 de ids que sobrariam ainda.
+	  
+	64 bits - ponteiros para memorias de outros contexto serão usados 16+48= 64 bits
+	128 bits (vai suportar um dia)
+	
+	*ao usar ponteiros, nunca existe numero negativo
+	*m[5] = 5º byte (não importa se a operação é de 8,16,32,48,64 ou 128 bits)
+
+Mapeamento de flags{
+
+	error flags:
+	RUNNING_ 1<<0
+	OVERLOAD_COD_ERROR_ 1<<1
+	OVERLOAD_MEM_ERROR_ 1<<2
+	MAX_LIMIT_STACK_ 1<<3
+	NO_OPCODE_COMMAND_ 1<<4
+	INVALID_OPCODE_JIT_ 1<<5
+	INVALID_JMP_JIT_ 1<<6
+	INTERNAL_ERROR_ 1<<7
+
+
+	compare flags:
+	IGUAL 1<<0
+	MAIOR 1<<1
+	MENOR 1<<2
+
+}
+
+O que vai poder fazer:
+-movimentação memoria on context (dados -> dados) (Read/Write);{
+	 mov m[14],5
+	 ; move o valor 5 para a posição da memoria 14
+	 mov m[14],m[5]
+	 ; move o valor da memoria 5 para a posição da memoria 14
+	 mov m[14],m[m[5]]
+	 ; move o valor da memoria de posição (valor dentro da posição 5) para a posição 14 da memoria
+}
+-implementação de ponteiros{
+	3 tipos de acesso a memoria que vai existir
+	imd  -> [imd] = [0x140]
+	wrk+imd -> [w0+imd] = [rax+10]
+	wkr+wrk<<imd+imd -> [w0+w1<<imd+imd] = [rax+rbx<<2+10]
+}
+-pular para funções e retornar{
+	
+	jmp func
+	ptr pax,m[0] ; pula essa execução
+	func:
+	----------------------------
+	
+	call func
+	ptr pax,m[0] 
+	jmp pulo
+	func:
+	mov m,1
+	ret
+	pulo:
+	
+	;chama o func (armazena o ponteiro do cod atual na pilha)
+	;executa o movimento
+	;retorna para o local onde foi chamado ultimo call
+	;define o ponteiro
+	;efetua o jmp indo para o local pulo
+	
+	--------------------------
+	mov m[0],func
+	jmp m[0]
+	func:
+	
+	;efetua o pulo em relação a posição de memoria
+}
+-contas básicas (+ - * / % ** ) (dado - dado) ou (dado - const(code));
+-contas binarias (& | ^ ~ ) (and, or, xor, not)
+
+
+
+nv 2:
+-implementação de outros contextos.
+-leitura memoria out context (dados->dados) (Read);
+

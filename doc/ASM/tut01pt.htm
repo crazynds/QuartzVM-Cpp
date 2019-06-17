@@ -1,0 +1,616 @@
+<html>
+
+<head>
+<title>Tutorial 1 - Adam Hyde</title>
+</head>
+
+<body bgcolor="#00FFFF">
+
+<p>&nbsp;</p>
+<div align="center"><center>
+
+<table border="5" width="50%">
+  <tr>
+    <td width="50%" align="center" bgcolor="#FF0000"><strong><big>Tutorial de Assembler de
+    Adam Hyde 1.0</big></strong><p><small>PARTE 1</small><br>
+    <small>Traduzido por Renato Nunes Bastos</small></td>
+  </tr>
+</table>
+</center></div>
+
+<p>Versão&nbsp;&nbsp; :&nbsp; 1.2<br>
+Data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; :&nbsp; 16-02-1996 / online by Renato 01-11-1998<br>
+Contato&nbsp; :&nbsp; blackcat@vale.faroc.com.au<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; http://www.faroc.com.au/~blackcat<br>
+;Renato&nbsp; :&nbsp;&nbsp;
+<a href="mailto:rnbastos@ig.com.br">rnbastos@ig.com.br</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="http://www.geocities.com/SiliconValley/Park/3174">http://www.geocities.com/SiliconValley/Park/3174</a></p>
+
+<hr>
+
+<p align="center"><a href="#oque">O que é Assembler?</a> | <a href="#porque">Por que
+usá-lo?</a> | <a href="#como">Como este tutorial apareceu?</a> | <a href="#reg">Registradores</a>
+| <a href="#8086">Instruções do 8086 </a></p>
+
+<hr>
+
+<p><big><strong><u><a name="oque">O que é Assembler?</a><br>
+</u></strong></big></p>
+
+<p>Assembler conseguiu ser uma das minhas linguagens favoritas para trabalhar. Não que
+seja uma linhguagem fácil no início, mas quando você fica familiar com ela, você
+entende o quão lógica ela é.</p>
+
+<p>Assembler é uma linguagem de baixo nível, que você pode usar em seus programas para
+acelerar tarefas lentas. Basicamente ela consite de sentenças que representam
+instruções em linguagem de máquina, e, como ela está próxima ao código de máquina,
+ela é rápida.</p>
+
+<p>Há muito tempo atrás, quando o 8086 apareceu (sim, existiam humanos na Terra nessa
+época :), programar&nbsp; não era uma tarefa fácil.&nbsp; Quando os primeiros
+computadores foram desenvolvidos, a programação tinha que ser feita em código de
+máquina, que _não_ era uma tarefa fácil, e assim o Assembler nasceu.<br>
+</p>
+
+<p><a name="porque"><u><big><strong>Por que usá-lo?</strong></big><br>
+</u></a></p>
+
+<p>Como eu disse antes, Assembler é veloz. Ele também permite a você falar com a
+máquina a nível de hardware, e lhe dá muito maior controle e flexibilidade sobre o PC.
+Uma das outras vantagens do Assembler é que ele permite a você impressionar seus amigos
+com páginas de código aparentemente incompreensível. Não está vendo eles aglomerados
+em volta de você e impressionados/rindo de sua nerdeza?&nbsp;&nbsp; :)<br>
+</p>
+
+<p><a name="como"><big><strong><u>Como este tutorial apareceu?<br>
+</u></strong></big></a></p>
+
+<p>Bem, Eu tinha uma dupla de amigos que queriam aprender Assembler para acelerar seus
+programas em Pascal, então eu dei-lhes alguns Tutoriais de Assembler que eu tinha. Como
+esses tutoriais tinham toda a informação que você precisaria, eles não foram escritos
+para os principiantes entenderem facilmente, então, decidi escrever meu próprio.</p>
+
+<p>Se você está usando este tutorial e o acha útil e informativo, então, por favor
+escreva para mim.<br>
+</p>
+
+<hr>
+
+<p><a name="reg"><u><big><strong>LIÇÃO 1 - Registradores</strong></big><br>
+</u></a></p>
+
+<p>Quando você está trabalhando com Assembler, você tem que usar registradores. Você
+pode imaginá-los como sendo vari&nbsp;veis já definidas para você. Os mais comuns
+estão listados abaixo: 
+
+<ul>
+  <li>AX&nbsp;&nbsp; - o acumulador.&nbsp; Compreende AH e AL, os bytes alto e baixo de AX.
+    &nbsp; Comumente usado em operações matemáticas e de E/S.</li>
+  <li>BX&nbsp;&nbsp; - a base.&nbsp; Compreende BH e BL.&nbsp; Comumente usado como uma base
+    ou registrador apontador.</li>
+  <li>CX&nbsp;&nbsp; - o contador.&nbsp; Compreende CH e CL.&nbsp; Usado frequentemente em
+    loops.</li>
+  <li>DX&nbsp;&nbsp; - o deslocamento, similar ao registrador de base.&nbsp; Compreende DH e
+    DL. Acho que você está pegando o espírito da coisa agora.</li>
+</ul>
+
+<p>Estes registradores são definidos como registradores de uso geral pois podemos
+realmente armazenar qualquer coisa que quisermos neles. São também registradores de 16
+bits, o que significa que podemos armazenar um inteiro positivo de 0 a 65535, ou um
+inteiro com sinal de -32768 to 32768.</p>
+
+<p>Incidentalmente, o assunto do alto e do baixo byte destes resgistradores causou muita
+confusão no passado, logo, tentarei dar alguma explicação aqui. AX tem um intervalo de
+0 até FFFFh. Isto significa que você tem um intervalo de 0 até FFh para AH e AL. &nbsp;
+(Se sabe pouco sobre hexadecimal, não se preocupe. O próximo tutorial vai falar sobre
+ele.)</p>
+
+<p>Agora, se nós tivermos que armazenar 0A4Ch em AX, AH conterá 0Ah, e AL conterá 4Ch.
+&nbsp; Sacou?&nbsp; Este é um conceito muito importante, e eu falarei sobre ele mais
+profundamente no próximo tutorial.<br>
+</p>
+
+<p>Os registradores de segmento:&nbsp; - ta da!</p>
+
+<p>Estes são outros registradores que nós não vamos ver nos primeiros tutorias, mas
+vamos vê-los em maior profundidade mais tarde. Eles são imensamente úteis, mas podem
+ser também perigosos. 
+
+<ul>
+  <li>CS - o segmento de código. O bloco de mem¢ria onde o código &#130; armazenado. NÃO
+    brinque com esse, a menos que saiba o que está fazendo.</li>
+  <li>DS - o segmento de dados. A área na memória onde os dados são armazenados. Durante
+    operações de bloco, quando grandes blocos de dados são movidos, este é o segmento a
+    que a CPU comumente se refere.</li>
+  <li>ES - o segmento extra. Apenas outro segmento de dados, mas este é comumente usado
+    quando se quer acessar o vídeo.</li>
+  <li>SS - não, não é o exército alemão. É o segmento de pilha, em que a CPU armazena
+    endere&#135;os de retorno de subrotinas. Tome cuidado com ele.&nbsp; :)</li>
+</ul>
+
+<p>Alguns outros que você vai comumente usar: 
+
+<ul>
+  <li>SI - o índice de fonte. Frequentemente usado para movimentações de blocos de
+    instruções. Este é um ponteiro que, com um segmento, geralmente DS, é usado pela CPU
+    para leitura.</li>
+  <li>DI - o índice de destino. Novamente, você o usará muito. Um outro ponteiro que, com
+    um segmento, geralmente ES, é usado para escrita pela CPU.</li>
+  <li>BP - o apontador da base, usado em conjunto com o segmento de pilha. Nós não vamos
+    usá-lo muito.</li>
+  <li>SP - o apontador da pilha, comumente usado com o segmento de pilha. NÃO brinque com
+    isso de jeito nenhum.&nbsp; :|</li>
+</ul>
+
+<p>Por enquanto você deveria saber o que são registradores. Há outros registradores
+também, e coisas conhecidas como flags, mas nós não iremos a eles agora.<br>
+</p>
+
+<hr>
+
+<p>COISAS PARA FAZER:</p>
+
+<p>1) Aprender os vários registradores de cor.<br>
+2) Arrumar uma calculadora que suporte hexadecimal - ou pelo menos uma<br>
+&nbsp;&nbsp;&nbsp; tabela ASCII. Isso cobre 0 - 255, ou, de 0h a FFh.</p>
+
+<hr>
+
+<p><a name="8086"><big><strong><u>LIÇÃO 2 - O conjunto de instruções do 8086:</u><br>
+</strong></big></a></p>
+
+<p>Okay, então você já aprendeu sobre registradores, mas, como usá-los, e como se
+codifica em Assembler? Bem, primeiro você precisa de algumas instruções. As seguintes
+instruções podem ser usadas em todas as CPU's do 8086 para cima. (by Renato - da mesma
+família 80x86, né? Não tente fazer num PowerPC que não vai rodar.) 
+
+<ul>
+  <li>MOV &lt;dest&gt;, &lt;valor&gt; - MOVE. Esta instrução permite MOVER um valor para uma
+    posição na mem¢ria.</li>
+</ul>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Ex.: MOV AX, 13h</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Isso deveria mover 13h (19 em decimal) para o<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+registrador AX. Logo, se AX valia antes 0, ele<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+agora seria 13h.</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ISSO APENAS MOVE UM VALOR PARA UM REGISTRADOR,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+NÃO FAZ NADA MAIS.</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Ex.: (Em Pascal) AX := $13; 
+
+<ul>
+  <li>INT &lt;número&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - INTERRUPÇÃO. Esta
+    instrução gera uma interupção.<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    Você pode pensar nisso como sendo quase uma<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    procedure.</li>
+</ul>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Ex.: INT 10h</p>
+
+<blockquote>
+  <blockquote>
+    <blockquote>
+      <p>Geraria a interrupção 10h (16 em decimal). Agora, o que isso faria depende do
+      conteúdo do registrador AH, entre outras coisas. Por exemplo, se AX = 13h e a
+      interrupção 10h foi gerada, o vídeo seria colocado no modo 320x200x256.</p>
+    </blockquote>
+  </blockquote>
+</blockquote>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Mais precisamente:</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+AH seria igual a 00&nbsp; - seleciona a subfunção do<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+modo, e<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+AL seria igual a 13h - modo gráfico 320x200x256.</p>
+
+<blockquote>
+  <blockquote>
+    <blockquote>
+      <p>Contudo, se AH = 2h, e a interrupção 16h foi gerada, isso instruiria a CPU para
+      checar se alguma tecla pressionada está no buffer do teclado.</p>
+    </blockquote>
+  </blockquote>
+</blockquote>
+
+<blockquote>
+  <blockquote>
+    <blockquote>
+      <p>Se AH = 2h, e BH = 0h e a interrupção 10h foi gerada, então a CPU moveria o cursor
+      para a posição X em DL e posição Y em DH.</p>
+    </blockquote>
+  </blockquote>
+</blockquote>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+NÃO SE PREOCUPE COM ISSO POR ENQUANTO! NÓS<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+FALAREMOS NISSO MAIS TARDE, COM MAIS DETALHES. 
+
+<ul>
+  <li>ADD &lt;dest&gt; &lt;valor&gt;&nbsp; - ADICIONA. Esta instrução soma um número ao
+    valor<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    armazenado em dest.</li>
+</ul>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Ex: MOV AX, 0h&nbsp; ; AX agora é igual a 0h<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ADD AX, 5h&nbsp; ; AX agora é igual a 5h<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ADD AX, 10h ; AX agora é igual a 15h</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Bem simples, não? 
+
+<ul>
+  <li>SUB &lt;dest&gt; &lt;valor&gt;&nbsp; - SUBTRAI. Acho que dá pra você adivinhar o que
+    isso<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    faz.</li>
+</ul>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Ex: MOV AX, 13h&nbsp; ; AX agora é igual a 13h&nbsp; (19 dec)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+SUB AX, 5h&nbsp;&nbsp; ; AX agora é igual a 0Eh&nbsp; (14 dec) 
+
+<ul>
+  <li>DEC &lt;registrador&gt;&nbsp;&nbsp; - DECREMENTA algo.</li>
+</ul>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Ex: MOV AX, 13h&nbsp; ; AX agora é igual a 13h<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+DEC AX&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; AX agora é igual a 12h 
+
+<ul>
+  <li>INC &lt;registrador&gt;&nbsp;&nbsp; - INCREMENTA algo.</li>
+</ul>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Ex: MOV AX, 13h&nbsp; ; Adivinha...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+INC AX&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; AX = AX + 1 
+
+<ul>
+  <li>JMP &lt;posição&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - PULA para uma posição.</li>
+</ul>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+EG: JMP 020Ah&nbsp;&nbsp;&nbsp; ; Pula para a instrução em 020Ah<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+JMP @MyLabel ; Pula para @MyLabel.</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+NÃO SE PREOCUPE SE ISTO É UM POUCO CONFUSO - VAI <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+FICAR PIOR! HÁ OUTRAS 28 INSTRUÇÕES JUMP PARA<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+APRENDER, TALVEZ MAIS. FALAREMOS NELAS MAIS TARDE. 
+
+<ul>
+  <li>CALL &lt;procedimento&gt; - CHAMA uma subfunção.</li>
+</ul>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+EG: Procedure MyProc;</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Begin &nbsp;&nbsp; { MyProc }<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+{ ... }<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+End; &nbsp;&nbsp;&nbsp; { MyProc }</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Begin &nbsp;&nbsp; { Main }<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Asm<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+CALL MyProc&nbsp;&nbsp; ; Adivinha o que isso faz!<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+End;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+End.</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Ou: CALL F6E0h&nbsp; ; Chama subfunção em F6E0h 
+
+<ul>
+  <li>LOOP &lt;rótulo/label&gt; - Faz LOOPS (repetição) durante um certo tempo.</li>
+</ul>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+EG: MOV CX, 10h&nbsp; ; Isto é o porque de CX ser<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; chamado de&nbsp; registro CONTADOR.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; 10h = 16</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+@MyLabel:</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; alguma coisa<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; mais coisa</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+LOOP @MyLabel&nbsp;&nbsp; ; At&#130; que CX = 0<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; Note: CX é decrementado<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; a cada vez. Não decremente-o<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; você mesmo (DEC CX).</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; ISSO DEVERIA SE REPETIR 16 vezes - i.e., 10<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+em hexadecimal. 
+
+<ul>
+  <li>LODSB
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -
+    Carrega um byte<br>
+    LODSW &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    - Carrega uma word<br>
+    STOSB &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    - Armazena um byte<br>
+    STOSW &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    - Armazena uma word</li>
+</ul>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp; Estas instruções são usadas para pôr ou conseguir algo
+numa posição na memória.&nbsp; O registrador DS:SI, (lembra que nós falamos sobre isso
+antes, sobre SI ser o índice de fonte?),&nbsp; aponta para a localização de onde
+queremos obter os dados, e DS:DI aponta para onde colocaremos informações.</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp; É claro, não somos obrigados a usar DS - poderia ser ES por
+exemplo.<br>
+&nbsp;&nbsp;&nbsp;&nbsp; Meu procedimento PutPixel colocará um byte em ES:DI.</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp; De qualquer modo, imagine que temos a seguinte configuração
+na memória:</p>
+<div align="center"><center>
+
+<table border="1" width="90%">
+  <tr>
+    <td width="40%" bgcolor="#FF0000">Posição de Memória</td>
+    <td width="12%" bgcolor="#FF0000"><big>06</big></td>
+    <td width="12%" bgcolor="#FF0000"><big>07</big></td>
+    <td width="12%" bgcolor="#FF0000"><big>08</big></td>
+    <td width="13%" bgcolor="#FF0000"><big>09</big></td>
+    <td width="13%" bgcolor="#FF0000"><big>10</big></td>
+    <td width="13%" bgcolor="#FF0000"><big>11</big></td>
+    <td width="13%" bgcolor="#FF0000"><big>12</big></td>
+  </tr>
+  <tr>
+    <td width="40%" bgcolor="#FFFF00">Valor</td>
+    <td width="12%" bgcolor="#FFFF00"><big>50</big></td>
+    <td width="12%" bgcolor="#FFFF00"><big>32</big></td>
+    <td width="12%" bgcolor="#FFFF00"><big>38</big></td>
+    <td width="13%" bgcolor="#FFFF00"><big>03</big></td>
+    <td width="13%" bgcolor="#FFFF00"><big>23</big></td>
+    <td width="13%" bgcolor="#FFFF00"><big>01</big></td>
+    <td width="13%" bgcolor="#FFFF00"><big>12</big></td>
+  </tr>
+</table>
+</center></div>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp; Quando nós usamos LODSB ou STOSB, ele retorna ou pega um
+número de AL.<br>
+&nbsp;&nbsp;&nbsp;&nbsp; Assim, se DS:SI apontava para 07 e executássemos uma instrução
+LODSB, AL seria agora igual a 32.</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp; Agora, se nós apontássemos DS:DI para 11, colocando, diria,
+50 no registrador AL, e executasse STOSB, então teríamos o seguinte resultado:</p>
+<div align="center"><center>
+
+<table border="1" width="90%">
+  <tr>
+    <td width="40%" bgcolor="#FF0000">Posição de Memória</td>
+    <td width="12%" bgcolor="#FF0000"><big>06</big></td>
+    <td width="12%" bgcolor="#FF0000"><big>07</big></td>
+    <td width="12%" bgcolor="#FF0000"><big>08</big></td>
+    <td width="13%" bgcolor="#FF0000"><big>09</big></td>
+    <td width="13%" bgcolor="#FF0000"><big>10</big></td>
+    <td width="13%" bgcolor="#FF0000"><big>11</big></td>
+    <td width="13%" bgcolor="#FF0000"><big>12</big></td>
+  </tr>
+  <tr>
+    <td width="40%" bgcolor="#FFFF00">Valor</td>
+    <td width="12%" bgcolor="#FFFF00"><big>50</big></td>
+    <td width="12%" bgcolor="#FFFF00"><big>32</big></td>
+    <td width="12%" bgcolor="#FFFF00"><big>38</big></td>
+    <td width="13%" bgcolor="#FFFF00"><big>03</big></td>
+    <td width="13%" bgcolor="#FFFF00"><big>23</big></td>
+    <td width="13%" bgcolor="#FFFF00"><big>50</big></td>
+    <td width="13%" bgcolor="#FFFF00"><big>12</big></td>
+  </tr>
+</table>
+</center></div>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp; OBS.:&nbsp; Quando usamos LODSB/STOSB, usamos AL. Isto porque
+estaremos mexendo com um número de 8 bits (um byte), apenas. Podemos armazenar um número
+de 8 bits em AL, AH, ou AX, mas não podemos armazenar um número de 16 bits em AH ou AL
+porque eles são REGISTRADORES DE 8 BITS.</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Como resultado,
+quando usarmos LODSW ou STOSW, nós devemos usar AX e não AL, já que estaremos
+pegando/colocando um número de 16 bits.<br>
+
+<ul>
+  <li>MOVSB - Move um byte<br>
+    MOVSW - Move uma word</li>
+</ul>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp; Como exemplo vamos pegar um byte de DS:SI e mandá-lo para
+ES:DI.</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp; Em DS:SI:</p>
+<div align="center"><center>
+
+<table border="1" width="90%">
+  <tr>
+    <td width="40%" bgcolor="#FF0000">Posição de Memória</td>
+    <td width="12%" bgcolor="#FF0000"><big>06</big></td>
+    <td width="12%" bgcolor="#FF0000"><big>07</big></td>
+    <td width="12%" bgcolor="#FF0000"><big>08</big></td>
+    <td width="13%" bgcolor="#FF0000"><big>09</big></td>
+    <td width="13%" bgcolor="#FF0000"><big>10</big></td>
+    <td width="13%" bgcolor="#FF0000"><big>11</big></td>
+    <td width="13%" bgcolor="#FF0000"><big>12</big></td>
+  </tr>
+  <tr>
+    <td width="40%" bgcolor="#FFFF00">Valor</td>
+    <td width="12%" bgcolor="#FFFF00"><big>50</big></td>
+    <td width="12%" bgcolor="#FFFF00"><big>32</big></td>
+    <td width="12%" bgcolor="#FFFF00"><big>38</big></td>
+    <td width="13%" bgcolor="#FFFF00"><big>03</big></td>
+    <td width="13%" bgcolor="#FFFF00"><big>23</big></td>
+    <td width="13%" bgcolor="#FFFF00"><big>50</big></td>
+    <td width="13%" bgcolor="#FFFF00"><big>12</big></td>
+  </tr>
+</table>
+</center></div>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp; Em ES:DI:</p>
+<div align="center"><center>
+
+<table border="1" width="90%">
+  <tr>
+    <td width="40%" bgcolor="#FF0000">Posição de Memória</td>
+    <td width="12%" bgcolor="#FF0000"><big>06</big></td>
+    <td width="12%" bgcolor="#FF0000"><big>07</big></td>
+    <td width="12%" bgcolor="#FF0000"><big>08</big></td>
+    <td width="13%" bgcolor="#FF0000"><big>09</big></td>
+    <td width="13%" bgcolor="#FF0000"><big>10</big></td>
+    <td width="13%" bgcolor="#FF0000"><big>11</big></td>
+    <td width="13%" bgcolor="#FF0000"><big>12</big></td>
+  </tr>
+  <tr>
+    <td width="40%" bgcolor="#FFFF00">Valor</td>
+    <td width="12%" bgcolor="#FFFF00"><big>10</big></td>
+    <td width="12%" bgcolor="#FFFF00"><big>11</big></td>
+    <td width="12%" bgcolor="#FFFF00"><big>20</big></td>
+    <td width="13%" bgcolor="#FFFF00"><big>02</big></td>
+    <td width="13%" bgcolor="#FFFF00"><big>67</big></td>
+    <td width="13%" bgcolor="#FFFF00"><big>00</big></td>
+    <td width="13%" bgcolor="#FFFF00"><big>12</big></td>
+  </tr>
+</table>
+</center></div>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp; Se apontarmos DS:SI para a posição 07, apontarmos ES:SI para
+a posição 11 e executarmos MOVSB, o resultado em ES:DI pareceria com:</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp; Em ES:DI:</p>
+<div align="center"><center>
+
+<table border="1" width="90%">
+  <tr>
+    <td width="40%" bgcolor="#FF0000">Posição de Memória</td>
+    <td width="12%" bgcolor="#FF0000"><big>06</big></td>
+    <td width="12%" bgcolor="#FF0000"><big>07</big></td>
+    <td width="12%" bgcolor="#FF0000"><big>08</big></td>
+    <td width="13%" bgcolor="#FF0000"><big>09</big></td>
+    <td width="13%" bgcolor="#FF0000"><big>10</big></td>
+    <td width="13%" bgcolor="#FF0000"><big>11</big></td>
+    <td width="13%" bgcolor="#FF0000"><big>12</big></td>
+  </tr>
+  <tr>
+    <td width="40%" bgcolor="#FFFF00">Valor</td>
+    <td width="12%" bgcolor="#FFFF00"><big>10</big></td>
+    <td width="12%" bgcolor="#FFFF00"><big>11</big></td>
+    <td width="12%" bgcolor="#FFFF00"><big>20</big></td>
+    <td width="13%" bgcolor="#FFFF00"><big>02</big></td>
+    <td width="13%" bgcolor="#FFFF00"><big>67</big></td>
+    <td width="13%" bgcolor="#FFFF00"><big>32</big></td>
+    <td width="13%" bgcolor="#FFFF00"><big>12</big></td>
+  </tr>
+</table>
+</center></div>
+
+<p align="center">&nbsp;&nbsp;&nbsp;&nbsp; ESPERO QUE VOCÊ PEGUE A IDÉIA GERAL. CONTUDO,
+É CLARO, NÃO É TÃO SIMPLES.<br>
+&nbsp;&nbsp;&nbsp;&nbsp; POSIÇÕES DE MEMÓRIA NÃO SÃO ARRUMADAS EM FORMA DE ARRAY,
+EMBORA EU<br>
+&nbsp;&nbsp;&nbsp;&nbsp; DESEJASSE MUITO QUE FOSSEM. QUANDO FOR MOVER/PEGAR/COLOCAR, VOCE
+ESTARÁ<br>
+&nbsp;&nbsp;&nbsp;&nbsp; MEXENDO COM UMA POSIÇÃO TAL COMO: 100:102H. AINDA ASSIM, VOCÊ
+DEVERIA<br>
+&nbsp;&nbsp;&nbsp;&nbsp; PEGAR A IDÉIA.</p>
+
+<ul>
+  <li>REP - REPETE o número de vezes especificado no registrador CX.<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Um REP na frente de um
+    MOVSB/LODSB/STOSB causaria a repetição da instrução. Logo:</li>
+</ul>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Se CX = 5, e<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; se ES:DI apontava para
+1000:1000h,</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; então REP STOSB
+armazenaria o que estava no&nbsp; registrador AL na posição 1000:1000h 5 vezes.</p>
+
+<p>COISAS A FAZER:</p>
+
+<p>1) Memorizar todas as instruções acima - não é tão difícil assim e não há
+tantas lá.</p>
+
+<p>2) Tenha certeza que você entendeu a teoria por trás delas.<br>
+</p>
+
+<hr>
+
+<p align="center"><u>NA PRÓXIMA SEMANA</u><br>
+</p>
+
+<ul>
+  <li>Hexadecimal e o que é isso.</li>
+  <li>Segmentos e offsets (deslocamentos) - nós falamos nisso nesse tutorial.</li>
+  <li>Mais algumas instruções.</li>
+  <li>Alguns programas de exemplo, e código que você pode usar em seus programas.</li>
+</ul>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp; Talvez um PutPixel, ClrScr, algo que eu ache útil.</p>
+
+<p>Se você deseja ver um tópico discutido em um tutorial futuro, então escreva-me, e eu
+vou ver o que eu posso fazer.</p>
+
+<hr>
+
+<p>Não perca!!!&nbsp; Baixe o <a href="tut02pt.htm">tutorial da próxima semana</a> na
+minha home-page: 
+
+<ul>
+  <li>http://www.faroc.com.au/~blackcat</li>
+  <li><a href="http://www.geocities.com/SiliconValley/Park/3174">http://www.geocities.com/SiliconValley/Park/3174<br>
+    </a></li>
+</ul>
+
+<p>- Adam.&nbsp;&nbsp; &quot; Essa noite não, querida - eu tenho um modem. &quot;<br>
+- Renato Nunes Bastos</p>
+</body>
+</html>

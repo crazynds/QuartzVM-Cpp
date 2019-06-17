@@ -1,0 +1,1020 @@
+<html>
+
+<head>
+<title>Tutorial 9 - Adam Hyde</title>
+</head>
+
+<body bgcolor="#00FFFF">
+<div align="center"><center>
+
+<table border="5" width="50%">
+  <tr>
+    <td width="50%" align="center" bgcolor="#FF0000"><strong><big>Tutorial de Assembler de
+    Adam Hyde 1.0</big></strong><p><small>PARTE 9</small><br>
+    <small>Traduzido por Renato Nunes Bastos</small></td>
+  </tr>
+</table>
+</center></div>
+
+<p><br>
+Versão&nbsp;&nbsp; :&nbsp; 1.2<br>
+Data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : 19-12-1996 / online by Renato 03-11-1998<br>
+Contato&nbsp; :&nbsp; blackcat@vale.faroc.com.au<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+http://www.faroc.com.au/~blackcat<br>
+;Renato&nbsp; :&nbsp;
+<a href="mailto:rnbastos@ig.com.br">rnbastos@ig.com.br</a>&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="http://www.geocities.com/SiliconValley/Park/3174">http://www.geocities.com/SiliconValley/Park/3174</a></p>
+
+<hr>
+
+<p align="center"><a href="#es">E/S de Arquivos</a> | <a href="#asmc">Chamando o ASM no
+C++</a> | <a href="#macros">Introdução às Macros</a> | <a href="#demo">O Demo</a></p>
+
+<hr>
+
+<p>Nota: O Tutorial de Assembler de Adam é PROTEGIDO POR DIREITOS AUTORAIS, e todos os
+direitos são reservadas pelo autor. Você pode redistribuir só o arquivo ORIGINAL
+livremente, e os tutoriais não deveriam ser editados de qualquer forma. </p>
+
+<p>(by Renato - antes que alguém me pergunte, desde o início, antes de traduzir a<br>
+1ª palavra do Tutorial 1, eu já havia pedido ao Adam a permissão para fazer isso,<br>
+OK? Suponho que eu possa traduzir, já que ele deixou - embora, como ele mesmo disse,<br>
+ele não entenda nada de Português, ou Espanhol -- tinha alguém traduzindo para <br>
+Espanhol.)</p>
+
+<hr>
+
+<p>Bem, este tutorial realmente chega atrasado e eu me sinto particularmente culpado sobre
+isto. Todavia, eu ainda incluí outro <a href="tut9demo.zip">programa demonstrativo</a>
+com esta edição de forma que isto compensa um pouco. </p>
+
+<p>Apenas uma palavrinha sobre o último programa de demonstração - FIRE!. Depois de
+obter uma versão mais recente do TASM, eu descobri aquele FIRE! não gosta de compilar
+tudo direitinho, assim tenha certeza de que você tem a versão <br>
+mais recente do Tutorial Oito (V 1.4) com o bugfix (by Renato - hmmmm, não sei que erro
+é esse, e não tenho essa versão 1.4 - o cara sumiu - se alguém souber de algum erro me
+diz que vou ver se sei consertar). Você sempre pode obter diretamente todas as revisões
+mais novas dos tutoriais de ftp.faroc.com.au no diretório
+/pub/blackcat/programming/tutorials, e isso é altamente recomendado. </p>
+
+<p>De qualquer maneira, vamos lá com: <br>
+</p>
+
+<hr>
+<div align="center"><center>
+
+<table border="5" width="50%">
+  <tr>
+    <td width="50%" align="center" bgcolor="#FF0000"><p align="center"><a name="es"><strong>E/S
+    DE ARQUIVOS</strong></a></td>
+  </tr>
+</table>
+</center></div>
+
+<p>Cedo ou tarde, você vai querer mexer com arquivos. Tudo que você tem que ter em mente
+aqui é que tudo é BASEADO EM HANDLES. Aqueles de vocês que usaram ou experimentaram com
+XMS perceberão o que eu quero dizer com handles exatamente, mas se você não, então
+aqui vai um resumo rápido: </p>
+
+<p>&nbsp; * Você abre/cria um arquivo. <br>
+&nbsp; * Você recebe um inteiro de 16 bits sem sinal para referenciá-lo. </p>
+
+<p>Qual a dificuldade nisso? <br>
+</p>
+
+<p>Nota: Antigamente, antes do DOS 2, você tinha que usar Blocos de Controle de Arquivo
+(FCB) para referenciar seus arquivos. (Você provavelmente já viu FCBS=xxxx em arquivos
+de CONFIG.SYS, e isso é para ajudar programas que foram projetados para o XT.)&nbsp; Nós
+podemos esquecer agora tudo sobre FCBs, já eles estão quase obsoletos. </p>
+
+<hr>
+
+<p>&nbsp; Abrindo UM Arquivo: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(Interrupção 21H) </p>
+
+<p>&nbsp;&nbsp; AH = 3DH <br>
+&nbsp;&nbsp; AL = tipo de operação: </p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0 = operação só
+de leitura; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 = operação só de
+escrita; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 = operação de
+leitura/escrita. </p>
+
+<p>&nbsp;&nbsp; DS:DX = nome do arquivo<br>
+</p>
+
+<p>&nbsp; Retorna: </p>
+
+<p>&nbsp;&nbsp; Se foi realizada com sucesso, o flag de carry é zerado, e o handle de
+arquivo é returnado em AX. Porém, se algo saiu errado, o flag de carry é setado em um,
+&nbsp; e o código de erro volta em AX. Para uma lista de todo os códigos de erro,<br>
+veja a seguinte tabela mais abaixo. <br>
+</p>
+
+<p>Agora, depois de tudo isso, um exemplo: <br>
+</p>
+
+<p>&nbsp;&nbsp; .MODEL SMALL<br>
+&nbsp;&nbsp; .STACK 200H<br>
+&nbsp;&nbsp; .DATA</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FileName&nbsp;&nbsp; DB &quot;EXAMPLE.TXT$&quot;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Error&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DB &quot;Uh oh$&quot;</p>
+
+<p>&nbsp;&nbsp; .CODE</p>
+
+<p>&nbsp;&nbsp; START:</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MOV&nbsp;&nbsp; AX, @DATA
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ;
+Aponta AX para o segmento de dados<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MOV&nbsp;&nbsp; DS, AX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; AX --&gt; DX<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MOV&nbsp;&nbsp; DX, OFFSET FileName
+&nbsp;&nbsp;&nbsp;&nbsp; ; Põe o offset do arquivo a abrir em DX<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MOV&nbsp;&nbsp; AH, 3DH
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; Abre<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MOV&nbsp;&nbsp; AL, 00H
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; só para leitura<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; INT&nbsp;&nbsp; 21H</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; JC&nbsp;&nbsp;&nbsp; Problem
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; Aconteceu algo de errado?</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Aqui você deveria ter o handle AX, e fazer alguma
+coisa</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; JMP&nbsp;&nbsp; Done
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; Nada</p>
+
+<p>&nbsp;&nbsp; Problem:</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MOV&nbsp;&nbsp; DX, OFFSET Error
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Uh oh<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MOV&nbsp;&nbsp; AH, 09H<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; INT&nbsp;&nbsp; 21H</p>
+
+<p>&nbsp;&nbsp; Done:</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MOV&nbsp;&nbsp; AX, 4C00H
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ;
+Pula de volta pro DOS - fechando qualquer <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; INT&nbsp;&nbsp; 21H
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; arquivo aberto. Relaxado, mas nós ainda não sabemos <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; como fechar arquivos.<br>
+&nbsp;&nbsp; END START</p>
+
+<hr>
+
+<p>OK... simples bastante, espero. Agora, suponha que queiramos criar um arquivo novo? É
+apenas uma outra subfunção simples da interrupção 21H.&nbsp; É assim que se faz:<br>
+</p>
+
+<p>&nbsp; Criando UM Arquivo Novo:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Interrupção 21H) </p>
+
+<p>&nbsp;&nbsp; AH = 3CH <br>
+&nbsp;&nbsp; CX = tipo de arquivo: </p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0 = arquivo normal; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 = só de leitura; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 = arquivo escondido; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4 = arquivo de sistema;
+</p>
+
+<p>&nbsp;&nbsp; DS:DX = nome do arquivo <br>
+</p>
+
+<p>&nbsp; Retorna: </p>
+
+<p>&nbsp;&nbsp; Como antes, se realizar com sucesso, o flag de carry é zerado, e o handle
+do arquivo é retornado em AX. Note que você deve tomar cuidado com arquivos existentes
+antes de criar um arquivo novo com mesmo nome. O DOS não conferirá se um arquivo do
+mesmo nome já existe, e escreverá por cima do velho.</p>
+
+<p>&nbsp;&nbsp; Antes de criar um arquivo novo - tente abrir o arquivo primeiro. Se <br>
+&nbsp;&nbsp; você obtiver o código de erro 2 em AX, (arquivo não existe), então
+prossiga e <br>
+&nbsp;&nbsp; crie o arquivo novo. Se você não conseguiu o erro 2, você estará
+escrevendo <br>
+&nbsp;&nbsp; por cima de um arquivo já existente! </p>
+
+<hr>
+
+<p>Como você deveria saber de experiências com linguagens de alto-nível, você tem que
+fechar seus arquivos antes de terminar seu programa. (Na verdade, a função 4CH fecha
+todos os arquivos abertos de qualquer maneira, mas isso é um modo&nbsp; relaxado de fazer
+as coisas.) Para fechar um arquivo aberto, você deveria fazer isto: <br>
+</p>
+
+<p>&nbsp; Fechando UM Arquivo:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Interrupção 21H) </p>
+
+<p>&nbsp;&nbsp; AH = 3EH <br>
+&nbsp;&nbsp; BX = handle de arquivo <br>
+</p>
+
+<p>&nbsp; Retorna: </p>
+
+<p>&nbsp;&nbsp; De novo, qualquer erro é refletido no flag de carry e AX.</p>
+
+<hr>
+
+<p>Finalmente, códigos de erro. Apenas checando o CF para ver se qualquer coisa saiu
+errado, nos deixará saber certamente se algo está faltando, mas nós realmente gostamos
+de mais detalhes. Examinar o AX depois de um erro ser descoberto é o caminho a seguir, e
+AX poderia conter qualquer um dos códigos seguintes: <br>
+</p>
+<div align="center"><center>
+
+<table border="4" width="47%">
+  <tr>
+    <td width="50%" bgcolor="#FF0000">Código</td>
+    <td width="50%" bgcolor="#FF0000">Explicação</td>
+  </tr>
+  <tr>
+    <td width="50%" bgcolor="#FFFF00">00H</td>
+    <td width="50%" bgcolor="#FFFF00">erro Desconhecido </td>
+  </tr>
+  <tr>
+    <td width="50%" bgcolor="#FFFF00">01H</td>
+    <td width="50%" bgcolor="#FFFF00">número de função inválido</td>
+  </tr>
+  <tr>
+    <td width="50%" bgcolor="#FFFF00">02H</td>
+    <td width="50%" bgcolor="#FFFF00">Arquivo não achado</td>
+  </tr>
+  <tr>
+    <td width="50%" bgcolor="#FFFF00">03H</td>
+    <td width="50%" bgcolor="#FFFF00">Caminho não achado</td>
+  </tr>
+  <tr>
+    <td width="50%" bgcolor="#FFFF00">04H</td>
+    <td width="50%" bgcolor="#FFFF00">muitos arquivos abertos</td>
+  </tr>
+  <tr>
+    <td width="50%" bgcolor="#FFFF00">05H</td>
+    <td width="50%" bgcolor="#FFFF00">Acesso negado</td>
+  </tr>
+  <tr>
+    <td width="50%" bgcolor="#FFFF00">06H</td>
+    <td width="50%" bgcolor="#FFFF00">handle inválido</td>
+  </tr>
+  <tr>
+    <td width="50%" bgcolor="#FFFF00">07H </td>
+    <td width="50%" bgcolor="#FFFF00">Blocos de controle destruídos</td>
+  </tr>
+  <tr>
+    <td width="50%" bgcolor="#FFFF00">08H</td>
+    <td width="50%" bgcolor="#FFFF00">Falta de memória</td>
+  </tr>
+  <tr>
+    <td width="50%" bgcolor="#FFFF00">09H</td>
+    <td width="50%" bgcolor="#FFFF00">endereço de bloco de controle Ruim</td>
+  </tr>
+  <tr>
+    <td width="50%" bgcolor="#FFFF00">0AH</td>
+    <td width="50%" bgcolor="#FFFF00">ambiente inválido</td>
+  </tr>
+  <tr>
+    <td width="50%" bgcolor="#FFFF00">0BH</td>
+    <td width="50%" bgcolor="#FFFF00">formato inválido</td>
+  </tr>
+  <tr>
+    <td width="50%" bgcolor="#FFFF00">0CH</td>
+    <td width="50%" bgcolor="#FFFF00">código de acesso inválido</td>
+  </tr>
+  <tr>
+    <td width="50%" bgcolor="#FFFF00">0DH</td>
+    <td width="50%" bgcolor="#FFFF00">dados inválidos</td>
+  </tr>
+  <tr>
+    <td width="50%" bgcolor="#FFFF00">0EH</td>
+    <td width="50%" bgcolor="#FFFF00">erro desconhecido</td>
+  </tr>
+  <tr>
+    <td width="50%" bgcolor="#FFFF00">0FH</td>
+    <td width="50%" bgcolor="#FFFF00">drive inválido</td>
+  </tr>
+  <tr>
+    <td width="50%" bgcolor="#FFFF00">10H</td>
+    <td width="50%" bgcolor="#FFFF00">não pode remover diretório atual</td>
+  </tr>
+  <tr>
+    <td width="50%" bgcolor="#FFFF00">11H</td>
+    <td width="50%" bgcolor="#FFFF00">Dispositivo não é o mesmo</td>
+  </tr>
+  <tr>
+    <td width="50%" bgcolor="#FFFF00">12H</td>
+    <td width="50%" bgcolor="#FFFF00">mais nenhum arquivo disponível</td>
+  </tr>
+  <tr>
+    <td width="50%" bgcolor="#FFFF00">13H</td>
+    <td width="50%" bgcolor="#FFFF00">Disco protegido contra escrita</td>
+  </tr>
+  <tr>
+    <td width="50%" bgcolor="#FFFF00">14H</td>
+    <td width="50%" bgcolor="#FFFF00">unidade Ruim </td>
+  </tr>
+  <tr>
+    <td width="50%" bgcolor="#FFFF00">15H</td>
+    <td width="50%" bgcolor="#FFFF00">Drive não pronto</td>
+  </tr>
+  <tr>
+    <td width="50%" bgcolor="#FFFF00">16H</td>
+    <td width="50%" bgcolor="#FFFF00">comando Desconhecido </td>
+  </tr>
+  <tr>
+    <td width="50%" bgcolor="#FFFF00">17H</td>
+    <td width="50%" bgcolor="#FFFF00">erro de CRC</td>
+  </tr>
+  <tr>
+    <td width="50%" bgcolor="#FFFF00">18H</td>
+    <td width="50%" bgcolor="#FFFF00">tamanho de estrutura ruim</td>
+  </tr>
+  <tr>
+    <td width="50%" bgcolor="#FFFF00">19H</td>
+    <td width="50%" bgcolor="#FFFF00">erro de procura</td>
+  </tr>
+  <tr>
+    <td width="50%" bgcolor="#FFFF00">1AH</td>
+    <td width="50%" bgcolor="#FFFF00">mídia inválida</td>
+  </tr>
+  <tr>
+    <td width="50%" bgcolor="#FFFF00">1BH</td>
+    <td width="50%" bgcolor="#FFFF00">Setor não achado</td>
+  </tr>
+  <tr>
+    <td width="50%" bgcolor="#FFFF00">1CH</td>
+    <td width="50%" bgcolor="#FFFF00">Impressora desligada **</td>
+  </tr>
+  <tr>
+    <td width="50%" bgcolor="#FFFF00">1DH</td>
+    <td width="50%" bgcolor="#FFFF00">erro de escrita</td>
+  </tr>
+  <tr>
+    <td width="50%" bgcolor="#FFFF00">1EH</td>
+    <td width="50%" bgcolor="#FFFF00">erro de leitura</td>
+  </tr>
+  <tr>
+    <td width="50%" bgcolor="#FFFF00">1FH</td>
+    <td width="50%" bgcolor="#FFFF00">falha geral</td>
+  </tr>
+</table>
+</center></div>
+
+<p>&nbsp; ** Eu sei, eu não cheguei lá ainda. Eu acho que isso está lá porque o DOS
+trata tudo como arquivo. </p>
+
+<p>Ufa!&nbsp; Tudo cortesia da boa e velha referência técnica do DOS. Algum deles lá
+encima são bem obscuros - na verdade só há alguns que você precisa de se lembrar.
+Algum de meu *favoritos * é:&nbsp; Setor não achado, Erro de procura e Erro de CRC no
+meio de uma pilha de disquetes relaxados arjeados. É o tipo de porcaria que traz
+recordações.&nbsp; :) </p>
+
+<hr>
+
+<p>Certo, assim nós vimos como criar, abrir e fechar arquivos. Agora vamos fazer algo com
+eles. Para ler alguns bytes de um arquivo, você tem que usar função 3FH. Assumindo que
+você já abriu o arquivo de onde você quer ler, você pode usar um pouco de código como
+o abaixo: <br>
+</p>
+
+<p>&nbsp;&nbsp; MOV&nbsp;&nbsp; AH, 3FH
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; Lê byte(s)<br>
+&nbsp;&nbsp; MOV&nbsp;&nbsp; BX, Handle
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; arquivo a trabalhar<br>
+&nbsp;&nbsp; MOV&nbsp;&nbsp; CX, BytesToRead
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; quanto a ler<br>
+&nbsp;&nbsp; MOV&nbsp;&nbsp; DX, OFFSET WhereToPutThem&nbsp;&nbsp;&nbsp; ; um array ou
+variável<br>
+&nbsp;&nbsp; INT&nbsp;&nbsp; 21H</p>
+
+<p>&nbsp;&nbsp; JC&nbsp;&nbsp;&nbsp; DidSomethingGoWrong
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; Checa erros<br>
+</p>
+
+<p>Se você está tendo problemas em sacar algo disso - não se preocupe muito. Apenas
+volte aos exemplos acima e veja como pode fazer sentido. Próximo tutorial nós
+continuaremos com sprites - (e como carrregá-los do disco) - assim você verá um bom
+exemplo.</p>
+
+<p>Bem... agora, escrevendo em um arquivo. Muito semelhante a ler, nós usamos a função
+40H. Um código para escrever um byte se pareceria com isso: <br>
+</p>
+
+<p>&nbsp;&nbsp; MOV&nbsp;&nbsp; AH, 40H
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; Escreve byte(s)<br>
+&nbsp;&nbsp; MOV&nbsp;&nbsp; BX, Handle
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; arquivo para se escrever nele<br>
+&nbsp;&nbsp; MOV&nbsp;&nbsp; CX, BytesToWrite
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; quanto escrever<br>
+&nbsp;&nbsp; MOV&nbsp;&nbsp; DX, OFFSET WhereToWriteFrom&nbsp; ; de onde os dados estão
+vindo<br>
+&nbsp;&nbsp; INT&nbsp;&nbsp; 21H<br>
+&nbsp;&nbsp; JC&nbsp;&nbsp;&nbsp; DidSomethingGoWrong
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; algum erro?<br>
+</p>
+
+<p>Bem, aquilo quase conclui E/S de arquivos para este tutorial. Embora não seja um
+componente principal da peogramação da linguuagem Assembly, E/S de arquivos é todavia,
+um conceito importante para se pegar. </p>
+
+<hr>
+<div align="center"><center>
+
+<table border="5" width="50%">
+  <tr>
+    <td width="50%" align="center" bgcolor="#FF0000"><p align="center"><a name="asmc"><strong>CHAMANDO
+    O ASSEMBLER NO C/C++</strong></a></td>
+  </tr>
+</table>
+</center></div>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Eu suponho que já passou da hora de falar
+sobre como linkar o Assembler no C.&nbsp; Pessoalmente, eu prefiro codificar VGA numa
+combinação de Assembler/Pascal.&nbsp; Porém, C tem seu lugar, e linkar com C é um
+assunto importante que nós <br>
+deveríamos cobrir. <br>
+</p>
+
+<p>Você deve ter percebido que você pode entrar código Assembly em seu programa de C
+desse jeito: <br>
+</p>
+
+<p>&nbsp;&nbsp; / * Seu código em C vai aqui * / </p>
+
+<p>&nbsp;&nbsp; asm { <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+/ * * / <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+/ * Seu código em Assembler vai aqui * / <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+/ * * / <br>
+&nbsp;&nbsp; } </p>
+
+<p>&nbsp;&nbsp; / * Seu código em C continua daqui * / <br>
+</p>
+
+<p>Agora, considerando que nós podemos inserir o Assembly diretamente no código em C,
+por que nos preocuparíamos em escrever código externo? A resposta é bastante simples.
+Usando rotinas externas, temos código que é mais rápido de se executar, mais rápido de
+compilar, que pode usar algumas das características especiais de Turbo Assembler - como
+modo ideal, e pode ser até mesmo portável a outras linguagens. </p>
+
+<p>Escrever código externo para C é bem simples, e é gratificantemente mais fácil que
+escrever código externo para Pascal. (Veja o Tutorial Sete). Como você pôde observar no
+Tutorial Sete, nós tínhamos que declarar o segmento de código e o de dados usando o a
+meio confusa diretiva SEGMENT. Isto é devido ao modo como o Pascal gosta de organizar a
+memória, e só há um modo de contornar problema - nós podemos usar o modelo TPASCAL.
+Infelizmente, TPASCAL é um modo antiquado de fazer as coisas, assim nós temos que pôr
+um pouco de trabalho nisso. Eu não vou falar novamente em TPASCAL, assim nós podemos nos
+esquecer seguramente de detalhes chatos. <br>
+</p>
+
+<p>Note que nada disto aplica a nós em C - nós podemos usar felizmente nossos simples e
+agradáveis esqueletos de Assembler. Há algumas restrições colocadas, entretanto, a
+nós pela maioria dos compiladores: <br>
+
+<ul>
+  <li>O compilador usa SI e DI para armazenar variáveis registradoras.&nbsp; Se você usou <br>
+    variáveis registradoras em seu código, lembre-se de dar um push e pop em SI e DI em <br>
+    seu código externo. </li>
+  <li>O compilador provavelmente não vai dar push e pop em CS, DS, SS e BP, então <br>
+    tenha certeza de ter cuidado se for alterar algum desses registradores.<br>
+  </li>
+</ul>
+
+<p>Além desses pequenos detalhes, há pouco que nós precisamos ter em mente.Vamos lá!</p>
+
+<hr>
+
+<p>OK... agora nós vamos escrever uma pequena rotina externa e linkar isto ao C. Vamos
+dar uma olhada num esqueleto básico que apenas põe algum texto na tela. <br>
+</p>
+
+<p>&nbsp;&nbsp; ============================&nbsp; LIBRARY.ASM &nbsp;
+=============================<br>
+</p>
+
+<p>&nbsp;&nbsp; .MODEL&nbsp;&nbsp;&nbsp; SMALL<br>
+&nbsp;&nbsp; .DATA</p>
+
+<p>&nbsp;&nbsp; Message&nbsp;&nbsp; DB &quot;Well looky here - we got ourselves some
+text$&quot;</p>
+
+<p>&nbsp;&nbsp; .CODE</p>
+
+<p>&nbsp;&nbsp; PUBLIC&nbsp;&nbsp;&nbsp; _sample</p>
+
+<p>; ---------------------------------------------------------------------------</p>
+
+<p>;<br>
+; void sample();<br>
+;</p>
+
+<p>_sample&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PROC&nbsp;&nbsp; NEAR
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Declara uma procedure near</p>
+
+<p>&nbsp;&nbsp; MOV&nbsp;&nbsp; AH, 00H
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; Acerta o modo de video<br>
+&nbsp;&nbsp; MOV&nbsp;&nbsp; AL, 03H
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; Modo 03H<br>
+&nbsp;&nbsp; INT&nbsp;&nbsp; 10H</p>
+
+<p>&nbsp;&nbsp; MOV&nbsp;&nbsp; AH, 09H
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; Imprime uma string<br>
+&nbsp;&nbsp; MOV&nbsp;&nbsp; DX, OFFSET Message&nbsp;&nbsp;&nbsp;&nbsp; ; DS:DX &lt;--
+Mensagem<br>
+&nbsp;&nbsp; INT&nbsp;&nbsp; 21H</p>
+
+<p>&nbsp;&nbsp; RET
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; Fora daqui!</p>
+
+<p>_sample&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDP</p>
+
+<p>END</p>
+
+<hr>
+
+<p>Bem.... não há nada muito engenhoso lá. Agora, e o código C que vai junto com isto?
+<br>
+</p>
+
+<p>&nbsp;&nbsp; =============================&nbsp; EXAMPLE.C
+==============================<br>
+</p>
+
+<p>&nbsp;&nbsp; extern void sample();</p>
+
+<p>&nbsp;&nbsp; int main()<br>
+&nbsp;&nbsp; {</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sample();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return 0;</p>
+
+<p>&nbsp;&nbsp; }<br>
+</p>
+
+<hr>
+
+<p>E para compilar o lote, a linha abaixo fará o trabalho. </p>
+
+<p>C:\&gt; TCC EXAMPLE.C LIBRARY.ASM</p>
+
+<p>Claro que, se você está usando então que outro &quot;sabor&quot; de C, substitua TCC
+com qualquer outro interpretador de linha de comando que você tiver. Também é possível
+fazer o C reconhecer variáveis declaradas em Assembler, e o seguinte esqueleto explica
+como isso é feito: <br>
+</p>
+
+<p>&nbsp;&nbsp; ============================&nbsp; LIBRARY.ASM &nbsp;
+=============================<br>
+</p>
+
+<p>&nbsp;&nbsp; .MODEL SMALL<br>
+&nbsp;&nbsp; .DATA</p>
+
+<p>&nbsp;&nbsp; PUBLIC _YourVariable&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Declara uma variável
+externa</p>
+
+<p>&nbsp;&nbsp; _YourVariable&nbsp; DW 9999&nbsp;&nbsp;&nbsp; ; Faz a variável ser uma
+word valendo 9999</p>
+
+<p>&nbsp;&nbsp; .CODE</p>
+
+<p>&nbsp;&nbsp; END<br>
+<br>
+</p>
+
+<p>&nbsp;&nbsp; =============================&nbsp; EXAMPLE.C
+==============================<br>
+</p>
+
+<p>&nbsp;&nbsp; extern int YourVariable;</p>
+
+<p>&nbsp;&nbsp; int main()<br>
+&nbsp;&nbsp; {</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; printf(&quot;The Assembler external variable is:
+%d&quot;, YourVariable);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return(0);</p>
+
+<p>&nbsp;&nbsp; }<br>
+</p>
+
+<p>Novamente, compile isto com:&nbsp; TCC EXAMPLE.C LIBRARY.ASM <br>
+</p>
+
+<p>Mas que tal passar parâmetros para suas rotinas?&nbsp; Nós poderíamos fazer isso do
+modo difícil, como nós fizemos com Pascal, ou alternativamente, poderíamos usar a
+diretiva ARG. </p>
+
+<p>ARG é brilhante, porque simplifica grandemente as coisas -- mas tem algumas
+negligências. Isto é, em toda rotina você precisa de umas três instruções
+adicionais. Se você quer velocidade e não se incomoda com um pouco de trabalho duro,
+trabalhe diretamente com a pilha como nós fizemos no Tutorial Sete. </p>
+
+<p>Aqui está como se usa ARG: <br>
+</p>
+
+<p>&nbsp;&nbsp; ============================&nbsp; LIBRARY.ASM &nbsp;
+=============================<br>
+</p>
+
+<p>&nbsp;&nbsp; .MODEL SMALL<br>
+&nbsp;&nbsp; .DATA<br>
+&nbsp;&nbsp; .CODE</p>
+
+<p>&nbsp;&nbsp; PUBLIC _putpixel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Declara a
+procedure externa</p>
+
+<p>; ---------------------------------------------------------------------------<br>
+;<br>
+; void putpixel(int x, int y, char color, int location);<br>
+;</p>
+
+<p>_putpixel&nbsp;&nbsp; PROC NEAR</p>
+
+<p>&nbsp;&nbsp; ARG&nbsp;&nbsp; X : Word, Y : Word, Color : Byte, Location : Word</p>
+
+<p>&nbsp;&nbsp; PUSH&nbsp; BP
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; Salva BP<br>
+&nbsp;&nbsp; MOV&nbsp;&nbsp; BP, SP
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; BP *deve ser* igual a
+SP para ARG funcionar</p>
+
+<p>&nbsp;&nbsp; MOV&nbsp;&nbsp; AX, [Location]&nbsp;&nbsp;&nbsp; ; Parâmetros podem ser
+acessados facilmente agora<br>
+&nbsp;&nbsp; MOV&nbsp;&nbsp; ES, AX<br>
+&nbsp;&nbsp; MOV&nbsp;&nbsp; BX, [X]<br>
+&nbsp;&nbsp; MOV&nbsp;&nbsp; DX, [Y]<br>
+&nbsp;&nbsp; MOV&nbsp;&nbsp; DI, BX<br>
+&nbsp;&nbsp; MOV&nbsp;&nbsp; BX, DX<br>
+&nbsp;&nbsp; SHL&nbsp;&nbsp; DX, 8<br>
+&nbsp;&nbsp; SHL&nbsp;&nbsp; BX, 6<br>
+&nbsp;&nbsp; ADD&nbsp;&nbsp; DX, BX<br>
+&nbsp;&nbsp; ADD&nbsp;&nbsp; DI, DX<br>
+&nbsp;&nbsp; MOV&nbsp;&nbsp; AL, [Color]<br>
+&nbsp;&nbsp; MOV&nbsp;&nbsp; ES:[DI], AL</p>
+
+<p>&nbsp;&nbsp; POP&nbsp;&nbsp; BP
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; BP precisa ser restaurado!</p>
+
+<p>&nbsp;&nbsp; RET</p>
+
+<p>_putpixel&nbsp;&nbsp; ENDP</p>
+
+<p>END<br>
+</p>
+
+<p>&nbsp;&nbsp; =============================&nbsp; EXAMPLE.C
+==============================<br>
+</p>
+
+<p>&nbsp;&nbsp; extern void putpixel(int x, int y, char color, int location);</p>
+
+<p>&nbsp;&nbsp; int main()<br>
+&nbsp;&nbsp; {</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; asm {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; mov&nbsp;&nbsp; ax, 0x13<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; int&nbsp;&nbsp; 0x10<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; putpixel(100, 100, 12, 0xa000);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sleep(2);</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; asm {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; mov&nbsp;&nbsp; ax, 0x03<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; int&nbsp;&nbsp; 0x10<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return(0);<br>
+&nbsp;&nbsp; }<br>
+<br>
+</p>
+
+<p>Não é tão macetoso, hein? Porém, se você escolher escrever rotinas externas porque
+você quer a velocidade que o Assembler pode lhe dar, então acesse a pilha do modo
+difícil. Esses extras push's e pop's realmente podem crescer se sua rotina de putpixel
+for chamada 320x200 vezes! </p>
+
+<hr>
+<div align="center"><center>
+
+<table border="5" width="50%">
+  <tr>
+    <td width="50%" align="center" bgcolor="#FF0000"><p align="center"><a name="macros"><strong>UMA
+    INTRODUÇÃO ÀS MACROS</strong></a></td>
+  </tr>
+</table>
+</center></div>
+
+<p>Macros são uma das características mais poderosas que você tem à sua disposição
+quando está trabalhando com o Assembler. Freqüentemente você se achará repetindo as
+mesmas poucas linhas de código inúmeras vezes quando estiver escrevendo programas
+maiores. Você não quer fazer aquela dificuldade de criar um procedimento -- que
+reduziria a velocidade do código, mas você não quer continuar se repetindo. </p>
+
+<p>A resposta.... MACROS. <br>
+</p>
+
+<p>Uma macro é só um conjunto de instruções que recebe um nome pelo qual ela será
+referenciada no código. Você pode definir um macro assim: <br>
+</p>
+
+<p>&nbsp;&nbsp; MyMacroName&nbsp;&nbsp;&nbsp; MACRO</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Suas instruções vão aqui<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ;</p>
+
+<p>&nbsp;&nbsp; ENDM &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+MyMacroName<br>
+</p>
+
+<p>E dali em diante, sempre que você puser MyMacroName em seu código, serão colocadas
+as instruções contidas dentro da macro no lugar do nome da macro. <br>
+</p>
+
+<p>OBS.: É provavelmente melhor declarar qualquer macro antes de declarar o segmento de
+dados. Para ficar mais claro, coloque todas suas macros em outro arquivo de texto e então
+use INCLUDE&lt;nomedoarquivo&gt; para incluir as macros. </p>
+
+<hr>
+
+<p>Macros também podem ter parâmetros e podendo ser muito úteis. Por exemplo, eu usei
+muito a função DOS 09H para pôr uma string na tela. Eu poderia fazer os programas que
+eu escrevo mais fáceis de ler à primeira vista criando a seguinte macro: </p>
+
+<p>&nbsp;&nbsp; PutText&nbsp; MACRO TextParam</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MOV&nbsp;&nbsp; AH, 09H
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; TextParam é o parâmetro--NÃO <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MOV&nbsp;&nbsp; DX, OFFSET TextParam
+&nbsp;&nbsp;&nbsp;&nbsp; ; uma variável.&nbsp; Substitua TextParam com <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; INT&nbsp;&nbsp; 21H
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; qualquer nome que você escolher. </p>
+
+<p>&nbsp;&nbsp; ENDM&nbsp;&nbsp;&nbsp;&nbsp; PutText<br>
+</p>
+
+<p>Então, assumindo no segmento de dados que eu tenha declarado uma string assim: </p>
+
+<p>&nbsp;&nbsp; AString&nbsp;&nbsp; DB &quot;This is a string$&quot;<br>
+</p>
+
+<p>Eu poderia exibir aquela string escrevendo: </p>
+
+<p>&nbsp;&nbsp; PutText&nbsp;&nbsp; AString<br>
+</p>
+
+<p>OBS.:&nbsp; Quando você está trabalhando com macros, tenha cuidado em observar <br>
+que registradores elas mudam. Se estiver em dúvida, dê um push e um pop em <br>
+quaisquer registradores que você sente que possam ser afetados. </p>
+
+<hr>
+
+<p>Embora aquela macro simples realmente não fosse nada de especial, macros têm muitas
+outras utilidades. Eu não vou dizer mais nada sobre macros agora, mas eu as usarei de vez
+em quando em programas de demonstração no futuro, e você aprenderá outras técnicas
+que você pode pôr em bom uso. </p>
+
+<p>De qualquer maneira, vamos ao que eu queria fazer: </p>
+
+<hr>
+<div align="center"><center>
+
+<table border="5" width="50%">
+  <tr>
+    <td width="50%" align="center" bgcolor="#FF0000"><p align="center"><a name="demo"><strong>O
+    PROGRAMA DEMONSTRATIVO</strong></a></td>
+  </tr>
+</table>
+</center></div>
+
+<p>&nbsp;</p>
+
+<p>No princípio eu ia lançar este tutorial sem um programa demo, mas vendo como eu fui
+um pouco preguiçoso esse tempo todo, (e também porque um amigo meu há pouco tempo fez
+uma demonstração como essa), eu decidi incluir um demo de plasma. </p>
+
+<p>Plasmas podem ser um pouco engenhosas em umas partes -- me levou um bom tempo para
+fazer a coisa funcionar direito por causa de um problema que eu tive com minha tabela de
+lookup. Mas se você seguir o algoritmo abaixo, você não deve ter nenhum problema. <br>
+</p>
+
+<p>***&nbsp; Antes de começar, você precisará de QUATRO variáveis temporárias em
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ***<br>
+seu código. Em Assembler isto pode se pôr um pouco trabalhoso porque você <br>
+&nbsp; se achará freqüentemente com falta de registradores. Você poderia declarar <br>
+alguns bytes no segmento de dados, mas é mais rápido usar registradores.&nbsp; <br>
+&nbsp; Estas quatro variáveis temporárias armazenarão só números entre 0 e 255, <br>
+&nbsp; assim elas só precisam ser BYTES. </p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; No algoritmo, eu me refiro a
+estas variáveis temporárias como Temp1, <br>
+***&nbsp;&nbsp;&nbsp; Temp2, Temp3 e Temp4.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+*** <br>
+</p>
+
+<p>O algoritmo se parece com isso: <br>
+
+<ul>
+  <li>Crie uma tabela de lookup </li>
+</ul>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Isto é basicamente só uma senóide longa. Você pode
+experimentar <br>
+usar uma onda de co-seno, ou alterar a amplitude da função que você <br>
+está usando. Eu criei minha tabela de lookup usando a seguinte expressão: </p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp; For W := 1 To 512 Do<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SinTable[W] := Round(Sin(W / 255 * Pi * 2) * 128);</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp; (SinTable é um array de 512 BYTES)<br>
+
+<ul>
+  <li>Inicialize a palette</li>
+</ul>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Eu pessoalmente gosto de fazer minhas palettes depois de
+ver o demonstrativo <br>
+rodando com a palette padrão. Desse modo, fazendo certas cores escuras e outras <br>
+muito claras, o resultado é exatamente do jeito que eu quero.<br>
+Eu descobri que o melhor modo de fazer isto é capturar a tela quando a demonstração <br>
+está rodando, com um programa como Screen Thief, então carregar aquela tela <br>
+em um programa de pintura que deixe alterar a palette. </p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Depois de conseguir a palette do jeito que você quer,
+salve-a para o disco como <br>
+um arquivo COL (se possível) e então escreve um pequeno programa para ler no <br>
+arquivo COL e escrever um arquivo tipo o PLASMA.DAT. </p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Se lembre, Screen Thief é shareware, assim se você for
+usá-lo, envie para <br>
+o autor algum dinheiro, hein? <br>
+</p>
+
+<p>Loop (1):&nbsp; Antes de começar a plotar a primeira linha, você deve: </p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Zerar Temp4; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Decrementar Temp3 de dois; </p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Você pode
+fazer experiências com Temp3 -- quanto maior for o número<br>
+que você subtrair, mais rápido o plasma vai mover. </p>
+
+<p>&nbsp;&nbsp; Você agora vai para o Loop (2). <br>
+</p>
+
+<p>Loop (2):&nbsp; Ao início de cada linha você deve: </p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Incrementar Temp4 de um;
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Fazer Temp1 =
+Sintable[Linha corrente + Temp3]; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Fazer Temp2 =
+SinTable[Temp4]; </p>
+
+<p>&nbsp;&nbsp; Você agora vai para o Loop (3). <br>
+</p>
+
+<p>Loop (3):&nbsp; Para todo pixel na linha atual você deve: </p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Calcular a cor daquele
+pixel a ser plotado; </p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; O valor de cor
+daquele pixel é simplesmente definido por: </p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SinTable[Temp1
++ Temp2] + SinTable[Linha corrente + Temp2] </p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Infelizmente,
+isto é um pouco mais difícil de calcular no <br>
+Assembler e acaba levando muitas linhas de código!! <br>
+</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Incrementar Temp1 de um;
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Incrementar Temp2 de um; <br>
+</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Depois de fazer uma linha
+inteira, você então volta atrás ao Loop (2).</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp; Uma vez feitas todas as linhas (200), você pode então voltar
+ao Loop (1).<br>
+<br>
+</p>
+
+<p>Claro que, você também vai querer pôr algo para checar o retrace, e seria uma boa<br>
+idéia também se alguém apertou alguma tecla!! <br>
+</p>
+
+<p>NOTA:&nbsp; Para quem não sabe, o VGA tem um registrador de estado que vale a pena <br>
+prestar atenção em que ele serve. É registrador 03DAH, e conferindo seus <br>
+vários bits, podemos ver o que está acontecendo com o VGA. </p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Para aqueles que querem saber para quê são
+exatamente todos os bits,<br>
+&nbsp; ache que deveriam obter uma cópia da Ralf Brown's Interrupt List. Isto <br>
+&nbsp; está disponível na minha homepage e ela contém uma lista completa de todas <br>
+&nbsp; as interrupções, registradores e muito mais.) </p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; De qualquer modo, nós estamos só interessados no
+quarto bit do 03DAH que nos <br>
+deixa saber se um retrace está acontecendo. Se pudermos acessar o VGA enquanto <br>
+o canhão de elétrons do monitor está voltando (retrace) ao topo da tela -- nós <br>
+podemos obter um rápido acesso, livre de flicks (tremidas..., sacou? - by Renato)<br>
+O que é demais, já que o retrace acontece a cada 1/80 de segundo EM TODOS OS <br>
+COMPUTADORES, é agora nós temos um método de fazer que nosso demo rode numa <br>
+velocidade específica em todas as máquinas. </p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Para conferir se o retrace está acontecendo, nós
+examinamos simplesmente <br>
+o bit quatro. Se o bit quatro está setado, um retrace está em execução.<br>
+Porém, nós não sabemos o quanto de um retrace já aconteceu, e não sabemos <br>
+quanto tempo de acesso live de flicks nós temos. A solução é checar de novo<br>
+por um retrace, de modo que podemos estar seguros de que estamos no <br>
+COMEÇO de um. </p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Eu usei retrace no código para ter certeza de que
+o demo ia<br>
+rodar à mesma velocidade em todas as máquinas. (Mais ou menos). <br>
+</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Também note que meu plasma é mais uma variante
+de plasma. Você pode, <br>
+e é encorajado a alterar o código -- (tente incrementar os valores de temp <br>
+em vez de decrementar e mudar a quanto o valor de temp é decrementado ou <br>
+mudar o modo como o valor das corer é achado. Também tente mudar a palette, <br>
+porque isto pode fazer o plasma parecer completamente diferente). </p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; É possível criar todos os tipos de efeitos só
+fazendo mudanças simples, <br>
+assim, experimente... seja criativo! <br>
+</p>
+
+<hr>
+
+<p>Bem, isso conclui as coisas para este tutorial. Eu não estou precisamente seguro sobre
+o que eu porei no Tutorial Dez (by Renato - que Tutorial 10? tá sonhando... cadê? bem
+que eu queria que eles continuassem. Se alguém souber onde o Adam foi parar, me avise.)
+-- serão (bye Renato - seriam) cobertos sprites, mas eu posso ver que os tutoriais talvez
+tendam a efeitos de demonstração e como você pode os codificar em Assembler puro. </p>
+
+<p>Até a próxima vez,&nbsp; (by Renato - hahaha. Engraçadinho!)</p>
+
+<p>-- Adam.<br>
+</p>
+
+<p>(by Renato - cadê a finalização de Sempre? Sobre pegar na próxima semana? <br>
+Parece que o cara já sabia que esse era o último. <br>
+E agora, as minhas despedidas:<br>
+Bom galera, agradeço a todos vocês que me ajudaram a continuar essa tradução,<br>
+incentivando-me a terminar logo isso, sempre me escrevendo, cobrando.<br>
+O interesse demonstrado por vocês foi fundamental para que isso acabasse. <br>
+Finalmente, a tradução desses tutoriais de Assembler terminaram.<br>
+</p>
+
+<p>Se houver erros na tradução, ou alguma frase que não tá dando pra entender,<br>
+me avisem, que eu traduzo ela de novo!, de modo a ficar inteligível.</p>
+
+<p>Valeu! </p>
+
+<p>Agora, vou ver se eu começo a traduzir os tutoriais de VGA do Denthor.<br>
+Alguém sabe onde ele foi parar também?</p>
+
+<p>bye,<br>
+Renato Nunes Bastos, aka Krull<br>
+Rio de Janeiro, 3 de Novembro de 1998)</p>
+</body>
+</html>

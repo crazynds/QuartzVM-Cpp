@@ -1,0 +1,880 @@
+<html>
+
+<head>
+<title>Tutorial 6 - Adam Hyde</title>
+</head>
+
+<body bgcolor="#00FFFF">
+<div align="center"><center>
+
+<table border="5" width="50%">
+  <tr>
+    <td width="50%" align="center" bgcolor="#FF0000"><strong><big>Tutorial de Assembler de
+    Adam Hyde 1.0</big></strong><p><small>PARTE 6</small><br>
+    <small>Traduzido por Renato Nunes Bastos</small></td>
+  </tr>
+</table>
+</center></div>
+
+<p><br>
+Versão&nbsp;&nbsp; :&nbsp; 1.1<br>
+Data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; :&nbsp; 13-04-1996 / online by Renato 03-11-1998<br>
+Contato&nbsp; :&nbsp; blackcat@vale.faroc.com.au<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+http://www.faroc.com.au/~blackcat<br>
+;Renato&nbsp;&nbsp; :&nbsp;&nbsp;
+<a href="mailto:rnbastos@ig.com.br">rnbastos@ig.com.br</a>&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="http://www.geocities.com/SiliconValley/Park/3174">http://www.geocities.com/SiliconValley/Park/3174</a></p>
+
+<hr>
+
+<p align="center"><a href="#ult">Introdução / Rotina do último tutorial</a> | <a
+href="#inout">In e Out</a> | <a href="#flag">Mais Flags</a></p>
+
+<hr>
+
+<p>Olá de novo, programadores de Assembler. Esta edição demorou um pouco, mas eu tinha
+muita coisa para terminar, e eu estou trabalhando em um jogo meu agora. É um jogo de
+estratégia, como Warlords II, e acho que eu vou ter que escrever<br>
+a maior parte do código em 640x480, não meu amado 320x200 - mas eu posso mudar de
+idéia. Eca, a quantidade de jogos que eu comecei a escrever mas nunca cheguei a terminar
+é enorme, e este não deve chegar muito longe.</p>
+
+<p>De qualquer modo, eu disse que daríamos uma olhada numas rotinas de linha e círculo
+esta semana, então, vamos lá...</p>
+
+<hr>
+
+<p><a name="ult">Semana</a> passada nós chegamos à seguinte rotina de linhas horizontais
+- </p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; mov&nbsp;&nbsp; ax, 0A000h<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; mov&nbsp;&nbsp; es, ax
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Aponta ES para a VGA</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; mov&nbsp;&nbsp; ax, x1
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; AX = X1<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; mov&nbsp;&nbsp; bx, y
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; BX = Y<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; mov&nbsp;&nbsp; cx, x2
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; CX = X2</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sub&nbsp;&nbsp; cx, ax
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; CX = Diferença de X2 e X1</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; mov&nbsp;&nbsp; di, ax
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; DI = X1<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; mov&nbsp;&nbsp; dx, bx
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; DX = Y<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; shl&nbsp;&nbsp; bx, 8
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Y SHL 8<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; shl&nbsp;&nbsp; dx, 6
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Y SHL 6<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; add&nbsp;&nbsp; dx, bx
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; DX = Y SHL 8 + Y SHL 6<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; add&nbsp;&nbsp; di, dx
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; DI = Offset do primeiro pixel</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; mov&nbsp;&nbsp; al, color&nbsp;&nbsp;&nbsp;&nbsp; ; Põe
+a cor a plotar em AL<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; rep&nbsp;&nbsp; stosb
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Desenha a linha<br>
+</p>
+
+<p>Agora, embora essa rotina seja muito mais rápida que as rotinas do BGI, (ou seja lá o
+que for que seu compilador tenha), ela poderia ser melhorada pra caramba. Se entrarmos na
+rotina, com a lista de clocks que eu dei no último tutorial, você vai ver que ela gasta
+bem pouco.</p>
+
+<p>Eu vou deixar a otimização com você por enquanto, (vamos ver isso em outro
+tutorial), mas se substituir STOSB por MOV ES:[DI], AL ou STOSW vai melhorar muito as
+coisas. Não se esqueça que se você decidir usar um loop, para jogar words na VGA, você
+terá que decrementar CX de uma unidade.</p>
+
+<p>Agora, vamos ver uma linha vertical. Teremos que calcular o offset do primeiro pixel
+como nós fizemos na rotina de linhas horizontais, então, algo desse tipo funcionaria:</p>
+
+<p>&nbsp;&nbsp; mov&nbsp;&nbsp; ax, 0A000h&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Põe o segmento
+VGA em AX<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; es, ax
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ;
+Aponta ES para a VGA</p>
+
+<p>&nbsp;&nbsp; mov&nbsp;&nbsp; ax, Y1
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Move o primeiro valor de Y para
+AX<br>
+&nbsp;&nbsp; shl&nbsp;&nbsp; ax, 6
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Y x
+2<sup>6</sup><br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; di, ax
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Move o novo valor de
+Y para DI<br>
+&nbsp;&nbsp; shl&nbsp;&nbsp; ax, 2
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ;
+Agora temos Y = Y x 320<br>
+&nbsp;&nbsp; add&nbsp;&nbsp; di, ax
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Adiciona aquele
+valor a DI<br>
+&nbsp;&nbsp; add&nbsp;&nbsp; di, X
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Soma o
+valor de X a DI<br>
+</p>
+
+<p>Agora umas coisas básicas...<br>
+</p>
+
+<p>&nbsp;&nbsp; mov&nbsp;&nbsp; cx, Y2
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Guarda Y2 em CX<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; al, Color&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Guarda a cor
+a plotar em AL<br>
+&nbsp;&nbsp; sub&nbsp;&nbsp; cx, Y1
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; CX = tamanho da linha<br>
+</p>
+
+<p>E agora o loop final...<br>
+</p>
+
+<p>Plota:<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; es:[di], al&nbsp;&nbsp;&nbsp;&nbsp; ; Põe um pixel no offset
+corrente<br>
+&nbsp;&nbsp; add&nbsp;&nbsp; di, 320&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ;
+Move para a próxima linha<br>
+&nbsp;&nbsp; dec&nbsp;&nbsp; cx
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; Decrementa CX de um<br>
+&nbsp;&nbsp; jnz&nbsp;&nbsp; Plota
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Se CX &lt;&gt;
+0, então continua plotando<br>
+</p>
+
+<p>Não é uma rotina fantástica, mas é muito boa. Note como foi possível realizar uma
+comparação depois de DEC CX. Isto é um conceito extremamente útil, logo, não se
+esqueça de que isso é possível.</p>
+
+<p>Brinque um pouco com o código, e tente fazê-lo mais rápido. Tente outros métodos de
+calcular o offset, ou métodos diferentes de controle de fluxo.</p>
+
+<hr>
+
+<p>Agora, isso foi a coisa fácil. Vamos ver agora uma rotina capaz de desenhar linhas
+diagonais.</p>
+
+<p>A seguinte rotina foi tirada de SWAG, autor desconhecido, e é uma rotina ideal para
+demonstrar um algoritmo de linhas. Ele está precisando muito de uma otimização, assim,
+essa pode ser uma tarefa para você - se você quiser. Alguns dos pontos a considerar
+são:</p>
+
+<p>&nbsp;&nbsp; 1) Seja lá quem o escreveu nunca ouviu falar de XCHG - isso economizaria<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; alguns clocks;</p>
+
+<p>&nbsp;&nbsp; 2) Ele comete um dos grandes pecados do código não-otimizado - ele move<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; um valor para AX, e então realiza uma
+operação envolvendo AX na próxima<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; instrução, assim fazendo um ciclo a mais.
+(Vamos falar sobre isso semana<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; que vem).</p>
+
+<p>&nbsp;&nbsp; 3) Ele trabalha com BYTES e não WORDS, assim, a velocidade de escrita
+para a<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VGA poderia se dobrada se usasse words.</p>
+
+<p>&nbsp;&nbsp; 4) E o maior pecado de todos, ele usa um MUL para achar o offset. Tente<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; usar shifts ou um XCHG para acelerar as coisas.</p>
+
+<p>De qualquer modo, eu pus os comentários nele, e acho que ele é auto-explicativo,
+assim, eu não vou entrar em detalhes como ele funciona. Você deve ser capaz de pegar
+isso sozinho. Adentre a rotina, e veja como a derivada (gradiente, variação,
+inclinação...) da linha foi calculada.<br>
+</p>
+
+<p>Procedure Line(X1, Y1, X2, Y2 : Word; Color : Byte);&nbsp;&nbsp; Assembler;</p>
+
+<p>Var<br>
+&nbsp;&nbsp; DeX&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : Integer;<br>
+&nbsp;&nbsp; DeY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : Integer;<br>
+&nbsp;&nbsp; IncF&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : Integer;</p>
+
+<p>Asm&nbsp;&nbsp;&nbsp;&nbsp; { Line }<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; ax, [X2]&nbsp;&nbsp;&nbsp;&nbsp; { Move X2 para AX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; sub&nbsp;&nbsp; ax, [X1]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Pega o tamanho
+horizontal da linha&nbsp;&nbsp;&nbsp; (X2 - X1)&nbsp;&nbsp;&nbsp; }<br>
+&nbsp;&nbsp; jnc&nbsp;&nbsp; @Dont1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { X2 - X1 é negativo?
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; neg&nbsp;&nbsp; ax
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {
+Sim, então faz com que seja positivo
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</p>
+
+<p>@Dont1:<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; [DeX], ax&nbsp;&nbsp;&nbsp; { Agora, move o tamanho
+horizontal da linha para DeX }<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; ax, [Y2]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Move Y2 para
+AX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; sub&nbsp;&nbsp; ax, [Y1]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Subtrai
+Y1 de Y2, dando o tamanho vertical&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
+&nbsp;&nbsp; jnc&nbsp;&nbsp; @Dont2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Foi
+negativo?
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; neg&nbsp;&nbsp; ax
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+{ Sim, então faça-o positivo
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}</p>
+
+<p>@Dont2:<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; [DeY], ax&nbsp;&nbsp;&nbsp;&nbsp; { Move o tamanho vertica
+para DeY
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; cmp&nbsp;&nbsp; ax, [DeX]&nbsp;&nbsp;&nbsp;&nbsp; { Compara o tamanho
+vertivcal com o horizontal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
+&nbsp;&nbsp; jbe&nbsp;&nbsp; @OtherLine&nbsp;&nbsp; { Se o vertical foi &lt;= horizontal
+então pula&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</p>
+
+<p>&nbsp;&nbsp; mov&nbsp;&nbsp; ax, [Y1]
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Move Y1 para AX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; cmp&nbsp;&nbsp; ax, [Y2]
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Compara Y1 a Y2
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; jbe&nbsp;&nbsp; @DontSwap1&nbsp;&nbsp; { Se Y1 &lt;= Y2 então pula,
+senão...
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; bx, [Y2]
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Põe Y2 em BX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; [Y1], bx
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Põe Y2 em Y1
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; [Y2], ax
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Move Y1 para Y2
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+{ Para que depois de tudo isso.....
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+{ Y1 = Y2 e Y2 = Y1
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}</p>
+
+<p>&nbsp;&nbsp; mov&nbsp;&nbsp; ax, [X1]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Põe X1 em AX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; bx, [X2]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Põe X2 em BX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; [X1], bx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Põe X2 em X1
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; [X2], ax&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Põe X1 em X2
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}</p>
+
+<p>@DontSwap1:<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; [IncF], 1
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Põe 1 em IncF, i.e., plota
+outro pixel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; ax, [X1]
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Põe X1 em AX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; cmp&nbsp;&nbsp; ax, [X2]
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Compara X1 com X2
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; jbe&nbsp;&nbsp; @SkipNegate1&nbsp; { Se X1 &lt;= X2 então pula, senão...
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; neg&nbsp;&nbsp; [IncF]
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+{ Nega IncF
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}</p>
+
+<p>@SkipNegate1:<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; ax, [Y1]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Move Y1 para AX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; bx, 320&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Move 320 para
+BX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; mul&nbsp;&nbsp; bx
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+{ Multiplica 320 por Y1
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; di, ax &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+{ Põe o resultado em DI
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; add&nbsp;&nbsp; di, [X1]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Soma X1 a DI,
+e tcham - offset em&nbsp; DI
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; bx, [DeY]&nbsp;&nbsp; { Põe DeY em BX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; cx, bx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Põe
+DeY em CX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; ax, 0A000h{ Põe o segmento a ser plotado, em AX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; es, ax&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { ES
+aponta para a VGA
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; dl, [Color]&nbsp; { Põe a cor a usar em DL
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; si, [DeX]&nbsp;&nbsp;&nbsp; { Aponta SI para DeX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}</p>
+
+<p>@DrawLoop1:<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; es:[di], dl&nbsp;&nbsp; { Põe a cor a plotar, DL, em ES:DI
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; add&nbsp;&nbsp; di, 320&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Soma 320 a DI,
+i.e., próxima linha abaixo&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
+&nbsp;&nbsp; sub&nbsp;&nbsp; bx, si &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+{ Subtrai DeX de BX, DeY
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; jnc&nbsp;&nbsp; @GoOn1&nbsp;&nbsp; { Ficou negativo?
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; add&nbsp;&nbsp; bx, [DeY]&nbsp; { Sim, então soma DeY a BX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; add&nbsp;&nbsp; di, [IncF]&nbsp;&nbsp; { Soma a quantidade a incrementar a DI
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</p>
+
+<p>@GoOn1:<br>
+&nbsp;&nbsp; loop&nbsp; @DrawLoop1&nbsp;&nbsp;&nbsp;&nbsp; { Nenhum resultado negativo,
+então plota outro pixel }<br>
+&nbsp;&nbsp; jmp&nbsp;&nbsp; @ExitLine
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Acabou, então vamos
+embora!
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}</p>
+
+<p>@OtherLine:<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; ax, [X1]
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Move X1
+para AX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; cmp&nbsp;&nbsp; ax, [X2]
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Compara
+X1 a&nbsp; X2
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; jbe&nbsp;&nbsp; @DontSwap2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { X1 &lt;= X2 ?
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; bx, [X2]
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Não,
+então move X2 para BX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; [X1], bx
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Move X2
+para X1
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; [X2], ax
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {
+Move X1 para X2
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; ax, [Y1]
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {
+Move Y1 para AX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; bx, [Y2]
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {
+Move Y2 para BX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; [Y1], bx
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {
+Move Y2 para Y1
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; [Y2], ax
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {
+Move Y1 para Y2
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}</p>
+
+<p>@DontSwap2:<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; [IncF], 320&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Move 320
+para IncF, i.e., o próximo pixel está na&nbsp; }<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+{ próxima linha
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; ax, [Y1]
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Move Y1 para AX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; cmp&nbsp;&nbsp; ax, [Y2]
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Compara Y1 a&nbsp; Y2
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; jbe&nbsp;&nbsp; @SkipNegate2&nbsp;&nbsp; { Y1 &lt;= Y2 ?
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; neg&nbsp;&nbsp; [IncF]
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+{ Não, então nega IncF
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}</p>
+
+<p>@SkipNegate2:<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; ax, [Y1]
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Move Y1 para AX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; bx, 320
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Move 320 para BX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; mul&nbsp;&nbsp; bx
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+{ Multiplica AX por 320
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; di, ax
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Move o
+resultado para DI
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; add&nbsp;&nbsp; di, [X1]
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Soma X1 a DI, dando o
+&nbsp; offset
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; bx, [DeX]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Move DeX para
+BX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; cx, bx
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Move BX para CX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; ax, 0A000h&nbsp;&nbsp;&nbsp; { Move o endereço da VGA para
+AX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; es, ax
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Aponta ES
+para a VGA
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; dl, [Color]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Move a cor
+a plotar para DL
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; si, [DeY]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {
+Move DeY para SI
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}</p>
+
+<p>@DrawLoop2:<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; es:[di], dl&nbsp;&nbsp; { Põe o byte em DL para ES:DI
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; inc&nbsp;&nbsp; di
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+{ Incrementa DI de um, o próximo pixel
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
+&nbsp;&nbsp; sub&nbsp;&nbsp; bx, si
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { Subtrai SI de BX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; jnc&nbsp;&nbsp; @GoOn2&nbsp;&nbsp;&nbsp;&nbsp; { Ficou negativo?
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; add&nbsp;&nbsp; bx, [DeX]&nbsp;&nbsp; { Sim, então soma DeX a BX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp; add&nbsp;&nbsp; di, [IncF]&nbsp;&nbsp;&nbsp;&nbsp; { Soma IncF a DI
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}</p>
+
+<p>@GoOn2:<br>
+&nbsp;&nbsp; loop&nbsp; @DrawLoop2&nbsp;&nbsp;&nbsp; { Continua plotando
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}</p>
+
+<p>@ExitLine:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+{ Pronto!
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+End;<br>
+</p>
+
+<p>Acho que não fiz nenhum erro com os comentários, mas eu estou bem cansado, e não
+tenho bebido cafeína há dias - se você encontrar um erro - por favor me diga.</p>
+
+<p>Eu ia colocar um algoritmo de círculo, mas eu não consegui fazer a minha funcionar em
+Assembler - toda aquela matemática de ponto flutuante deve ter algo a ver com isso. Eu
+poderia incluir uma escrita em linguagem de alto nível, mas eu suponho que esse seja um
+tutorial de Assembler, não de gráficos. Contudo, se pessoas suficientes reclamarem,
+querendo uma...</p>
+
+<hr>
+<div align="center"><center>
+
+<table border="5" width="50%">
+  <tr>
+    <td width="50%" align="center" bgcolor="#FF0000"><strong>&nbsp;<a name="inout">&nbsp; OS
+    INS E OUTS DE IN E OUT </a></strong></td>
+  </tr>
+</table>
+</center></div>
+
+<p>IN e OUT são uma parte muito importante de código em Assembler. Elas permitem você a
+mandar/receber diretamente dados de qualquer uma das&nbsp; 65,536 portas de hardware, ou
+registradores. A sintaxe básica é como segue:<br>
+
+<ul>
+  <li>IN &lt;ACUMULADOR&gt;, &lt;PORTA&gt;&nbsp;&nbsp;&nbsp;&nbsp; - Nome: Entrada de porta de
+    E/S<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    Tipo: 8086+</li>
+</ul>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Descrição: Esta instrução lê um valor<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+de uma das 65536 portas de hardware <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+para o acumulador especificado.</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+AX e AL são comumente usados para portas<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+de entrada, e DX é mais usado para<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+identificar a porta.</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+EX.: IN&nbsp;&nbsp;&nbsp; AX, 72h<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+MOV &nbsp;&nbsp; DX, 3C7h<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+IN &nbsp;&nbsp;&nbsp; AL, DX<br>
+
+<ul>
+  <li>OUT &lt;PORTA&gt;, &lt;ACUMULADOR&gt;&nbsp;&nbsp;&nbsp; - Nome: Saída para a Porta<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    Tipo: 8086+</li>
+</ul>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Descrição: Esta instrução põe na saída o <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+valor no acumulador para &lt;PORTA&gt;.&nbsp; Usando<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+o registrador DX para passar a porta para<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+OUT, você pode acessar até 65,536 portas.</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+EX.: MOV&nbsp;&nbsp; DX, 378h<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+OUT &nbsp;&nbsp; DX, AX<br>
+&nbsp; </p>
+
+<p>OK, isso não ajudou muito, já que não disse muito sobre como usar - muito menos para
+que usar. Bem, se você pretende trabalhar muito com a VGA, você terá que ser capaz de
+programar seus registradores internos. Semelhantes aos registradores com que você tem
+trabalhado até agora, você pode pensar em mudá-los como interrupções, exceto que: 1)
+Você passa os valores para a porta, e é isso aí; e 2) É muito perto de ser
+instantâneo.</p>
+
+<p>Como exemplo, vamos ver como setar e pegar a palette controlando diretamente o hardware
+da VGA.<br>
+</p>
+
+<p>Agora, a VGA tem uma porção de registradores, mas as próximas três é bom que você
+conheça bem: 
+
+<ul>
+  <li>03C7h&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - PEL Registrador de Endereços (Leitura)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    Seta a palette em mode de leitura</li>
+  <li>03C8h&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - PEL Registrador de Endereços (Escrita)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    Seta a palette em modo de escrita</li>
+  <li>03C9h&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - PEL Registrador de Dados (Leitura/Escrita)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    Lê, ou escreve 3 valores RGB, a cada terceira escrita, o<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    índice, ou cor que você está setando, é incrementado de um.</li>
+</ul>
+
+<p>O que tudo isso significa é -</p>
+
+<p>Se nós fôssemos setar um valor RGB de uma cor RGB, nós mandaríamos o valor da cor
+que queríamos mudar para 03C8h, então ler os 3 valores de 03C9h. Em Assembler, faríamos
+isso:</p>
+
+<p>&nbsp;&nbsp; mov&nbsp;&nbsp; dx, 03C8h&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Põe
+o registrador DAC de leitura em DX<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; al, [Color]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ;
+Põe o valor da cor em AL<br>
+&nbsp;&nbsp; out&nbsp;&nbsp; dx, al
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; Manda AL para a porta DX<br>
+&nbsp;&nbsp; inc&nbsp;&nbsp; dx
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; Agora usa a porta 03C9h<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; al, [R]
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ;
+Põe o novo valor VERMELHO em AL<br>
+&nbsp;&nbsp; out&nbsp;&nbsp; dx, al
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; Manda AL para a porta DX<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; al, [G]
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ;
+Põe o novo valor VERDE em AL<br>
+&nbsp;&nbsp; out&nbsp;&nbsp; dx, al
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; Manda AL para a porta DX<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; al, [B]
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ;
+Põe o novo valor AZUL em AL<br>
+&nbsp;&nbsp; out&nbsp;&nbsp; dx, al
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; Manda AL para a porta DX</p>
+
+<p>E aquilo deveria fazer a coisas direitinho. Para ler a palette, faríamos isso:</p>
+
+<p>&nbsp;&nbsp; mov&nbsp;&nbsp; dx, 03C7h&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Põe
+o registrador DAC de escrita em DX<br>
+&nbsp;&nbsp; mov&nbsp;&nbsp; al, [Color]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ;
+Põe o valor da cor em AL<br>
+&nbsp;&nbsp; out&nbsp;&nbsp; dx, al
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; Manda AL para a porta DX<br>
+&nbsp;&nbsp; add&nbsp;&nbsp; dx, 2
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; Agora usa a porta 03C9h</p>
+
+<p>&nbsp;&nbsp; in&nbsp;&nbsp;&nbsp; al, dx
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; Põe o valor conseguido da porta DX em AL<br>
+&nbsp;&nbsp; les&nbsp;&nbsp; di, [R]
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; Aponta DI para a variável R - Isso vem do Pascal<br>
+&nbsp;&nbsp; stosb
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; Guarda AL em R</p>
+
+<p>&nbsp;&nbsp; in&nbsp;&nbsp;&nbsp; al, dx
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Põe o valor
+conseguido da porta DX em AL<br>
+&nbsp;&nbsp; les&nbsp;&nbsp; di, [G]
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Aponta DI para a variável G<br>
+&nbsp;&nbsp; stosb
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; Guarda AL em G</p>
+
+<p>&nbsp;&nbsp; in&nbsp;&nbsp;&nbsp; al, dx
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Põe o valor
+conseguido da porta DX em AL<br>
+&nbsp;&nbsp; les&nbsp;&nbsp; di, [B]
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Aponta DI para a variável B<br>
+&nbsp;&nbsp; stosb
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; Guarda AL em B</p>
+
+<p>Note como essa rotina foi codificada diferentemente. Isso era originalmente uma rotina
+em Pascal, e como o Pascal não gosta que você mexa com variáveis de Pascal em
+Assembler, você tem que improvisar.</p>
+
+<p>Se você está trabalhando com Assembler puro, então você pode codificar isso muito
+mais eficientemente, como o primeiro exemplo. Eu deixei o código como estava para que
+aqueles trabalhando com uma linguagem de alto nível possam chegar a um problema
+particularmente irritante.</p>
+
+<p>Agora você já viu como IN e OUT podem ser úteis. Controlar diretamente o hardware é
+mais rápido e mais eficiente. Nas próximas semanas, eu posso incluir uma lista das
+portas mais comuns, mas se você tivesse uma cópia da Ralf Brown's Interrupt List
+(disponível no X2FTP), você já teria uma cópia. </p>
+
+<p>OBS.: Você pode achar um link para a Ralf Brown's Interrupt List na minha página.</p>
+
+<hr>
+
+<p>Um pouco mais sobre o registrador de <a name="flag">flags:</a><br>
+</p>
+
+<p>Agora, embora tenhamos usado o registrador de flags em quase todo nosso código até
+esse ponto, eu não entrei profundamente nesse assunto. Você pode trabalhar felizmente
+sem conhecer muito sobre os flags, e comparar coisas sem saber o que está realmente
+acontecendo, mas se você quiser avançar no Assembler, você precisa saber algo mais.</p>
+
+<p>De volta ao Tutorial Três, eu dei uma visão simplista do registrador de FLAGS. Na
+realidade, os FLAGS, ou EFLAGS é na verdade um registrador de 32-bit, embora apenas só
+os bits de 0 a 18 sejam usados. Na realidade não precisamos conhecer os flags acima do 11
+por enquanto, mas é bom saber que eles existem.</p>
+
+<p>O registrador EFLAGS na verdade se parece com isso:</p>
+
+<p>18&nbsp; 17&nbsp; 16&nbsp; 15&nbsp; 14&nbsp; 13&nbsp; 12&nbsp; 11&nbsp; 10&nbsp; 09
+&nbsp; 08&nbsp; 07&nbsp; 06&nbsp; 05&nbsp; 04&nbsp; 03&nbsp; 02&nbsp; 01&nbsp; 00<br>
+AC&nbsp; VM&nbsp; RF&nbsp; --&nbsp; NT&nbsp; IO/PL&nbsp;&nbsp; OF&nbsp; DF&nbsp; IF &nbsp;
+TF&nbsp; SF&nbsp; ZF&nbsp; --&nbsp; AF&nbsp; --&nbsp; PF&nbsp; --&nbsp; CF<br>
+</p>
+
+<p>Agora, os flags são os seguintes: 
+
+<ul>
+  <li>AC&nbsp;&nbsp; - Alignment Check (80486) / Checagem de Alinhamento</li>
+  <li>VM&nbsp;&nbsp; - Virtual 8086 Mode / Modo Virtual 8086</li>
+  <li>RF&nbsp;&nbsp; - Resume Flag / Flag de Continuação</li>
+  <li>NT&nbsp;&nbsp; - Nested Task Flag / Flag de Tarefa Aninhada</li>
+  <li>IOPL - I/O Privilege Level / Nível de Privilégio de E/S<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Tem um valor de 0,1,2
+    ou 3 logo ocupa 2 bits</li>
+  <li>OF&nbsp;&nbsp; - Overflow Flag / Flag de Overflow<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Este bit é setado para
+    UM se uma instrução aritmética gerar um<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; resultado que é muito
+    grande ou muito pequeno para caber no<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; registrador destino.</li>
+  <li>DF&nbsp;&nbsp; - Direction Flag / Flag de Direção<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Qaundo setado para
+    ZERO, as instruções de string, como MOVS, LODS,<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; e STOS incrementarão o
+    endereço de memória que elas estão<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; trabalhando de uma
+    unidade. Isto significa que, digamos, DI será<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; incrementado quando
+    você usar STOSB para colocar um pixel em<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ES:DI. Setando o bit
+    para UM decrementará o endereço de memória<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; após cada chamada.</li>
+  <li>IF&nbsp;&nbsp; - Interrupt Enable Flag / Flag de Habilitação de Interrupções<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Quando este bit está
+    setado, o processador responderá a<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; interrupções externas
+    do hardware. Quando o bit for resetado,<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; interrupções de
+    hardware são ignoradas.</li>
+  <li>TF&nbsp;&nbsp; - Trap Flag / Flag de Trap (&quot;armadilha&quot;)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Quando este bit estiver
+    setado, uma interrupção ocorrerá<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; imediatamente depois
+    que a próxima instrução executar. Isto é<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; geralmente usado em
+    depurações.</li>
+  <li>SF&nbsp;&nbsp; - Sign Flag / Flag de Sinal<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Este bit é mudado
+    após operações aritméticas. O bit recebe<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; o bit de mais alta
+    ordem do resultado, e se setado para UM,<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; indica que o resultado
+    da operação foi negativo.</li>
+  <li>ZF&nbsp;&nbsp; - Zero Flag / Flag de Zero<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Este bit é setado
+    quando instruções aritméticas geram um<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; resultado zero.</li>
+  <li>AF&nbsp;&nbsp; - Auxiliary Carry Flag / Flag de Vai-Um Auxiliar<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Este bit indica que um
+    vai-um no nibble de baixa ordem de AL<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ocorreu na instrução
+    aritmética.</li>
+  <li>PF&nbsp;&nbsp; - Parity Flag / Flag de Paridade<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Este bit é setado para
+    um quando uma instrução aritmética resulta<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; num número par de bits
+    1.</li>
+  <li>CF&nbsp;&nbsp; - Carry Flag / Flag de Vai-Um<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Este bit é setado
+    quando o resultado de uma operação aritmética<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; é muito grande ou
+    muito pequena para o registrador destino<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ou endereço de
+    memória.<br>
+  </li>
+</ul>
+
+<p>Agora, de todos esses acima, você não precisa mesmo se preocupar muito com a maioria
+deles. Por enquanto, só conhecer CF, PF, ZF, IF, DF e OF será suficiente. Eu não dei
+comentários para os primeiros já que eles são puramente técnicos, e são usados mais
+no modo protegido e situações complexas. Você não deveria ter que conhecê-los.</p>
+
+<p>Você pode, se quiser, mover uma copia do flags para AH com LAHF - (Carrega AH com
+Flags) - e modificar ou ler bits individualmente, ou mudar o status dos bits mais
+facilmente com CLx e STx. Contudo se você planeja mudar os flags, lembre-se de que eles
+podem ser extremamente úteis em muitas situações.</p>
+
+<p>(Eles podem também ser muito enjoados quando tarde da noite, linhas começam a
+desenhar para trás, e você gasta um hora procurando o porquê - e então se lembra que
+você se esqueceu de limpar o flag de direção!)</p>
+
+<hr>
+
+<p>Acho que cobrimos muito pouca coisa importante neste tutorial. Dê uma olhada nos
+flags, e volte naquela rotina compridona de fazer linhas, já que ela é um ótimo exemplo
+de controle de fluxo. Assegure-se de que suas capacidades de controlar fluxos de
+intruções estão perfeitas.</p>
+
+<p>Semana que vem, vou tentar amarrar todos os tópicos que vimos estas poucas semanas
+juntos, e apresentar alguma forma de revisão de tudo que você aprendeu. Semana que vem
+eu também vou entrar em otimização, e como você pode acelerar todo o código com que
+temos trabalhado até agora.</p>
+
+<hr>
+
+<p>No próximo tutorial vamos ver: 
+
+<ul>
+  <li>Uma revisão&nbsp; de tudo que você aprendeu </li>
+  <li>Otimização </li>
+  <li>Declarando procedures (procedimentos) em Assembler</li>
+  <li>Ligando seu código a C/C++ ou Pascal</li>
+</ul>
+
+<p>Se você deseja ver um tópico discutido num tutorial no futuro, escreva-me, e eu vou
+ver o que eu posso fazer.</p>
+
+<hr>
+
+<p>Não perca!!! Baixe o <a href="tut07pt.htm">tutorial da próxima</a> semana na minha
+homepage: 
+
+<ul>
+  <li>http://www.faroc.com.au/~blackcat</li>
+  <li><a href="http://www.geocities.com/SiliconValley/Park/3174">http://www.geocities.com/SiliconValley/Park/3174</a></li>
+</ul>
+
+<p>Vejo vocês na próxima semana!</p>
+
+<p>- Adam.<br>
+- Renato Nunes Bastos</p>
+</body>
+</html>

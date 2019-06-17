@@ -1,0 +1,660 @@
+<html>
+
+<head>
+<title>Tutorial 7 - Adam Hyde</title>
+</head>
+
+<body bgcolor="#00FFFF">
+<div align="center"><center>
+
+<table border="5" width="50%">
+  <tr>
+    <td width="50%" align="center" bgcolor="#FF0000"><strong><big>Tutorial de Assembler de
+    Adam Hyde 1.0</big></strong><p><small>PARTE 7</small><br>
+    <small>Traduzido por Renato Nunes Bastos</small></td>
+  </tr>
+</table>
+</center></div>
+
+<p>&nbsp;</p>
+
+<p>Versão&nbsp;&nbsp; :&nbsp; 1.0<br>
+Data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; :&nbsp; 01-05-1996<br>
+Contato&nbsp; :&nbsp; blackcat@vale.faroc.com.au<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+http://www.faroc.com.au/~blackcat<br>
+;Renato&nbsp; :&nbsp;
+<a href="mailto:rnbastos@ig.com.br">rnbastos@ig.com.br</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="http://www.geocities.com/SiliconValley/Park/3174">http://www.geocities.com/SiliconValley/Park/3174</a></p>
+
+<hr>
+
+<p align="center"><a href="#escrev">Escrevendo Código Externo para sua Linguagem de Alto
+Nível</a> | <a href="#func">Funções e Otimizações Posteriores</a> | <a href="#otim">Otimização</a></p>
+
+<hr>
+
+<p>Oi de novo, e bem-vindo à sétima parte dos Tutoriais de Assembler. Estes tutoriais
+parecem estar saindo sem regularidade, mas pessoas estão me pedindo coisas que eu nunca
+fiz, e eu ainda estou trabalhando em projetos meus. Espero cuspir estes tutoriais
+quinzenalmente. </p>
+
+<p>Agora, esta semana vamos cobrir dois tópicos muito importantes. Quando eu comecei a
+brincar com Assembler eu logo vi que o Turbo Pascal, (a linguagem com que eu trabalhava
+até então), tinha poucas limitações - uma delas é que ela era, e ainda é, uma
+linguagem de 16 bits. Isso significava que se eu quisesse brincar com escritas
+super-rápidas em 32 bits, eu não poderia. Nem mesmo com seu próprio Assembler (bem,
+não facilmente).</p>
+
+<p>O que eu precisava fazer era escrever código separadamente 100% em Assembler e linkar
+ao Turbo. Isso não é uma tarefa particularmente difícil, e uma das que eu vou tentar
+ensinar a você hoje.</p>
+
+<p>A outra vantagem de escrever rotinas em Assembler puro é que você também pode linkar
+o código objeto resultante a outra linguagem de alto nível, como o C.&nbsp; </p>
+
+<hr>
+<div align="center"><center>
+
+<table border="5" width="50%">
+  <tr>
+    <td width="50%" align="center" bgcolor="#FF0000"><a name="escrev"><strong>ESCREVENDO
+    CÓDIGO EXTERNO PARA SUA LINGUAGEM DE ALTO NÍVEL</strong></a></td>
+  </tr>
+</table>
+</center></div>
+
+<p>Antes de começarmos, você precisa de uma idéia do que são chamadas far e near. Se
+você já sabe, então pule essa pequena seção.</p>
+
+<p>Como discutimos antes, o PC tem uma arquitetura segmentada. Como você sabe, você só
+pode acessar um segmento de 64K de cada vez. Agora se você está trabalhando com código
+de menos de 64K de tamanho, ou em uma linguagem que cuida de todas as preocupações para
+você, você não precisa de se preocupar tanto. Contudo, trabalhando em Assembler,
+precisamos sim.</p>
+
+<p>Imagine que tenhamos o seguinte programa caregado na memória:</p>
+<div align="center"><center>
+
+<table border="4" width="44%">
+  <tr>
+    <td width="25%" align="center">64k</td>
+    <td width="35%" align="center">Rotina 2</td>
+    <td width="40%" align="center">Executa<br>
+    Volta ao Principal</td>
+  </tr>
+  <tr>
+    <td width="25%" rowspan="2" align="center">64k</td>
+    <td width="35%" align="center">Rotina 1</td>
+    <td width="40%" align="center">Executa<br>
+    Chama Rotina 2</td>
+  </tr>
+  <tr>
+    <td width="35%" align="center">Programa Principal</td>
+    <td width="40%" align="center">Entrada (início)<br>
+    Executa<br>
+    Chama Rotina 1<br>
+    Saída (fim)</td>
+  </tr>
+</table>
+</center></div>
+
+<p>Quando um JMP for executado para transferir o controle para a Rotina Um, esse será uma
+chamada near(perto). Nós não deixamos o segmento em que o corpo principal do programa
+está localizado, e assim quando o JMP ou CALL é executado, e CS:IP é mudado por JMP,
+só o IP precisa ser mudado, não CS.</p>
+
+<p>O offset muda, mas o segmento não.</p>
+
+<p>Agora, pular para a Rotina Dois seria diferente. Isto deixa o segmento corrente, e
+assim ambas as partes do par CS:IP precisarão de ser alteradas. Isto é uma chamada far
+(longe).</p>
+
+<p>O problema ocorre quando a CPU encontra um RET ou RETF no fim da chamada. Digamos que
+você, por acidente, colocou RET no fim da Rotina Dois, ao invés de RETF. Como a CPU viu
+RET, ela só tiraria IP da pilha, e assim, sua máquina travaria, provavelmente, já que
+CS:IP estaria apontando para um lixo.</p>
+
+<p>Este ponto é especialmente importante quando for linkar a uma linguagem de alto
+nível. Seja lá quando for que você escrever um código em Assembly e linkar, digamos,
+ao Pascal, lembre-se de usar a diretiva de compilação {$F+}, mesmo se não foi uma
+chamada FAR. Deste modo, depois de o Turbo chamar a rotina, ele tira CS e IP da pilha, e
+tudo vai bem.</p>
+
+<p>Falhas em fazer isso são problemas seus!</p>
+
+<hr>
+
+<p>OK, de volta ao modelo em Assembly puro do <a href="tut03pt.htm">Tutorial Três</a>. Eu
+não me lembro direito, mas eu acho que era alguma coisa assim:<br>
+</p>
+
+<p>&nbsp;&nbsp;&nbsp; DOSSEG<br>
+&nbsp;&nbsp;&nbsp; .MODEL SMALL<br>
+&nbsp;&nbsp;&nbsp; .STACK 200h<br>
+&nbsp;&nbsp;&nbsp; .DATA<br>
+&nbsp;&nbsp;&nbsp; .CODE</p>
+
+<p>START:<br>
+</p>
+
+<p>END START<br>
+</p>
+
+<p>Agora, acho que é hora de vocês pularem um grau no uso daquele esqueleto. Vejamos
+outros modos de arrumar uma rotina-esqueleto.<br>
+<br>
+</p>
+
+<p>&nbsp;&nbsp;&nbsp; DATA&nbsp;&nbsp;&nbsp;&nbsp; SEGMENT WORD PUBLIC</p>
+
+<p>&nbsp;&nbsp;&nbsp; DATA&nbsp;&nbsp;&nbsp;&nbsp; ENDS<br>
+</p>
+
+<p>&nbsp;&nbsp;&nbsp; CODE&nbsp;&nbsp;&nbsp;&nbsp; SEGMENT WORD PUBLIC<br>
+&nbsp;&nbsp;&nbsp; ASSUME&nbsp; CS:CODE, DS:DATA</p>
+
+<p>&nbsp;&nbsp;&nbsp; CODE&nbsp;&nbsp;&nbsp;&nbsp; ENDS</p>
+
+<p>&nbsp;&nbsp;&nbsp; END</p>
+
+<p>Este é, obviamente, um esqueleto diferente. Note como eu omiti o ponto antes de DATA e
+CODE. Dependendo de que Assembler/Linker você usar, você pode precisar do ponto ou não.
+TASM, o Assembler que eu uso, aceita os dois formatos, então, pegue um com que você e
+seu assembler estejam felizes. Note também o uso de DATA&nbsp; SEGMENT WORD PUBLIC.
+Primeiramente, WORD diz ao Assembler para alinhar o segmento em limites de word. </p>
+
+<p>FATO ENGRAÇADO: Você não precisa se preocupar com isso por enquanto, pois o Turbo
+Pascal faz isso de qualquer modo, assim, colocar BYTE ao invés de word não faria
+diferença nenhuma. :)</p>
+
+<p>PUBLIC permite ao compilador que você usar, acessar quaisquer variáveis no segmento
+de dados. Se você não quer que seu compilador tenha acesso a qualquer variável que
+você declarar, então apenas omita isso. Se você não precisar de acessar o segmento de
+dados, então esqueça o segmento de dados todo. Agora, o segmento de código. Geralmente,
+você vai precisar incluir isso em todo o código que você escrever. :) A sentença
+ASSUME também será um padrão em tudo que você vai trabalhar. Você também pode
+esperar ver CSEG e DSEG ao invés de CODE e DATA. Note de novo que ele é declarado como
+PUBLIC. É nele que todas as nossas rotinas vão.</p>
+
+<hr>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Então, como eu declaro procedures externas?<br>
+</p>
+
+<p>Ok, por exemplo, vamos usar umas poucas rotinas simples similares àquelas na
+biblioteca do modo 13H do PASCAL (disponível na minha homepage).</p>
+
+<p>Se você se lembrar, a procedure se parece um pouco com isso:&nbsp; 
+
+<ul>
+  <li>Procedure PutPixel(X, Y : Integer; Color : Byte);</li>
+  <li>Procedure InitMCGA;</li>
+  <li>Procedure Init80x25;<br>
+  </li>
+</ul>
+
+<p>Ajustando isso no nosso esqueleto, temos:<br>
+</p>
+
+<p>&nbsp;&nbsp;&nbsp; CODE&nbsp;&nbsp;&nbsp;&nbsp; SEGMENT WORD PUBLIC<br>
+&nbsp;&nbsp;&nbsp; ASSUME&nbsp; CS:CODE DS:DATA</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp; PUBLIC&nbsp; PutPixel<br>
+&nbsp;&nbsp;&nbsp;&nbsp; PUBLIC&nbsp; InitMCGA<br>
+&nbsp;&nbsp;&nbsp;&nbsp; PUBLIC&nbsp; Init80x25</p>
+
+<p>&nbsp;&nbsp;&nbsp; CODE&nbsp;&nbsp;&nbsp;&nbsp; ENDS<br>
+</p>
+
+<p>&nbsp;&nbsp;&nbsp; END</p>
+
+<p>Agora, tudo o que temos a fazer é codificá-los. Mas, espere um minuto - a rotina
+PutPixel tem PARÂMETROS! Como usá-los em código externo??</p>
+
+<p>Isto é um macete. O que fazemos é colocar os valores na pilha, simplesmente dizendo
+-- PutPixel(10,25,15); -- já faz isso para nós. É tirar eles de lá é que é o mais
+difícil. O que eu geralmente faço, e sugiro a vocês fazer, é se certificar de DECLARAR
+TODAS AS PROCEDURES EXTERNAS COMO FAR. Isso faz as coisas trabalharem com a pilha mais
+fácil.</p>
+
+<p>FATO ENGRAÇADO: Lembre que a primeira cois a entrar na pilha é a ÚLTIMA A SAIR. :)</p>
+
+<p>Quando você chamar a Putpixel, a pilha estará mudada. Como isso é uma chamada FAR,
+os primeiros 4 bytes são CS:IP. Os bytes daí em diante são os nossos parâmetros.</p>
+
+<p>Para encurtar a história, digamos que a pilha se pareça com isso:</p>
+
+<p>&nbsp;&nbsp; 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ...</p>
+
+<p>Depois de chamar -- PutPixel(10, 20, 15); -- um tempo depois, ela pode se parecer com
+isso:<br>
+</p>
+
+<p>&nbsp;&nbsp; 4C EF 43 12&nbsp;&nbsp;&nbsp; 0F 00&nbsp; 14 00&nbsp;&nbsp; 0A 00
+&nbsp;&nbsp; 9E F4 3A 23 1E 21 ...</p>
+
+<p>&nbsp;&nbsp; ^^^^^^^^^^^&nbsp; ^^^^^&nbsp; ^^^^^&nbsp; ^^^^^ &nbsp;&nbsp;
+^^^^^^^^^^^^^^^^^<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CS:IP
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Cor
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Y
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; X
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Algum lixo</p>
+
+<p>Agora, para complicar as coisas, a CPU armazena words na pilha com a PARTE MENOS
+SIGNIFICATIVA PRIMEIRO. Isso não nos atrapalha muito, mas se você ficar andando por aí
+com um debugger sem saber disso, você vai ficar mesmo confuso.</p>
+
+<p>Note também que quando o Turbo Pascal põe um tipo de dado byte na pilha, ele te chupa
+DOIS BYTES, NÃO UM. Você não adora o modo como o PC é organizado? ;)</p>
+
+<p>Agora, tudo que eu disse até agora só se aos parâmetros passados por valor -
+PARÂMETROS QUE VOCÊ NÃO PODE MUDAR. Quando você estiver por aí brincando com
+PARÂMETROS PASSADOS POR REFERÊNCIA, como -- MyProc(Var A, B, C : Word); -- cada
+parâmetro agora usa QUATRO BYTES de pilha, dois para o segmento e dois para o offset de
+onde a variável está na memória.</p>
+
+<p>Assim, se você pegou uma variável que está, digamos, na posição de memória
+4AD8:000Eh, não interessa o valor dela, 4AD8:000Eh seria armazenado na pilha. Já que
+isso acontece, você ia ver 0E 00 D8 4A na pilha, lembrando que o<br>
+nibble menos significativo é armazenado primeiro.</p>
+
+<p>FATO ENGRAÇADO: Parâmetros de Valor põe na verdade o valor na pilha, e Parâmetros
+de Referência armazenam o endereço. :)</p>
+
+<hr>
+
+<p>Ok, agora que eu tenho você realmente confuso, e com razão, isso piora!</p>
+
+<p>Para referenciar estes parâmetros no seu código, você tem que usar o ponteiro de
+pilha, SP. O problema é que você não pode brincar com SP diretamente, você tem que
+botar BP na pilha, e mover SP para ele. Isso agora coloca mais dois bytes na pilha.
+Digamos que BP era igual a 0A45h. Antes de colocar BP, a pilha era assim:</p>
+
+<p>&nbsp;&nbsp; 4C EF 43 12&nbsp;&nbsp;&nbsp; 0F 00&nbsp; 14 00&nbsp;&nbsp;&nbsp; 0A 00</p>
+
+<p>&nbsp;&nbsp; ^^^^^^^^^^^&nbsp; ^^^^^&nbsp; ^^^^^&nbsp; ^^^^^<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CS:IP
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Cor
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Y
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; X</p>
+
+<p>Depois, ela ficou assim:<br>
+</p>
+
+<p>45 0A&nbsp; 4C EF 43 12&nbsp;&nbsp; 0F 00&nbsp;&nbsp; 14 00&nbsp;&nbsp; 0A 00</p>
+
+<p>&nbsp; ^^^^&nbsp; ^^^^^^^^^^^&nbsp; ^^^^^&nbsp; ^^^^^&nbsp; ^^^^^<br>
+&nbsp;&nbsp; BP &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+CS:IP &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Color&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Y
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; X</p>
+
+<p>Agora que nós passamos por isso tudo, podemos realmente acessar essas as porcarias! O
+que você faria depois de chamar -- PutPixel(10, 20, 15); -- para acessar o valor de Color
+é isto:</p>
+
+<p>&nbsp;&nbsp; PUSH&nbsp; BP<br>
+&nbsp;&nbsp; MOV&nbsp;&nbsp; BP, SP</p>
+
+<p>&nbsp;&nbsp; MOV&nbsp;&nbsp; AX, [BP+6]&nbsp;&nbsp; ; Agora temos Color<br>
+</p>
+
+<p>Podemos acessar X e Y assim:</p>
+
+<p>&nbsp;&nbsp; MOV&nbsp;&nbsp; BX, [BP+8]&nbsp;&nbsp; ; Agora temos Y</p>
+
+<p>&nbsp;&nbsp; MOV&nbsp;&nbsp; CX, [BP+10]&nbsp; ; Agora temos X<br>
+</p>
+
+<p>E agora restauramos BP:</p>
+
+<p>&nbsp;&nbsp; POP&nbsp;&nbsp; BP<br>
+</p>
+
+<p>Agora, retornamos de uma chamada FAR, e removemos os seis bytes de dados que pusemos na
+pilha:</p>
+
+<p>&nbsp;&nbsp; RETF&nbsp; 6<br>
+</p>
+
+<p>E é só isso!</p>
+
+<hr>
+
+<p>Agora vamos por a PutPixel, InitMCGS e Init80x25 em código Assembler. Você obtém
+algo assim:</p>
+
+<p>CODE SEGMENT WORD PUBLIC<br>
+&nbsp;&nbsp;&nbsp;&nbsp; ASSUME&nbsp; CS:CODE DS:DATA</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp; PUBLIC PutPixel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ;
+Declara as procedures públicas<br>
+&nbsp;&nbsp;&nbsp;&nbsp; PUBLIC InitMCGA<br>
+&nbsp;&nbsp;&nbsp;&nbsp; PUBLIC Init80x25</p>
+
+<p>.386
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; Vamos usar alguns registradores de 386 </p>
+
+<p>; </p>
+
+<hr>
+
+<p>;<br>
+; Procedure PutPixel(X, Y : Integer; Color : Byte);<br>
+;<br>
+</p>
+
+<p>PutPixel PROC FAR&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Declara
+uma procedure FAR</p>
+
+<p>&nbsp;&nbsp; PUSH&nbsp; BP<br>
+&nbsp;&nbsp; MOV&nbsp;&nbsp; BP, SP
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; Arruma a pilha<br>
+&nbsp;&nbsp; </p>
+
+<p>&nbsp;&nbsp; MOV&nbsp;&nbsp; BX, [BP+10]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; BX
+= X<br>
+&nbsp;&nbsp; MOV&nbsp;&nbsp; DX, [BP+08]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; DX =
+Y<br>
+&nbsp;&nbsp; XCHG&nbsp; DH, DL
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; Como Y sempre terá um valor menor quee 200,<br>
+&nbsp;&nbsp; MOV&nbsp;&nbsp; AL, [BP+06]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ;
+isto é 320x200, não se esqueça, dizer XCHG DH,DL<br>
+&nbsp;&nbsp; MOV&nbsp;&nbsp; DI, DX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; é um modo genial de dizer SHL DX, 8<br>
+&nbsp;&nbsp; SHR&nbsp;&nbsp; DI, 2<br>
+&nbsp;&nbsp; ADD&nbsp;&nbsp; DI, DX<br>
+&nbsp;&nbsp; ADD&nbsp;&nbsp; DI, BX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; Agora temos o offset, então...<br>
+&nbsp;&nbsp; MOV&nbsp;&nbsp; FS:[DI], AL
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; ...plote em FS:DI</p>
+
+<p>&nbsp;&nbsp; POP&nbsp;&nbsp; BP<br>
+&nbsp;&nbsp; RETF&nbsp; 6</p>
+
+<p>PutPixel ENDP</p>
+
+<p>;</p>
+
+<hr>
+
+<p>;<br>
+; Procedure InitMCGA;<br>
+;</p>
+
+<p>InitMCGA PROC FAR</p>
+
+<p>&nbsp;&nbsp; MOV&nbsp;&nbsp; AX, 0A000H
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Aponta AX para a VGA<br>
+&nbsp;&nbsp; MOV&nbsp;&nbsp; FS, AX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; Porque não FS?<br>
+&nbsp;&nbsp; MOV&nbsp;&nbsp; AH, 00H<br>
+&nbsp;&nbsp; MOV&nbsp;&nbsp; AL, 13H<br>
+&nbsp;&nbsp; INT&nbsp;&nbsp; 10H<br>
+&nbsp;&nbsp; RETF</p>
+
+<p>InitMCGA ENDP</p>
+
+<p>; </p>
+
+<hr>
+
+<p>;<br>
+; Procedure Init80x25;<br>
+;</p>
+
+<p>Init80x25 PROC FAR</p>
+
+<p>&nbsp;&nbsp; MOV&nbsp;&nbsp; AH, 00H<br>
+&nbsp;&nbsp; MOV&nbsp;&nbsp; AL, 03H<br>
+&nbsp;&nbsp; INT&nbsp;&nbsp; 10H<br>
+&nbsp;&nbsp; RETF</p>
+
+<p>Init80x25 ENDP</p>
+
+<p>CODE&nbsp;&nbsp;&nbsp; ENDS<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; END</p>
+
+<hr>
+
+<p>E é só. Desculpe-me se eu fiz a coisa toda um pouco confusa, mas essa é a graça dos
+computadores! :)</p>
+
+<p>Ah! A propósito, você pode usar o código acima em Pascal, assemblando-o com TASM ou
+MASM. Depois, inclua no seu código isso:</p>
+
+<p>{$L SEJALÁDOQUEVOCÊCHAMOU.OBJ}<br>
+{$F+}<br>
+Procedure PutPixel(X, Y : Integer; Color : Byte);&nbsp;&nbsp; External;<br>
+Procedure InitMCGA;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+External;<br>
+Procedure Init80x25;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+External;<br>
+{$F-}</p>
+
+<p>Begin<br>
+&nbsp;&nbsp; InitMCGA;<br>
+&nbsp;&nbsp; PutPixel(100, 100, 100);<br>
+&nbsp;&nbsp; ReadLn;<br>
+&nbsp;&nbsp; Init80x25;<br>
+End.</p>
+
+<hr>
+<div align="center"><center>
+
+<table border="5" width="50%">
+  <tr>
+    <td width="50%" align="center" bgcolor="#FF0000"><a name="func"><strong>FUNÇÕES E
+    OTIMIZAÇÕES POSTERIORES</strong></a></td>
+  </tr>
+</table>
+</center></div>
+
+<p>Você pode fazer suas rotinas Assembler retornarem valores que você pode usar em sua
+linguagem de alto-nível, se você quiser. A tabela abaixo contém toda a informação que
+você precisa saber.<br>
+</p>
+<div align="center"><center>
+
+<table border="4" width="30%">
+  <tr>
+    <td width="50%" align="center" bgcolor="#008000"><font color="#FFFFFF">Tipo a Retornar</font></td>
+    <td width="50%" align="center" bgcolor="#008000"><font color="#FFFFFF">Registrador(es) a
+    usar</font></td>
+  </tr>
+  <tr>
+    <td width="50%" align="center" bgcolor="#FFFF00"><font color="#FF0000">Byte</font></td>
+    <td width="50%" align="center" bgcolor="#FFFF00"><font color="#FF0000">AL</font></td>
+  </tr>
+  <tr>
+    <td width="50%" align="center" bgcolor="#FFFF00"><font color="#FF0000">Word</font></td>
+    <td width="50%" align="center" bgcolor="#FFFF00"><font color="#FF0000">AX</font></td>
+  </tr>
+  <tr>
+    <td width="50%" align="center" bgcolor="#FFFF00"><font color="#FF0000">LongInt</font></td>
+    <td width="50%" align="center" bgcolor="#FFFF00"><font color="#FF0000">DX:AX</font></td>
+  </tr>
+  <tr>
+    <td width="50%" align="center" bgcolor="#FFFF00"><font color="#FF0000">Pointer</font></td>
+    <td width="50%" align="center" bgcolor="#FFFF00"><font color="#FF0000">DX:AX</font></td>
+  </tr>
+  <tr>
+    <td width="50%" align="center" bgcolor="#FFFF00"><font color="#FF0000">Real</font></td>
+    <td width="50%" align="center" bgcolor="#FFFF00"><font color="#FF0000">DX:BX:AX</font></td>
+  </tr>
+</table>
+</center></div>
+
+<p>Agora que você já viu como escrever código externo, você provavelmente quer saber
+como melhorá-lo para obter a performance total que o código externo pode oferecer.</p>
+
+<p>Alguns pontos para você trabalhar se seguem:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+<ul>
+  <li>Não se pode trabalhar com SP diretamente, mas você pode usar ESP.</li>
+  <li>Isso vai acabar com a lentidão de empilhar/desempilhar BP.</li>
+  <li>Lembre-se de mudar [xx+6] para [xx+4] para o último (primeiro) parâmetro, já que BP
+    não está mais na pilha.</li>
+</ul>
+
+<p>Gaste um tempo e veja o que você pode fazer com isso. É possível através de
+melhorias, fazer um código mais rápido que a rotina no MODE13H.ZIP versão 1
+(disponível na minha homepage).<br>
+</p>
+
+<p>Nota:&nbsp; Eu planejo mais pra frente desenvolver a biblioteca MODE13H, adicionando
+fontes e outras coisas legais. Ela será eventualmente codificada só em Assembler, e
+poderá ser chamada do C ou Pascal.</p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Código puro em Assembler também tem um grande
+aumento de velocidade.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Hoje eu testei a rotina PutPixel da biblioteca
+MODE13H e uma pura<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (praticamente idêntica), e vi uma diferença
+espantosa. </p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Num 486SX-25 com 4Mb de RAm e uma placa VGA de 16
+bits, levou 5<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; centéssimos de segundo para a rotina pura desenhar
+65536 pixels<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; no meio da tela, contra 31 centésimos de segundo da
+outra. Grande<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; diferença, não?</p>
+
+<hr>
+<div align="center"><center>
+
+<table border="5" width="50%">
+  <tr>
+    <td width="50%" align="center" bgcolor="#FF0000"><a name="otim"><strong>OTIMIZAÇÃO</strong></a></td>
+  </tr>
+</table>
+</center></div>
+
+<p>Por mais rápido que o Assembler seja, você sempre pode acelerar as coisas.Eu vou
+falar como acelerar seu código no 80486, e no 80386.</p>
+
+<p>Eu não vou me preocupar muito com o Pentium por enquanto, já que os truques de uso do
+Pentium são realmente truques, e demoraria um pouco para explicar. Também, você deveria
+evitar código específico para Pentium (embora isso esteja mudando lentamente). </p>
+
+<hr>
+
+<p><u><strong>A AGI (Address Generation Interlock):</strong></u></p>
+
+<p>Que merda é essa?, você pergunta. Uma AGI ocorre quando uma registrador que está
+correntemente sendo usado como base ou índice foi o destino da última instrução. AGI's
+são ruins, e chupam clocks.<br>
+</p>
+
+<p>EX.:&nbsp;&nbsp; MOV&nbsp;&nbsp; ECX, 3<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MOV&nbsp;&nbsp; FS, ECX</p>
+
+<p>Isso pode ser evitado executando-se uma outra instrução entre os dois MOV's, pois
+AGI's podem ocorrer só entre instruções adjacentes (no 486). No Pentium, uma AGI pode
+acontecer até entre 3 instruções! </p>
+
+<hr>
+
+<p><strong><u>Use Instruções/Registradores de 32 bits:<br>
+</u></strong></p>
+
+<p>Usar registradores de 32 bits tende a ser mais rápido que usar seus equivalentes de 16
+(particularmente EAX, já que muitas instruções ficam um byte menor quando ele é usado.
+Usar DS ao invés de ES também é mais rápido pelo mesmo motivo).</p>
+
+<hr>
+
+<p>&nbsp; Outras coisas para se tentar:<br>
+
+<ul>
+  <li>Evite LOOP's. tente usar um DEC, ou INC seguido de um JZ ou instrução<br>
+    &nbsp;&nbsp;&nbsp;&nbsp; similar. Isso pode fazer uma diferença enorme.</li>
+  <li>Quando for zerar registradores, use XOR ao invés de MOV xx, 0. acredite<br>
+    &nbsp;&nbsp;&nbsp;&nbsp; ou não, é mesmo mais rápido.</li>
+  <li>Use o TEST quando for checar se um registrador é igual a zero. Em se<br>
+    &nbsp;&nbsp;&nbsp;&nbsp; fazer um AND dos operandos juntos não se gasta tempo com um
+    registrador<br>
+    &nbsp;&nbsp;&nbsp;&nbsp; destino. TEST EAX,EAX é um bom mode de checar de EAX=0.</li>
+  <li>USE SHIFTS! Não use multiplicação para calcular mesmo as mais simples<br>
+    &nbsp;&nbsp;&nbsp;&nbsp; somas. A CPU pode mover uns poucos zeros para a esquerda ou para
+    a<br>
+    &nbsp;&nbsp;&nbsp;&nbsp; direita muito mais rápido que ela pode fazer uma
+    multiplicação/divisão.</li>
+  <li>Faça uso da LEA. Uma instrução é tudo o que leva para realizar uma<br>
+    &nbsp;&nbsp;&nbsp;&nbsp; multiplicação inteira e armazenar o resultado num registrador.
+    Esta é<br>
+    &nbsp;&nbsp;&nbsp;&nbsp; uma alternativa útil para SHL/SHR (eu sei, eu sei... eu disse
+    que a<br>
+    &nbsp;&nbsp;&nbsp;&nbsp; multiplicação era ruim. Mas uma LEA às vezes pode ser útil,
+    já que pode<br>
+    &nbsp;&nbsp;&nbsp;&nbsp; economizar várias instruções.).</li>
+</ul>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp; EX.: LEA ECX, [EDX+EDX*4]&nbsp;&nbsp; ; ECX = EDX x 5<br>
+
+<ul>
+  <li>Evite fazer MOV's para registradores de segmento muito frequentemente.<br>
+    &nbsp;&nbsp;&nbsp;&nbsp; Se você vai trabalhar com um valor que não muda, tal como
+    A000h, então<br>
+    &nbsp;&nbsp;&nbsp;&nbsp; carregue-o em FS, por exemplo, e use FS daí em diante.</li>
+  <li>Acredite ou não, instruções de string (LODSx, MOVSx, STOSx))são muito<br>
+    &nbsp;&nbsp;&nbsp;&nbsp; mais rápidas num 386 que num 486. Se estiver trabalhando num 486
+    ou mais,<br>
+    &nbsp;&nbsp;&nbsp;&nbsp; então use outra instrução, mais simples.</li>
+  <li>Quando for mover pedaços de 32 bits, REP STOSD é mais rápido que usar<br>
+    &nbsp;&nbsp;&nbsp;&nbsp; um loop para fazer a mesma coisa.</li>
+</ul>
+
+<hr>
+
+<p>Bem, agora você já viu como escrever código externo, declarar procedures em
+Assembler e otimizar suas rotinas. Na próxima semana eu finalmente vou descrever tudo o
+que temos aprendido juntos, e ver se faz algum sentido. Vou também incluir um exemplo em
+Assembler puro - um starfield melhor, com controle de palette, para demonstrar INs e OUTs,
+controle de programa, procedures e TEST's.</p>
+
+<hr>
+
+<p>No próximo tutorial vamos ver: 
+
+<ul>
+  <li>Uma revisão de tudo que aprendemos - finalmente (desculpem-me!);</li>
+  <li>Declarar sub-procedures em Assembler;</li>
+  <li>Um exemplo legal;&nbsp; :)</li>
+  <li>Algum outro tópico grandioso.</li>
+</ul>
+
+<p>Se você deseja ver um tópico discutido num tutorial no futuro, escreva-me, e<br>
+eu vou ver o que eu posso fazer.</p>
+
+<hr>
+
+<p>Não perca!!! Baixe o <a href="tut08pt.htm">tutorial da próxima</a> semana na minha
+homepage: 
+
+<ul>
+  <li>http://www.faroc.com.au/~blackcat</li>
+  <li><a href="http://www.geocities.com/SiliconValley/Park/3174">http://www.geocities.com/SiliconValley/Park/3174</a></li>
+</ul>
+
+<p>Vejo vocês na próxima semana!</p>
+
+<p>- Adam.<br>
+- Renato Nunes Bastos<br>
+</p>
+</body>
+</html>
