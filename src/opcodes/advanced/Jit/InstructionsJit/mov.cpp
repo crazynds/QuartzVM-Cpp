@@ -502,6 +502,7 @@ uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 max
 			else{
 				a.mov(ax,byte_ptr(workspace,val*8));
 				a.mov(byte_ptr(workspace,mem*8),ax);
+				val_rax=LIXO_REG;
 			}
 		}
 	}break;
@@ -517,6 +518,7 @@ uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 max
 			else{
 				a.mov(eax,byte_ptr(workspace,val*8));
 				a.mov(byte_ptr(workspace,mem*8),eax);
+				val_rax=LIXO_REG;
 			}
 		}
 	}break;
@@ -524,21 +526,23 @@ uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 max
 	case P_INT48+MOV_W_W:{
 		uint8 mem=t.getNext8();
 		uint8 val=t.getNext8();
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 		if(val<8){
 			a.mov(rax,qreg[val]);
 		}else{
 			a.mov(rax,qword_ptr(workspace,val*8));
 		}
-		a.and_(rax,0x0000FFFFFFFFFFFF);
+		a.and_(rax,rcx);
 		if(mem<8){
-			a.mov(rcx,0xFFFF000000000000);
-			a.and_(qreg[mem],rcx);
+			a.andn(qreg[mem],rcx,qreg[mem]);
 			a.add(qreg[mem],rax);
 		}else{
 			a.mov(dword_ptr(workspace,mem*8),eax);
 			a.shr(rax,32);
 			a.mov(word_ptr(workspace,(mem*8)+4),ax);
 		}
+		val_rax=LIXO_REG;
+		val_rcx=0x0000FFFFFFFFFFFF;
 	}break;
 	case P_UINT64+MOV_W_W:
 	case P_INT64+MOV_W_W:{
@@ -552,6 +556,7 @@ uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 max
 			else{
 				a.mov(rax,byte_ptr(workspace,val*8));
 				a.mov(byte_ptr(workspace,mem*8),rax);
+				val_rax=LIXO_REG;
 			}
 		}
 	}break;
@@ -563,6 +568,7 @@ uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 max
 		else{
 			a.mov(al,byte_ptr(memory,val));
 			a.mov(byte_ptr(workspace,mem*8),al);
+			val_rax=LIXO_REG;
 		}
 	}break;
 	case P_UINT16+MOV_W_M:
@@ -573,6 +579,7 @@ uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 max
 		else{
 			a.mov(ax,word_ptr(memory,val));
 			a.mov(word_ptr(workspace,mem*8),ax);
+			val_rax=LIXO_REG;
 		}
 	}break;
 	case P_UINT32+MOV_W_M:
@@ -583,6 +590,7 @@ uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 max
 		else{
 			a.mov(eax,dword_ptr(memory,val));
 			a.mov(dword_ptr(workspace,mem*8),eax);
+			val_rax=LIXO_REG;
 		}
 	}break;
 	case P_UINT48+MOV_W_M:
@@ -608,6 +616,8 @@ uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 max
 			a.mov(dword_ptr(workspace,mem*8),eax);
 			a.mov(word_ptr(workspace,(mem*8)+4),bx);
 		}
+		val_rax=LIXO_REG;
+		val_rbx=LIXO_REG;
 	}break;
 	case P_UINT64+MOV_W_M:
 	case P_INT64+MOV_W_M:{
@@ -617,6 +627,7 @@ uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 max
 		else{
 			a.mov(rax,qword_ptr(memory,val));
 			a.mov(qword_ptr(workspace,mem*8),rax);
+			val_rax=LIXO_REG;
 		}
 	}break;
 	case P_UINT8+MOV_M_W:
@@ -627,6 +638,7 @@ uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 max
 		else{
 			a.mov(al,byte_ptr(workspace,val*8));
 			a.mov(byte_ptr(memory,mem),al);
+			val_rax=LIXO_REG;
 		}
 	}break;
 	case P_UINT16+MOV_M_W:
@@ -637,6 +649,7 @@ uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 max
 		else{
 			a.mov(ax,word_ptr(workspace,val*8));
 			a.mov(word_ptr(memory,mem),ax);
+			val_rax=LIXO_REG;
 		}
 	}break;
 	case P_UINT32+MOV_M_W:
@@ -647,6 +660,7 @@ uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 max
 		else{
 			a.mov(eax,dword_ptr(workspace,val*8));
 			a.mov(dword_ptr(memory,mem),eax);
+			val_rax=LIXO_REG;
 		}
 	}break;
 	case P_UINT48+MOV_M_W:
@@ -657,13 +671,17 @@ uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 max
 			a.mov(rbx,qreg[val]);
 			a.mov(eax,ebx);
 			a.shr(rbx,32);
-			a.mov(cx,bx);
+			a.mov(dx,bx);
+			val_rbx=LIXO_REG;
 		}else{
 			a.mov(eax,dword_ptr(workspace,val*8));
-			a.mov(cx,word_ptr(workspace,(val*8)+4));
+			a.mov(dx,word_ptr(workspace,(val*8)+4));
 		}
 		a.mov(dword_ptr(memory,mem),eax);
-		a.mov(word_ptr(memory,mem+4),cx);
+		a.mov(word_ptr(memory,mem+4),dx);
+
+		val_rax=LIXO_REG;
+		val_rdx=LIXO_REG;
 	}break;
 	case P_UINT64+MOV_M_W:
 	case P_INT64+MOV_M_W:{
@@ -673,6 +691,7 @@ uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 max
 		else{
 			a.mov(rax,qword_ptr(workspace,val*8));
 			a.mov(qword_ptr(memory,mem),rax);
+			val_rax=LIXO_REG;
 		}
 	}break;
 	case P_UINT8+MOV_M_M:
@@ -682,6 +701,7 @@ uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 max
 
 		a.mov(al,byte_ptr(memory,val));
 		a.mov(byte_ptr(memory,mem),al);
+		val_rax=LIXO_REG;
 	}break;
 	case P_UINT16+MOV_M_M:
 	case P_INT16+MOV_M_M:{
@@ -690,6 +710,7 @@ uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 max
 
 		a.mov(ax,word_ptr(memory,val));
 		a.mov(word_ptr(memory,mem),ax);
+		val_rax=LIXO_REG;
 	}break;
 	case P_UINT32+MOV_M_M:
 	case P_INT32+MOV_M_M:{
@@ -698,6 +719,7 @@ uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 max
 
 		a.mov(eax,dword_ptr(memory,val));
 		a.mov(dword_ptr(memory,mem),eax);
+		val_rax=LIXO_REG;
 	}break;
 	case P_UINT48+MOV_M_M:
 	case P_INT48+MOV_M_M:{
@@ -706,10 +728,12 @@ uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 max
 
 
 		a.mov(eax,dword_ptr(memory,val));
-		a.mov(cx,word_ptr(memory,val+4));
+		a.mov(bx,word_ptr(memory,val+4));
 
 		a.mov(dword_ptr(memory,mem),eax);
-		a.mov(word_ptr(memory,mem+4),cx);
+		a.mov(word_ptr(memory,mem+4),bx);
+		val_rax=LIXO_REG;
+		val_rbx=LIXO_REG;
 	}break;
 	case P_UINT64+MOV_M_M:
 	case P_INT64+MOV_M_M:{
@@ -718,6 +742,7 @@ uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 max
 
 		a.mov(rax,qword_ptr(memory,val));
 		a.mov(qword_ptr(memory,mem),rax);
+		val_rax=LIXO_REG;
 	}break;
 	case P_UINT8+MOV_MMW_M:
 	case P_INT8+MOV_MMW_M:{
@@ -725,14 +750,18 @@ uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 max
 		uint8 mem=t.getNext8();
 		uint64 val=t.getNext48().toInt();
 
-		a.mov(al,byte_ptr(memory,val));
 
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
 		if(mem<8)a.mov(rbx,qreg[mem]);
 		else a.mov(rbx,qword_ptr(workspace,mem*8));
+		a.mov(al,byte_ptr(memory,val));
 		a.and_(rbx,rcx);
 
 		a.mov(byte_ptr(memory,rbx,0,inc),al);
+
+		val_rax=LIXO_REG;
+		val_rbx=LIXO_REG;
+		val_rcx=0x0000FFFFFFFFFFFF;
 	}break;
 	case P_UINT16+MOV_MMW_M:
 	case P_INT16+MOV_MMW_M:{
@@ -740,29 +769,34 @@ uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 max
 		uint8 mem=t.getNext8();
 		uint64 val=t.getNext48().toInt();
 
-		a.mov(ax,word_ptr(memory,val));
 
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
 		if(mem<8)a.mov(rbx,qreg[mem]);
 		else a.mov(rbx,qword_ptr(workspace,mem*8));
+		a.mov(ax,word_ptr(memory,val));
 		a.and_(rbx,rcx);
 
 		a.mov(word_ptr(memory,rbx,0,inc),ax);
+
+		val_rax=LIXO_REG;
+		val_rbx=LIXO_REG;
+		val_rcx=0x0000FFFFFFFFFFFF;
 	}break;
 	case P_UINT32+MOV_MMW_M:
 	case P_INT32+MOV_MMW_M:{
 		uint32 inc=t.getNext32();
 		uint8 mem=t.getNext8();
 		uint64 val=t.getNext48().toInt();
-
-		a.mov(eax,dword_ptr(memory,val));
-
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
 		if(mem<8)a.mov(rbx,qreg[mem]);
 		else a.mov(rbx,qword_ptr(workspace,mem*8));
+		a.mov(eax,dword_ptr(memory,val));
 		a.and_(rbx,rcx);
-
 		a.mov(dword_ptr(memory,rbx,0,inc),eax);
+
+		val_rax=LIXO_REG;
+		val_rbx=LIXO_REG;
+		val_rcx=0x0000FFFFFFFFFFFF;
 	}break;
 	case P_UINT48+MOV_MMW_M:
 	case P_INT48+MOV_MMW_M:{
@@ -770,18 +804,22 @@ uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 max
 		uint8 mem=t.getNext8();
 		uint64 val=t.getNext48().toInt();
 
-
-		a.mov(eax,dword_ptr(memory,val));
-		a.mov(cx,word_ptr(memory,val+4));
-
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
 		if(mem<8)a.mov(rbx,qreg[mem]);
 		else a.mov(rbx,qword_ptr(workspace,mem*8));
+		a.mov(eax,dword_ptr(memory,val));
+		a.mov(dx,word_ptr(memory,val+4));
 		a.and_(rbx,rcx);
 
 		a.mov(dword_ptr(memory,rbx,0,inc),eax);
 		a.add(rbx,4);
-		a.mov(word_ptr(memory,rbx,0,inc),cx);
+		a.mov(word_ptr(memory,rbx,0,inc),dx);
+
+
+		val_rax=LIXO_REG;
+		val_rbx=LIXO_REG;
+		val_rdx=LIXO_REG;
+		val_rcx=0x0000FFFFFFFFFFFF;
 	}break;
 	case P_UINT64+MOV_MMW_M:
 	case P_INT64+MOV_MMW_M:{
@@ -789,12 +827,16 @@ uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 max
 		uint8 mem=t.getNext8();
 		uint64 val=t.getNext48().toInt();
 
-		a.mov(rax,qword_ptr(memory,val));
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
 		if(mem<8)a.mov(rbx,qreg[mem]);
 		else a.mov(rbx,qword_ptr(workspace,mem*8));
+		a.mov(rax,qword_ptr(memory,val));
 		a.and_(rbx,rcx);
 		a.mov(qword_ptr(memory,rbx,0,inc),rax);
+
+		val_rax=LIXO_REG;
+		val_rbx=LIXO_REG;
+		val_rcx=0x0000FFFFFFFFFFFF;
 	}break;
 	case P_UINT8+MOV_M_MMW:
 	case P_INT8+MOV_M_MMW:{
@@ -808,6 +850,10 @@ uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 max
 		a.and_(rbx,rcx);
 		a.mov(al,byte_ptr(memory,rbx,0,inc));
 		a.mov(byte_ptr(memory,mem),al);
+
+		val_rax=LIXO_REG;
+		val_rbx=LIXO_REG;
+		val_rcx=0x0000FFFFFFFFFFFF;
 	}break;
 	case P_UINT16+MOV_M_MMW:
 	case P_INT16+MOV_M_MMW:{
@@ -821,6 +867,10 @@ uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 max
 		a.and_(rbx,rcx);
 		a.mov(ax,word_ptr(memory,rbx,0,inc));
 		a.mov(word_ptr(memory,mem),ax);
+
+		val_rax=LIXO_REG;
+		val_rbx=LIXO_REG;
+		val_rcx=0x0000FFFFFFFFFFFF;
 	}break;
 	case P_UINT32+MOV_M_MMW:
 	case P_INT32+MOV_M_MMW:{
@@ -834,6 +884,10 @@ uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 max
 		a.and_(rbx,rcx);
 		a.mov(eax,dword_ptr(memory,rbx,0,inc));
 		a.mov(dword_ptr(memory,mem),eax);
+
+		val_rax=LIXO_REG;
+		val_rbx=LIXO_REG;
+		val_rcx=0x0000FFFFFFFFFFFF;
 	}break;
 	case P_UINT48+MOV_M_MMW:
 	case P_INT48+MOV_M_MMW:{
@@ -847,9 +901,14 @@ uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 max
 		a.and_(rbx,rcx);
 		a.mov(eax,dword_ptr(memory,rbx,0,inc));
 		a.add(rbx,4);
-		a.mov(cx,word_ptr(memory,rbx,0,inc));
+		a.mov(dx,word_ptr(memory,rbx,0,inc));
 		a.mov(dword_ptr(memory,mem),eax);
-		a.mov(word_ptr(memory,mem+4),cx);
+		a.mov(word_ptr(memory,mem+4),dx);
+
+		val_rax=LIXO_REG;
+		val_rbx=LIXO_REG;
+		val_rdx=LIXO_REG;
+		val_rcx=0x0000FFFFFFFFFFFF;
 	}break;
 	case P_UINT64+MOV_M_MMW:
 	case P_INT64+MOV_M_MMW:{
@@ -863,6 +922,10 @@ uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 max
 		a.and_(rbx,rcx);
 		a.mov(rax,qword_ptr(memory,rbx,0,inc));
 		a.mov(qword_ptr(memory,mem),rax);
+
+		val_rax=LIXO_REG;
+		val_rbx=LIXO_REG;
+		val_rcx=0x0000FFFFFFFFFFFF;
 	}break;
 	case P_UINT8+MOV_MMW_C:
 	case P_INT8+MOV_MMW_C:{
@@ -875,6 +938,9 @@ uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 max
 		else a.mov(rbx,qword_ptr(workspace,mem*8));
 		a.and_(rbx,rcx);
 		a.mov(byte_ptr(memory,rbx,0,inc),val);
+
+		val_rbx=LIXO_REG;
+		val_rcx=0x0000FFFFFFFFFFFF;
 	}break;
 	case P_UINT16+MOV_MMW_C:
 	case P_INT16+MOV_MMW_C:{
@@ -887,6 +953,9 @@ uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 max
 		else a.mov(rbx,qword_ptr(workspace,mem*8));
 		a.and_(rbx,rcx);
 		a.mov(word_ptr(memory,rbx,0,inc),val);
+
+		val_rbx=LIXO_REG;
+		val_rcx=0x0000FFFFFFFFFFFF;
 	}break;
 	case P_UINT32+MOV_MMW_C:
 	case P_INT32+MOV_MMW_C:{
@@ -899,6 +968,9 @@ uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 max
 		else a.mov(rbx,qword_ptr(workspace,mem*8));
 		a.and_(rbx,rcx);
 		a.mov(dword_ptr(memory,rbx,0,inc),val);
+
+		val_rbx=LIXO_REG;
+		val_rcx=0x0000FFFFFFFFFFFF;
 	}break;
 	case P_UINT48+MOV_MMW_C:
 	case P_INT48+MOV_MMW_C:{
@@ -914,6 +986,9 @@ uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 max
 		a.mov(dword_ptr(memory,rbx,0,inc),val1);
 		a.add(rbx,4);
 		a.mov(word_ptr(memory,rbx,0,inc),val2);
+
+		val_rbx=LIXO_REG;
+		val_rcx=0x0000FFFFFFFFFFFF;
 	}break;
 	case P_UINT64+MOV_MMW_C:
 	case P_INT64+MOV_MMW_C:{
@@ -926,6 +1001,9 @@ uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 max
 		else a.mov(rbx,qword_ptr(workspace,mem*8));
 		a.and_(rbx,rcx);
 		a.mov(qword_ptr(memory,rbx,0,inc),val);
+
+		val_rbx=LIXO_REG;
+		val_rcx=0x0000FFFFFFFFFFFF;
 	}break;
 	default:
 		return 0;
