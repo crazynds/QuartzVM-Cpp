@@ -25,11 +25,16 @@
 	#define ERROR_JMP_ENTER_JIT_STATE 0x20
 	#define LIXO_REG 0x1FA9E225
 
-	uint64 val_rax;
-	uint64 val_rbx;
-	uint64 val_rcx;
-	uint64 val_rdx;
-
+	struct JitContentsAuxiliar{
+		uint16 opcode;
+		uint64 val_rax;
+		uint64 val_rbx;
+		uint64 val_rcx;
+		uint64 val_rdx;
+		uint32 maxCode;
+		uint32 minCode;
+		uint8 type;
+	};
 
 	void init_jit(Thread &t);
 	void end_jit(Thread &t);

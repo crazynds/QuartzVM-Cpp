@@ -9,7 +9,7 @@
 
 #include "../Jit.h"
 
-uint8 optimization(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 maxCode, uint32 minCode,std::vector<Dupla<Label,uint32>> &v){
+uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std::vector<Dupla<Label,uint32>> &v){
 	Gp memory=rdi;
 	Gp workspace=rsi;
 
@@ -18,7 +18,7 @@ uint8 optimization(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  u
 	Gp wreg[8];wreg[0]=r8w;wreg[1]=r9w;wreg[2]=r10w;wreg[3]=r11w;wreg[4]=r12w;wreg[5]=r13w;wreg[6]=r14w;wreg[7]=r15w;
 	Gp breg[8];breg[0]=r8b;breg[1]=r9b;breg[2]=r10b;breg[3]=r11b;breg[4]=r12b;breg[5]=r13b;breg[6]=r14b;breg[7]=r15b;
 
-	switch(p){
+	switch(jcontent.opcode){
 	case P_UINT8+COPY_MW_MW_C:
 	case P_INT8+COPY_MW_MW_C:{
 		uint8 dst=t.getNext8();
@@ -384,7 +384,7 @@ uint8 optimization(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  u
 			a.je(l);
 			a.mov(ptr(workspace,val*8),rax);
 		}
-		if(aux>=maxCode || aux<minCode){
+		if(aux>=jcontent.maxCode || aux<jcontent.minCode){
 			a.xor_(rax,rax);
 			a.mov(eax,aux);
 			a.jmp(end);

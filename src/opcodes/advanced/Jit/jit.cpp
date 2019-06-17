@@ -14,11 +14,11 @@
 	void laco_jit(Thread &t,CodeHolder *code);
 
 
-	uint8 cmov(uint16 op, Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 maxCode, uint32 minCode,std::vector<Dupla<Label,uint32>> &v);
-	uint8 mov(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 maxCode, uint32 minCode,std::vector<Dupla<Label,uint32>> &v);
-	uint8 aritimetic(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 maxCode, uint32 minCode,std::vector<Dupla<Label,uint32>> &v);
-	uint8 optimization(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end,  uint32 maxCode, uint32 minCode,std::vector<Dupla<Label,uint32>> &v);
-	uint8 jmp_cmp(uint16 p,Thread &t, Assembler &a, uint8 &type, Label &end, uint32 maxCode, uint32 minCode,std::vector<Dupla<Label,uint32>> &v);
+	uint8 cmov(JitContentsAuxiliar jcontent, Thread &t, Assembler &a, Label &end,std::vector<Dupla<Label,uint32>> &v);
+	uint8 mov(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std::vector<Dupla<Label,uint32>> &v);
+	uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std::vector<Dupla<Label,uint32>> &v);
+	uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std::vector<Dupla<Label,uint32>> &v);
+	uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std::vector<Dupla<Label,uint32>> &v);
 
 	void init_jit(Thread &t){
 		if(t.checkUseCode(2))return;
@@ -139,6 +139,7 @@
 	}
 
 	void laco_jit(Thread &t,CodeHolder *code){
+		JitContentsAuxiliar jcontent;
 		Assembler a(code);
 		//20 Clocks perdidos no inicio + 20 clocks no fim
 		a.push(rbx);
@@ -157,10 +158,10 @@
 		Gp dreg[8];dreg[0]=r8d;dreg[1]=r9d;dreg[2]=r10d;dreg[3]=r11d;dreg[4]=r12d;dreg[5]=r13d;dreg[6]=r14d;dreg[7]=r15d;
 		Gp wreg[8];wreg[0]=r8w;wreg[1]=r9w;wreg[2]=r10w;wreg[3]=r11w;wreg[4]=r12w;wreg[5]=r13w;wreg[6]=r14w;wreg[7]=r15w;
 		Gp breg[8];breg[0]=r8b;breg[1]=r9b;breg[2]=r10b;breg[3]=r11b;breg[4]=r12b;breg[5]=r13b;breg[6]=r14b;breg[7]=r15b;
-		val_rax=1;
-		val_rbx=1;
-		val_rcx=1;
-		val_rdx=1;
+		jcontent.val_rax=1;
+		jcontent.val_rbx=1;
+		jcontent.val_rcx=1;
+		jcontent.val_rdx=1;
 		a.mov(workspace,rdx); // RSI - WORKSPACE THREAD
 		a.mov(memory,qword_ptr(rcx)); //RDI - MEMORIA CONTEXTO
 		a.mov(rax,r8); // PRAMETRO goTo
@@ -181,20 +182,20 @@
 			return;
 		}
 
-		uint32 maxCode=v[v.size()-1].getSecond();
-		uint32 minCode=t.getPontCode();
+		jcontent.maxCode=v[v.size()-1].getSecond();
+		jcontent.minCode=t.getPontCode();
 		v.erase(v.begin()+v.size()-1);
 
 
 		a.mov(rax,ERROR_JMP_ENTER_JIT_STATE);  //Caso não tenha encontrado nenhuma opção para entrar no programa, sai da função e retorna um erro.
 		a.shl(rax,32);
-		a.mov(eax,maxCode);
+		a.mov(eax,jcontent.maxCode);
 		a.jmp(end);
 
 		a.bind(auxiLabel);
-		uint16 p=t.getNext16();
+		jcontent.opcode=t.getNext16();
 		uint8 type='u';	//Para fins de auxilio nas comparações
-		while(p!=JIT_FLAG_END){
+		while(jcontent.opcode!=JIT_FLAG_END){
 			{
 				uint32 aux=t.getPontCode()-2;
 				for(uint32 x=0;x<v.size();x++){
@@ -204,20 +205,20 @@
 					}
 				}
 			}
-			switch(p){
+			switch(jcontent.opcode){
 			case JIT_FLAG_ENTER_CODE:{
 				t.getNext32();
 			}break;
 			default:
-				if(mov(p,t,a,type,end,maxCode,minCode,v))break;
-				if(aritimetic(p,t,a,type,end,maxCode,minCode,v))break;
-				if(optimization(p,t,a,type,end,maxCode,minCode,v))break;
-				if(jmp_cmp(p,t,a,type,end,maxCode,minCode,v))break;
-				if(cmov(p,t,a,type,end,maxCode,minCode,v))break;
+				if(mov(jcontent,t,a,end,v))break;
+				if(aritimetic(jcontent,t,a,end,v))break;
+				if(optimization(jcontent,t,a,end,v))break;
+				if(jmp_cmp(jcontent,t,a,end,v))break;
+				if(cmov(jcontent,t,a,end,v))break;
 				t.error_flags|=INVALID_OPCODE_JIT_;
 				return;
 			}
-			p=t.getNext16();
+			jcontent.opcode=t.getNext16();
 		}
 
 
