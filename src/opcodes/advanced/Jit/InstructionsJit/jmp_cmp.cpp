@@ -7,7 +7,7 @@
 
 #include "../Jit.h"
 
-uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std::vector<Dupla<Label,uint32>> &v){
+uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,std::vector<Dupla<Label,uint32>> &v){
 	Gp memory=rdi;
 	Gp workspace=rsi;
 
@@ -37,6 +37,7 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 			a.mov(rax,uint64(aux));
 			a.jmp(end);
 			a.bind(l);
+
 		}else for(uint32 x=0;x<v.size();x++){
 			if(v[x].getSecond()==aux){
 				a.jne(v[x].getFirst());
@@ -52,6 +53,7 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 			a.mov(rax,uint64(aux));
 			a.jmp(end);
 			a.bind(l);
+
 		}else for(uint32 x=0;x<v.size();x++){
 			if(v[x].getSecond()==aux){
 				a.je(v[x].getFirst());
@@ -68,6 +70,7 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 			a.mov(rax,uint64(aux));
 			a.jmp(end);
 			a.bind(l);
+
 		}else for(uint32 x=0;x<v.size();x++){
 			if(v[x].getSecond()==aux){
 				if(jcontent.type=='u')a.ja(v[x].getFirst());
@@ -85,6 +88,7 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 			a.mov(rax,uint64(aux));
 			a.jmp(end);
 			a.bind(l);
+
 		}else for(uint32 x=0;x<v.size();x++){
 			if(v[x].getSecond()==aux){
 				if(jcontent.type=='u')a.jae(v[x].getFirst());
@@ -102,6 +106,7 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 			a.mov(rax,uint64(aux));
 			a.jmp(end);
 			a.bind(l);
+
 		}else for(uint32 x=0;x<v.size();x++){
 			if(v[x].getSecond()==aux){
 				if(jcontent.type=='u')a.jb(v[x].getFirst());
@@ -119,6 +124,7 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 			a.mov(rax,uint64(aux));
 			a.jmp(end);
 			a.bind(l);
+
 		}else for(uint32 x=0;x<v.size();x++){
 			if(v[x].getSecond()==aux){
 				if(jcontent.type=='u')a.jbe(v[x].getFirst());
@@ -135,7 +141,9 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 		}else{
 			a.mov(al,ptr(workspace,aux*8));
 			a.cmp(al,ptr(memory,val));
+
 		}
+
 		jcontent.type='u';
 	}break;
 	case P_INT8+CMP_W_M:{
@@ -144,9 +152,11 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 		if(aux<8){
 			a.cmp(breg[aux],ptr(memory,val));
 		}else{
-			a.mov(bl,ptr(memory,val));
-			a.cmp(ptr(workspace,aux*8),bl);
+			a.mov(al,ptr(memory,val));
+			a.cmp(ptr(workspace,aux*8),al);
+
 		}
+
 		jcontent.type='i';
 	}break;
 	case P_UINT16+CMP_W_M:{
@@ -157,6 +167,7 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 		}else{
 			a.mov(ax,ptr(workspace,aux*8));
 			a.cmp(ax,ptr(memory,val));
+
 		}
 		jcontent.type='u';
 	}break;
@@ -168,6 +179,7 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 		}else{
 			a.mov(ax,ptr(workspace,aux*8));
 			a.cmp(ax,ptr(memory,val));
+
 		}
 		jcontent.type='i';
 	}break;
@@ -179,6 +191,7 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 		}else{
 			a.mov(eax,ptr(workspace,aux*8));
 			a.cmp(eax,ptr(memory,val));
+
 		}
 		jcontent.type='u';
 	}break;
@@ -190,6 +203,7 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 		}else{
 			a.mov(eax,ptr(workspace,aux*8));
 			a.cmp(eax,ptr(memory,val));
+
 		}
 		jcontent.type='i';
 	}break;
@@ -203,26 +217,29 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 		}else{
 			a.mov(rax,ptr(workspace,aux*8));
 		}
-		a.and_(rax,0x0000FFFFFFFFFFFF);
-		a.and_(rbx,0x0000FFFFFFFFFFFF);
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		a.and_(rax,rcx);
+		a.and_(rbx,rcx);
 		a.cmp(rax,rbx);
 		jcontent.type='u';
+
+
+
 	}break;
 	case P_INT48+CMP_W_M:{
 		uint8 aux=t.getNext8();
 		uint64 val=t.getNext48().toInt();
-		a.mov(rbx,ptr(memory,val));
+		a.mov(rcx,0xFFFF000000000000);
 		if(aux<8){
 			a.mov(rax,qreg[aux]);
 		}else{
 			a.mov(rax,ptr(workspace,aux*8));
 		}
-		a.and_(rax,0x0000FFFFFFFFFFFF);
-		a.and_(rbx,0x0000FFFFFFFFFFFF);
+		a.mov(rbx,ptr(memory,val));
+		a.andn(rax,rcx,rax);
+		a.andn(rbx,rcx,rax);
 		Label l=a.newLabel();
 		Label l1=a.newLabel();
-		uint64 ap=0xFFFF000000000000;
-		a.mov(rcx,ap);
 		a.bt(rax,47);
 		a.jnc(l);
 		a.or_(rax,rcx);
@@ -234,6 +251,9 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 
 		a.cmp(rax,rbx);
 		jcontent.type='i';
+
+
+
 	}break;
 	case P_UINT64+CMP_W_M:{
 		uint8 aux=t.getNext8();
@@ -243,6 +263,7 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 		}else{
 			a.mov(rax,ptr(workspace,aux*8));
 			a.cmp(rax,ptr(memory,val));
+
 		}
 		jcontent.type='u';
 	}break;
@@ -254,6 +275,7 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 		}else{
 			a.mov(rax,ptr(workspace,aux*8));
 			a.cmp(rax,ptr(memory,val));
+
 		}
 		jcontent.type='i';
 	}break;
@@ -265,6 +287,7 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 		}else{
 			a.mov(al,ptr(workspace,aux*8));
 			a.cmp(ptr(memory,val),al);
+
 		}
 		jcontent.type='u';
 	}break;
@@ -276,6 +299,7 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 		}else{
 			a.mov(al,ptr(workspace,aux*8));
 			a.cmp(ptr(memory,val),al);
+
 		}
 		jcontent.type='i';
 	}break;
@@ -287,6 +311,7 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 		}else{
 			a.mov(ax,ptr(workspace,aux*8));
 			a.cmp(ptr(memory,val),ax);
+
 		}
 		jcontent.type='u';
 	}break;
@@ -298,6 +323,7 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 		}else{
 			a.mov(ax,ptr(workspace,aux*8));
 			a.cmp(ptr(memory,val),ax);
+
 		}
 		jcontent.type='i';
 	}break;
@@ -309,6 +335,7 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 		}else{
 			a.mov(eax,ptr(workspace,aux*8));
 			a.cmp(ptr(memory,val),eax);
+
 		}
 		jcontent.type='u';
 	}break;
@@ -320,37 +347,45 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 		}else{
 			a.mov(eax,ptr(workspace,aux*8));
 			a.cmp(ptr(memory,val),eax);
+
 		}
 		jcontent.type='i';
 	}break;
 	case P_UINT48+CMP_M_W:{
 		uint64 val=t.getNext48().toInt();
 		uint8 aux=t.getNext8();
-		a.mov(rbx,ptr(memory,val));
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 		if(aux<8){
 			a.mov(rax,qreg[aux]);
 		}else{
 			a.mov(rax,ptr(workspace,aux*8));
 		}
-		a.and_(rax,0x0000FFFFFFFFFFFF);
-		a.and_(rbx,0x0000FFFFFFFFFFFF);
+		a.mov(rbx,ptr(memory,val));
+		a.and_(rax,rcx);
+		a.and_(rbx,rcx);
 		a.cmp(rbx,rax);
 		jcontent.type='u';
+
+
 	}break;
 	case P_INT48+CMP_M_W:{
 		uint64 val=t.getNext48().toInt();
 		uint8 aux=t.getNext8();
 
-		a.mov(rbx,ptr(memory,val));
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 		if(aux<8){
 			a.mov(rax,qreg[aux]);
 		}else{
 			a.mov(rax,ptr(workspace,aux*8));
 		}
-		a.and_(rax,0x0000FFFFFFFFFFFF);
-		a.and_(rbx,0x0000FFFFFFFFFFFF);
+		a.mov(rbx,ptr(memory,val));
+		a.and_(rax,rcx);
+		a.and_(rbx,rcx);
 		a.cmp(rbx,rax);
+
 		jcontent.type='i';
+
+
 	}break;
 	case P_UINT64+CMP_M_W:{
 		uint64 val=t.getNext48().toInt();
@@ -360,6 +395,7 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 		}else{
 			a.mov(rax,ptr(workspace,aux*8));
 			a.cmp(ptr(memory,val),rax);
+
 		}
 		jcontent.type='u';
 	}break;
@@ -371,6 +407,7 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 		}else{
 			a.mov(rax,ptr(workspace,aux*8));
 			a.cmp(ptr(memory,val),rax);
+
 		}
 		jcontent.type='i';
 	}break;
@@ -380,6 +417,7 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 		a.mov(al,ptr(memory,aux));
 		a.cmp(ptr(memory,val),al);
 		jcontent.type='u';
+
 	}break;
 	case P_INT8+CMP_M_M:{
 		uint64 val=t.getNext48().toInt();
@@ -387,6 +425,7 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 		a.mov(al,ptr(memory,aux));
 		a.cmp(ptr(memory,val),al);
 		jcontent.type='i';
+
 	}break;
 	case P_UINT16+CMP_M_M:{
 		uint64 val=t.getNext48().toInt();
@@ -394,6 +433,7 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 		a.mov(ax,ptr(memory,aux));
 		a.cmp(ptr(memory,val),ax);
 		jcontent.type='u';
+
 	}break;
 	case P_INT16+CMP_M_M:{
 		uint64 val=t.getNext48().toInt();
@@ -401,6 +441,7 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 		a.mov(ax,ptr(memory,aux));
 		a.cmp(ptr(memory,val),ax);
 		jcontent.type='i';
+
 	}break;
 	case P_UINT32+CMP_M_M:{
 		uint64 val=t.getNext48().toInt();
@@ -408,6 +449,7 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 		a.mov(eax,ptr(memory,aux));
 		a.cmp(ptr(memory,val),eax);
 		jcontent.type='u';
+
 	}break;
 	case P_INT32+CMP_M_M:{
 		uint64 val=t.getNext48().toInt();
@@ -415,26 +457,33 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 		a.mov(eax,ptr(memory,aux));
 		a.cmp(ptr(memory,val),eax);
 		jcontent.type='i';
+
 	}break;
 	case P_UINT48+CMP_M_M:{
 		uint64 val=t.getNext48().toInt();
 		uint64 aux=t.getNext48().toInt();
-		a.mov(rbx,ptr(memory,val));
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 		a.mov(rax,ptr(memory,aux));
-		a.and_(rax,0x0000FFFFFFFFFFFF);
-		a.and_(rbx,0x0000FFFFFFFFFFFF);
+		a.mov(rbx,ptr(memory,val));
+		a.and_(rax,rcx);
+		a.and_(rbx,rcx);
 		a.cmp(rbx,rax);
 		jcontent.type='u';
+
+
 	}break;
 	case P_INT48+CMP_M_M:{
 		uint64 val=t.getNext48().toInt();
 		uint64 aux=t.getNext48().toInt();
-		a.mov(rbx,ptr(memory,val));
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 		a.mov(rax,ptr(memory,aux));
-		a.and_(rax,0x0000FFFFFFFFFFFF);
-		a.and_(rbx,0x0000FFFFFFFFFFFF);
+		a.mov(rbx,ptr(memory,val));
+		a.and_(rax,rcx);
+		a.and_(rbx,rcx);
 		a.cmp(rbx,rax);
 		jcontent.type='i';
+
+
 	}break;
 	case P_UINT64+CMP_M_M:{
 		uint64 val=t.getNext48().toInt();
@@ -442,6 +491,7 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 		a.mov(rax,ptr(memory,aux));
 		a.cmp(ptr(memory,val),rax);
 		jcontent.type='u';
+
 	}break;
 	case P_INT64+CMP_M_M:{
 		uint64 val=t.getNext48().toInt();
@@ -449,6 +499,7 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 		a.mov(rax,ptr(memory,aux));
 		a.cmp(ptr(memory,val),rax);
 		jcontent.type='i';
+
 	}break;
 	case P_UINT8+CMP_W_C:{
 		uint8 aux=t.getNext8();
@@ -513,41 +564,47 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 	case P_UINT48+CMP_W_C:{
 		uint8 aux=t.getNext8();
 		uint64 val=t.getNext48().toInt();
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 		if(aux<8){
 			a.mov(rax,qreg[aux]);
-			a.and_(rax,0x0000FFFFFFFFFFFF);
+			a.and_(rax,rcx);
 			a.cmp(rax,val);
 		}else{
 			a.mov(rax,ptr(workspace,aux*8));
-			a.and_(rax,0x0000FFFFFFFFFFFF);
+			a.and_(rax,rcx);
 			a.cmp(rax,val);
 		}
 		jcontent.type='u';
+
+
 	}break;
 	case P_INT48+CMP_W_C:{
 		uint8 aux=t.getNext8();
 		uint64 val=t.getNext48().toInt();
 		Label l=a.newLabel();
 
+		a.mov(rcx,0xFFFF000000000000);
 		if(val&uint64(1)<<47)val|=0xFFFF000000000000;
 		if(aux<8){
 			a.mov(rax,qreg[aux]);
-			a.and_(rax,0x0000FFFFFFFFFFFF);
+			a.andn(rax,rcx,rax);
 			a.bt(rax,47);
 			a.jnc(l);
-			a.or_(rax,0xFFFF000000000000);
+			a.or_(rax,rcx);
 			a.bind(l);
 			a.cmp(rax,val);
 		}else{
 			a.mov(rax,ptr(workspace,aux*8));
-			a.and_(rax,0x0000FFFFFFFFFFFF);
+			a.andn(rax,rcx,rax);
 			a.bt(rax,47);
 			a.jnc(l);
-			a.or_(rax,0xFFFF000000000000);
+			a.or_(rax,rcx);
 			a.bind(l);
 			a.cmp(rax,val);
 		}
 		jcontent.type='i';
+
+
 	}break;
 	case P_UINT64+CMP_W_C:{
 		uint8 aux=t.getNext8();
@@ -608,18 +665,25 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 	case P_UINT48+CMP_M_C:{
 		uint64 aux=t.getNext48().toInt();
 		uint64 val=t.getNext48().toInt();
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 		a.mov(rax,ptr(memory,aux));
-		a.and_(rax,0x0000FFFFFFFFFFFF);
+		a.and_(rax,rcx);
 		a.cmp(rax,val);
 		jcontent.type='u';
+
+
+
 	}break;
 	case P_INT48+CMP_M_C:{
 		uint64 aux=t.getNext48().toInt();
 		uint64 val=t.getNext48().toInt();
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 		a.mov(rax,ptr(memory,aux));
-		a.and_(rax,0x0000FFFFFFFFFFFF);
+		a.and_(rax,rcx);
 		a.cmp(rax,val);
 		jcontent.type='i';
+
+
 	}break;
 	case P_UINT64+CMP_M_C:{
 		uint64 aux=t.getNext48().toInt();
@@ -646,8 +710,9 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 			if(val<8){
 				a.cmp(ptr(workspace,aux*8),breg[val]);
 			}else{
-				a.mov(bl,ptr(workspace,val*8));
-				a.cmp(ptr(workspace,aux*8),bl);
+				a.mov(al,ptr(workspace,val*8));
+				a.cmp(ptr(workspace,aux*8),al);
+
 			}
 		}
 		jcontent.type='u';
@@ -665,8 +730,9 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 			if(val<8){
 				a.cmp(ptr(workspace,aux*8),breg[val]);
 			}else{
-				a.mov(bl,ptr(workspace,val*8));
-				a.cmp(ptr(workspace,aux*8),bl);
+				a.mov(al,ptr(workspace,val*8));
+				a.cmp(ptr(workspace,aux*8),al);
+
 			}
 		}
 		jcontent.type='i';
@@ -684,8 +750,9 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 			if(val<8){
 				a.cmp(ptr(workspace,aux*8),wreg[val]);
 			}else{
-				a.mov(bx,ptr(workspace,val*8));
-				a.cmp(ptr(workspace,aux*8),bx);
+				a.mov(ax,ptr(workspace,val*8));
+				a.cmp(ptr(workspace,aux*8),ax);
+
 			}
 		}
 		jcontent.type='u';
@@ -703,8 +770,9 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 			if(val<8){
 				a.cmp(ptr(workspace,aux*8),wreg[val]);
 			}else{
-				a.mov(bx,ptr(workspace,val*8));
-				a.cmp(ptr(workspace,aux*8),bx);
+				a.mov(ax,ptr(workspace,val*8));
+				a.cmp(ptr(workspace,aux*8),ax);
+
 			}
 		}
 		jcontent.type='i';
@@ -722,8 +790,9 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 			if(val<8){
 				a.cmp(ptr(workspace,aux*8),dreg[val]);
 			}else{
-				a.mov(ebx,ptr(workspace,val*8));
-				a.cmp(ptr(workspace,aux*8),ebx);
+				a.mov(eax,ptr(workspace,val*8));
+				a.cmp(ptr(workspace,aux*8),eax);
+
 			}
 		}
 		jcontent.type='u';
@@ -741,8 +810,9 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 			if(val<8){
 				a.cmp(ptr(workspace,aux*8),dreg[val]);
 			}else{
-				a.mov(ebx,ptr(workspace,val*8));
-				a.cmp(ptr(workspace,aux*8),ebx);
+				a.mov(eax,ptr(workspace,val*8));
+				a.cmp(ptr(workspace,aux*8),eax);
+
 			}
 		}
 		jcontent.type='i';
@@ -750,6 +820,7 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 	case P_UINT48+CMP_W_W:{
 		uint8 aux=t.getNext8();
 		uint8 val=t.getNext8();
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 		if(aux<8){
 			a.mov(rax,qreg[aux]);
 		}else{
@@ -760,22 +831,24 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 		}else{
 			a.mov(rbx,ptr(workspace,val*8));
 		}
-		a.and_(rax,0x0000FFFFFFFFFFFF);
-		a.and_(rbx,0x0000FFFFFFFFFFFF);
+		a.and_(rax,rcx);
+		a.and_(rbx,rcx);
 		a.cmp(rax,rbx);
 		jcontent.type='u';
+
+
+
 	}break;
 	case P_INT48+CMP_W_W:{
 		uint8 aux=t.getNext8();
 		uint8 val=t.getNext8();
+		a.mov(rcx,0xFFFF000000000000);
 		if(aux<8)a.mov(rax,qreg[aux]);
 		else a.mov(rax,ptr(workspace,aux*8));
 		if(val<8)a.mov(rbx,qreg[val]);
 		else a.mov(rbx,ptr(workspace,val*8));
-		a.and_(rax,0x0000FFFFFFFFFFFF);
-		a.and_(rbx,0x0000FFFFFFFFFFFF);
-		uint64 ap=0xFFFF000000000000;
-		a.mov(rcx,ap);
+		a.andn(rax,rcx,rax);
+		a.andn(rbx,rcx,rax);
 		Label l=a.newLabel();
 		Label l1=a.newLabel();
 		a.bt(rbx,47);
@@ -788,6 +861,9 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 		a.bind(l1);
 		a.cmp(rax,rbx);
 		jcontent.type='i';
+
+
+
 	}break;
 	case P_UINT64+CMP_W_W:{
 		uint8 aux=t.getNext8();
@@ -802,8 +878,9 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 			if(val<8){
 				a.cmp(ptr(workspace,aux*8),qreg[val]);
 			}else{
-				a.mov(rbx,ptr(workspace,val*8));
-				a.cmp(ptr(workspace,aux*8),rbx);
+				a.mov(rax,ptr(workspace,val*8));
+				a.cmp(ptr(workspace,aux*8),rax);
+
 			}
 		}
 		jcontent.type='u';
@@ -821,8 +898,9 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,s
 			if(val<8){
 				a.cmp(ptr(workspace,aux*8),qreg[val]);
 			}else{
-				a.mov(rbx,ptr(workspace,val*8));
-				a.cmp(ptr(workspace,aux*8),rbx);
+				a.mov(rax,ptr(workspace,val*8));
+				a.cmp(ptr(workspace,aux*8),rax);
+
 			}
 		}
 		jcontent.type='i';

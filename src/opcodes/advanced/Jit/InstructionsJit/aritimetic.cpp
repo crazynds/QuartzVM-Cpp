@@ -7,7 +7,7 @@
 
 #include "../Jit.h"
 
-uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std::vector<Dupla<Label,uint32>> &v){
+uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,std::vector<Dupla<Label,uint32>> &v){
 	Gp memory=rdi;
 	Gp workspace=rsi;
 

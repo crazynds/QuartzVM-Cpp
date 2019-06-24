@@ -9,7 +9,7 @@
 
 #include "../Jit.h"
 
-uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &end,std::vector<Dupla<Label,uint32>> &v){
+uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,std::vector<Dupla<Label,uint32>> &v){
 	Gp memory=rdi;
 	Gp workspace=rsi;
 
@@ -24,8 +24,14 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &
 		uint8 dst=t.getNext8();
 		uint8 val=t.getNext8();
 		uint32 times=t.getNext32();
-		if(dst>8)a.mov(rax,ptr(workspace,dst*8));
-		if(val>8)a.mov(rbx,ptr(workspace,val*8));
+		if(dst>8){
+
+			a.mov(rax,ptr(workspace,dst*8));
+		}
+		if(val>8){
+
+			a.mov(rbx,ptr(workspace,val*8));
+		}
 		a.push(rdi);
 		a.push(rsi);
 		a.mov(rcx,times);
@@ -37,14 +43,22 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &
 		a.movsb();
 		a.pop(rsi);
 		a.pop(rdi);
+
+
 	}break;
 	case P_UINT8+COPY_MW_MW_W:
 	case P_INT8+COPY_MW_MW_W:{
 		uint8 dst=t.getNext8();
 		uint8 val=t.getNext8();
 		uint8 times=t.getNext8();
-		if(dst>8)a.mov(rax,ptr(workspace,dst*8));
-		if(val>8)a.mov(rbx,ptr(workspace,val*8));
+		if(dst>8){
+
+			a.mov(rax,ptr(workspace,dst*8));
+		}
+		if(val>8){
+
+			a.mov(rbx,ptr(workspace,val*8));
+		}
 		a.push(rdi);
 		a.push(rsi);
 		if(times<8)a.movzx(rcx,dreg[times]);
@@ -57,14 +71,22 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &
 		a.movsb();
 		a.pop(rsi);
 		a.pop(rdi);
+
+
 	}break;
 	case P_UINT16+COPY_MW_MW_C:
 	case P_INT16+COPY_MW_MW_C:{
 		uint8 dst=t.getNext8();
 		uint8 val=t.getNext8();
 		uint32 times=t.getNext32();
-		if(dst>8)a.mov(rax,ptr(workspace,dst*8));
-		if(val>8)a.mov(rbx,ptr(workspace,val*8));
+		if(dst>8){
+
+			a.mov(rax,ptr(workspace,dst*8));
+		}
+		if(val>8){
+
+			a.mov(rbx,ptr(workspace,val*8));
+		}
 		a.push(rdi);
 		a.push(rsi);
 		a.mov(rcx,times);
@@ -76,14 +98,22 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &
 		a.movsw();
 		a.pop(rsi);
 		a.pop(rdi);
+
+
 	}break;
 	case P_UINT16+COPY_MW_MW_W:
 	case P_INT16+COPY_MW_MW_W:{
 		uint8 dst=t.getNext8();
 		uint8 val=t.getNext8();
 		uint8 times=t.getNext8();
-		if(dst>8)a.mov(rax,ptr(workspace,dst*8));
-		if(val>8)a.mov(rbx,ptr(workspace,val*8));
+		if(dst>8){
+
+			a.mov(rax,ptr(workspace,dst*8));
+		}
+		if(val>8){
+
+			a.mov(rbx,ptr(workspace,val*8));
+		}
 		a.push(rdi);
 		a.push(rsi);
 		if(times<8)a.movzx(rcx,dreg[times]);
@@ -96,14 +126,22 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &
 		a.movsw();
 		a.pop(rsi);
 		a.pop(rdi);
+
+
 	}break;
 	case P_UINT32+COPY_MW_MW_C:
 	case P_INT32+COPY_MW_MW_C:{
 		uint8 dst=t.getNext8();
 		uint8 val=t.getNext8();
 		uint32 times=t.getNext32();
-		if(dst>8)a.mov(rax,ptr(workspace,dst*8));
-		if(val>8)a.mov(rbx,ptr(workspace,val*8));
+		if(dst>8){
+
+			a.mov(rax,ptr(workspace,dst*8));
+		}
+		if(val>8){
+
+			a.mov(rbx,ptr(workspace,val*8));
+		}
 		a.push(rdi);
 		a.push(rsi);
 		a.mov(rcx,times);
@@ -115,14 +153,22 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &
 		a.movsd();
 		a.pop(rsi);
 		a.pop(rdi);
+
+
 	}break;
 	case P_UINT32+COPY_MW_MW_W:
 	case P_INT32+COPY_MW_MW_W:{
 		uint8 dst=t.getNext8();
 		uint8 val=t.getNext8();
 		uint8 times=t.getNext8();
-		if(dst>8)a.mov(rax,ptr(workspace,dst*8));
-		if(val>8)a.mov(rbx,ptr(workspace,val*8));
+		if(dst>8){
+
+			a.mov(rax,ptr(workspace,dst*8));
+		}
+		if(val>8){
+
+			a.mov(rbx,ptr(workspace,val*8));
+		}
 		a.push(rdi);
 		a.push(rsi);
 		if(times<8)a.movzx(rcx,dreg[times]);
@@ -135,14 +181,22 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &
 		a.movsd();
 		a.pop(rsi);
 		a.pop(rdi);
+
+
 	}break;
 	case P_UINT48+COPY_MW_MW_C:
 	case P_INT48+COPY_MW_MW_C:{
 		uint8 dst=t.getNext8();
 		uint8 val=t.getNext8();
 		uint32 times=t.getNext32();
-		if(dst>8)a.mov(rax,ptr(workspace,dst*8));
-		if(val>8)a.mov(rbx,ptr(workspace,val*8));
+		if(dst>8){
+
+			a.mov(rax,ptr(workspace,dst*8));
+		}
+		if(val>8){
+
+			a.mov(rbx,ptr(workspace,val*8));
+		}
 		a.push(rdi);
 		a.push(rsi);
 		a.mov(rcx,times);
@@ -154,14 +208,22 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &
 		a.movsw();
 		a.pop(rsi);
 		a.pop(rdi);
+
+
 	}break;
 	case P_UINT48+COPY_MW_MW_W:
 	case P_INT48+COPY_MW_MW_W:{
 		uint8 dst=t.getNext8();
 		uint8 val=t.getNext8();
 		uint8 times=t.getNext8();
-		if(dst>8)a.mov(rax,ptr(workspace,dst*8));
-		if(val>8)a.mov(rbx,ptr(workspace,val*8));
+		if(dst>8){
+
+			a.mov(rax,ptr(workspace,dst*8));
+		}
+		if(val>8){
+
+			a.mov(rbx,ptr(workspace,val*8));
+		}
 		a.push(rdi);
 		a.push(rsi);
 		if(times<8)a.movzx(rcx,dreg[times]);
@@ -175,14 +237,22 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &
 		a.movsw();
 		a.pop(rsi);
 		a.pop(rdi);
+
+
 	}break;
 	case P_UINT64+COPY_MW_MW_C:
 	case P_INT64+COPY_MW_MW_C:{
 		uint8 dst=t.getNext8();
 		uint8 val=t.getNext8();
 		uint32 times=t.getNext32();
-		if(dst>8)a.mov(rax,ptr(workspace,dst*8));
-		if(val>8)a.mov(rbx,ptr(workspace,val*8));
+		if(dst>8){
+
+			a.mov(rax,ptr(workspace,dst*8));
+		}
+		if(val>8){
+
+			a.mov(rbx,ptr(workspace,val*8));
+		}
 		a.push(rdi);
 		a.push(rsi);
 		a.mov(rcx,times);
@@ -194,14 +264,22 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &
 		a.movsq();
 		a.pop(rsi);
 		a.pop(rdi);
+
+
 	}break;
 	case P_UINT64+COPY_MW_MW_W:
 	case P_INT64+COPY_MW_MW_W:{
 		uint8 dst=t.getNext8();
 		uint8 val=t.getNext8();
 		uint8 times=t.getNext8();
-		if(dst>8)a.mov(rax,ptr(workspace,dst*8));
-		if(val>8)a.mov(rbx,ptr(workspace,val*8));
+		if(dst>8){
+
+			a.mov(rax,ptr(workspace,dst*8));
+		}
+		if(val>8){
+
+			a.mov(rbx,ptr(workspace,val*8));
+		}
 		a.push(rdi);
 		a.push(rsi);
 		if(times<8)a.movzx(rcx,dreg[times]);
@@ -214,6 +292,8 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &
 		a.movsq();
 		a.pop(rsi);
 		a.pop(rdi);
+
+
 	}break;
 	case P_UINT8+COPY_M_M_C:
 	case P_INT8+COPY_M_M_C:{
@@ -229,6 +309,8 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &
 		a.movsb();
 		a.pop(rsi);
 		a.pop(rdi);
+
+
 	}break;
 	case P_UINT8+COPY_M_M_W:
 	case P_INT8+COPY_M_M_W:{
@@ -245,6 +327,8 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &
 		a.movsb();
 		a.pop(rsi);
 		a.pop(rdi);
+
+
 	}break;
 	case P_UINT16+COPY_M_M_C:
 	case P_INT16+COPY_M_M_C:{
@@ -260,6 +344,8 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &
 		a.movsw();
 		a.pop(rsi);
 		a.pop(rdi);
+
+
 	}break;
 	case P_UINT16+COPY_M_M_W:
 	case P_INT16+COPY_M_M_W:{
@@ -276,6 +362,8 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &
 		a.movsw();
 		a.pop(rsi);
 		a.pop(rdi);
+
+
 	}break;
 	case P_UINT32+COPY_M_M_C:
 	case P_INT32+COPY_M_M_C:{
@@ -291,6 +379,8 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &
 		a.movsd();
 		a.pop(rsi);
 		a.pop(rdi);
+
+
 	}break;
 	case P_UINT32+COPY_M_M_W:
 	case P_INT32+COPY_M_M_W:{
@@ -307,6 +397,8 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &
 		a.movsd();
 		a.pop(rsi);
 		a.pop(rdi);
+
+
 	}break;
 	case P_UINT48+COPY_M_M_C:
 	case P_INT48+COPY_M_M_C:{
@@ -322,6 +414,8 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &
 		a.movsw();
 		a.pop(rsi);
 		a.pop(rdi);
+
+
 	}break;
 	case P_UINT48+COPY_M_M_W:
 	case P_INT48+COPY_M_M_W:{
@@ -339,6 +433,8 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &
 		a.movsw();
 		a.pop(rsi);
 		a.pop(rdi);
+
+
 	}break;
 	case P_UINT64+COPY_M_M_C:
 	case P_INT64+COPY_M_M_C:{
@@ -354,6 +450,8 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &
 		a.movsq();
 		a.pop(rsi);
 		a.pop(rdi);
+
+
 	}break;
 	case P_UINT64+COPY_M_M_W:
 	case P_INT64+COPY_M_M_W:{
@@ -370,6 +468,8 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &
 		a.movsq();
 		a.pop(rsi);
 		a.pop(rdi);
+
+
 	}break;
 	case LOOP_C_W:{
 		uint32 aux=t.getNext32();
@@ -383,11 +483,13 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &
 			a.dec(rax);
 			a.je(l);
 			a.mov(ptr(workspace,val*8),rax);
+
 		}
 		if(aux>=jcontent.maxCode || aux<jcontent.minCode){
 			a.xor_(rax,rax);
 			a.mov(eax,aux);
 			a.jmp(end);
+
 		}else for(uint32 x=0;x<v.size();x++){
 			if(v[x].getSecond()==aux){
 				a.jmp(v[x].getFirst());
@@ -405,7 +507,6 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &
 		uint8 mem=t.getNext8();
 		if(mem<8)a.dec(qreg[mem]);
 		else a.dec(qword_ptr(workspace,mem*8));
-
 	}break;
 	case LEA_W__W_W_C:{
 		uint8 dst=t.getNext8();
@@ -423,8 +524,8 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &
 		if(dst<8){
 			a.lea(qreg[dst],ptr(rbx,rax));
 		}else{
-			a.lea(rcx,ptr(rbx,rax));
-			a.mov(qword_ptr(workspace,dst*8),rcx);
+			a.lea(rdx,ptr(rbx,rax));
+			a.mov(qword_ptr(workspace,dst*8),rdx);
 		}
 
 	}break;
@@ -450,9 +551,11 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &
 			a.mov(qword_ptr(workspace,dst*8),rcx);
 		}
 
+
+
+
 	}break;
 	case LEA_W__W_W_1:{
-
 		uint8 dst=t.getNext8();
 		uint8 src1=t.getNext8();
 		uint8 src2=t.getNext8();
@@ -462,29 +565,36 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &
 				else{
 					a.lea(rax,ptr(qreg[src1],qreg[src2]));
 					a.mov(qword_ptr(workspace,dst*8),rax);
+
 				}
 			}else{
 				a.mov(rbx,qword_ptr(workspace,src2*8));
+
 				if(dst<8)a.lea(qreg[dst],ptr(qreg[src1],rbx));
 				else{
 					a.lea(rax,ptr(qreg[src1],rbx));
 					a.mov(qword_ptr(workspace,dst*8),rax);
+
 				}
 			}
 		}else{
 			a.mov(rcx,qword_ptr(workspace,src1*8));
+
 			if(src2<8){
 				if(dst<8)a.lea(qreg[dst],ptr(rcx,qreg[src2]));
 				else{
 					a.lea(rax,ptr(rcx,qreg[src2]));
 					a.mov(qword_ptr(workspace,dst*8),rax);
+
 				}
 			}else{
 				a.mov(rbx,qword_ptr(workspace,src2*8));
+
 				if(dst<8)a.lea(qreg[dst],ptr(rcx,rbx));
 				else{
 					a.lea(rax,ptr(rcx,rbx));
 					a.mov(qword_ptr(workspace,dst*8),rax);
+
 				}
 			}
 		}
@@ -501,29 +611,36 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &
 				else{
 					a.lea(rax,ptr(qreg[src1],qreg[src2],1));
 					a.mov(qword_ptr(workspace,dst*8),rax);
+
 				}
 			}else{
 				a.mov(rbx,qword_ptr(workspace,src2*8));
+
 				if(dst<8)a.lea(qreg[dst],ptr(qreg[src1],rbx,1));
 				else{
 					a.lea(rax,ptr(qreg[src1],rbx,1));
 					a.mov(qword_ptr(workspace,dst*8),rax);
+
 				}
 			}
 		}else{
 			a.mov(rcx,qword_ptr(workspace,src1*8));
+
 			if(src2<8){
 				if(dst<8)a.lea(qreg[dst],ptr(rcx,qreg[src2],1));
 				else{
 					a.lea(rax,ptr(rcx,qreg[src2],1));
 					a.mov(qword_ptr(workspace,dst*8),rax);
+
 				}
 			}else{
 				a.mov(rbx,qword_ptr(workspace,src2*8));
+
 				if(dst<8)a.lea(qreg[dst],ptr(rcx,rbx,1));
 				else{
 					a.lea(rax,ptr(rcx,rbx,1));
 					a.mov(qword_ptr(workspace,dst*8),rax);
+
 				}
 			}
 		}
@@ -540,29 +657,36 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &
 				else{
 					a.lea(rax,ptr(qreg[src1],qreg[src2],2));
 					a.mov(qword_ptr(workspace,dst*8),rax);
+
 				}
 			}else{
 				a.mov(rbx,qword_ptr(workspace,src2*8));
+
 				if(dst<8)a.lea(qreg[dst],ptr(qreg[src1],rbx,2));
 				else{
 					a.lea(rax,ptr(qreg[src1],rbx,2));
 					a.mov(qword_ptr(workspace,dst*8),rax);
+
 				}
 			}
 		}else{
 			a.mov(rcx,qword_ptr(workspace,src1*8));
+
 			if(src2<8){
 				if(dst<8)a.lea(qreg[dst],ptr(rcx,qreg[src2],2));
 				else{
 					a.lea(rax,ptr(rcx,qreg[src2],2));
 					a.mov(qword_ptr(workspace,dst*8),rax);
+
 				}
 			}else{
 				a.mov(rbx,qword_ptr(workspace,src2*8));
+
 				if(dst<8)a.lea(qreg[dst],ptr(rcx,rbx,2));
 				else{
 					a.lea(rax,ptr(rcx,rbx,2));
 					a.mov(qword_ptr(workspace,dst*8),rax);
+
 				}
 			}
 		}
@@ -579,29 +703,36 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &
 				else{
 					a.lea(rax,ptr(qreg[src1],qreg[src2],3));
 					a.mov(qword_ptr(workspace,dst*8),rax);
+
 				}
 			}else{
 				a.mov(rbx,qword_ptr(workspace,src2*8));
+
 				if(dst<8)a.lea(qreg[dst],ptr(qreg[src1],rbx,3));
 				else{
 					a.lea(rax,ptr(qreg[src1],rbx,3));
 					a.mov(qword_ptr(workspace,dst*8),rax);
+
 				}
 			}
 		}else{
 			a.mov(rcx,qword_ptr(workspace,src1*8));
+
 			if(src2<8){
 				if(dst<8)a.lea(qreg[dst],ptr(rcx,qreg[src2],3));
 				else{
 					a.lea(rax,ptr(rcx,qreg[src2],3));
 					a.mov(qword_ptr(workspace,dst*8),rax);
+
 				}
 			}else{
 				a.mov(rbx,qword_ptr(workspace,src2*8));
+
 				if(dst<8)a.lea(qreg[dst],ptr(rcx,rbx,3));
 				else{
 					a.lea(rax,ptr(rcx,rbx,3));
 					a.mov(qword_ptr(workspace,dst*8),rax);
+
 				}
 			}
 		}
@@ -618,29 +749,36 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &
 				else{
 					a.lea(rax,ptr(qreg[src1],qreg[src2],4));
 					a.mov(qword_ptr(workspace,dst*8),rax);
+
 				}
 			}else{
 				a.mov(rbx,qword_ptr(workspace,src2*8));
+
 				if(dst<8)a.lea(qreg[dst],ptr(qreg[src1],rbx,4));
 				else{
 					a.lea(rax,ptr(qreg[src1],rbx,4));
 					a.mov(qword_ptr(workspace,dst*8),rax);
+
 				}
 			}
 		}else{
 			a.mov(rcx,qword_ptr(workspace,src1*8));
+
 			if(src2<8){
 				if(dst<8)a.lea(qreg[dst],ptr(rcx,qreg[src2],4));
 				else{
 					a.lea(rax,ptr(rcx,qreg[src2],4));
 					a.mov(qword_ptr(workspace,dst*8),rax);
+
 				}
 			}else{
 				a.mov(rbx,qword_ptr(workspace,src2*8));
+
 				if(dst<8)a.lea(qreg[dst],ptr(rcx,rbx,4));
 				else{
 					a.lea(rax,ptr(rcx,rbx,4));
 					a.mov(qword_ptr(workspace,dst*8),rax);
+
 				}
 			}
 		}
@@ -657,29 +795,36 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &
 				else{
 					a.lea(rax,ptr(qreg[src1],qreg[src2],5));
 					a.mov(qword_ptr(workspace,dst*8),rax);
+
 				}
 			}else{
 				a.mov(rbx,qword_ptr(workspace,src2*8));
+
 				if(dst<8)a.lea(qreg[dst],ptr(qreg[src1],rbx,5));
 				else{
 					a.lea(rax,ptr(qreg[src1],rbx,5));
 					a.mov(qword_ptr(workspace,dst*8),rax);
+
 				}
 			}
 		}else{
 			a.mov(rcx,qword_ptr(workspace,src1*8));
+
 			if(src2<8){
 				if(dst<8)a.lea(qreg[dst],ptr(rcx,qreg[src2],5));
 				else{
 					a.lea(rax,ptr(rcx,qreg[src2],5));
 					a.mov(qword_ptr(workspace,dst*8),rax);
+
 				}
 			}else{
 				a.mov(rbx,qword_ptr(workspace,src2*8));
+
 				if(dst<8)a.lea(qreg[dst],ptr(rcx,rbx,5));
 				else{
 					a.lea(rax,ptr(rcx,rbx,5));
 					a.mov(qword_ptr(workspace,dst*8),rax);
+
 				}
 			}
 		}
@@ -696,29 +841,36 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, Assembler &a, Label &
 				else{
 					a.lea(rax,ptr(qreg[src1],qreg[src2],6));
 					a.mov(qword_ptr(workspace,dst*8),rax);
+
 				}
 			}else{
 				a.mov(rbx,qword_ptr(workspace,src2*8));
+
 				if(dst<8)a.lea(qreg[dst],ptr(qreg[src1],rbx,6));
 				else{
 					a.lea(rax,ptr(qreg[src1],rbx,6));
 					a.mov(qword_ptr(workspace,dst*8),rax);
+
 				}
 			}
 		}else{
 			a.mov(rcx,qword_ptr(workspace,src1*8));
+
 			if(src2<8){
 				if(dst<8)a.lea(qreg[dst],ptr(rcx,qreg[src2],6));
 				else{
 					a.lea(rax,ptr(rcx,qreg[src2],6));
 					a.mov(qword_ptr(workspace,dst*8),rax);
+
 				}
 			}else{
 				a.mov(rbx,qword_ptr(workspace,src2*8));
+
 				if(dst<8)a.lea(qreg[dst],ptr(rcx,rbx,6));
 				else{
 					a.lea(rax,ptr(rcx,rbx,6));
 					a.mov(qword_ptr(workspace,dst*8),rax);
+
 				}
 			}
 		}
