@@ -1,17 +1,18 @@
 ## [0.1.0] - 17-06-2019
 ### Added
- - Implementado Optimiza√ß√£o no reaproveitamento dos registradores (RAX,RBX,RCX,RDX) para melhora de performance; (BETA)
- - Adicionado ponteiros avan√ßados (REG1+REG2<<IMD+IMD);
+ - Implementado Optimizacao no reaproveitamento dos registradores (RAX,RBX,RCX,RDX) para melhora de performance; (BETA)
+ - Adicionado ponteiros avanÁados (REG1+REG2<<IMD+IMD);
  - Biblioteca Wordcoder modificada para se tornar dinamica;
- - Implementado sistema de vers√µes no c√≥digo fonte e de VM. Implementado tamb√©m sistemas da vers√£o de corre√ß√£o;
+ - Implementado header de cÛdigo;
+ - Implementado sistema de versıes no cÛdigo fonte e de VM. Implementado tambÈm sistemas da vers„o e de correÁ„o;
 ### Changed
  - Atualizado sistema de logs;
- - Reposit√≥rio agora est√° livre no GitHub;
+ - Repositorio agora esta livre no GitHub;
 ### Removed
  
 ## [0.0.3] - 22-05-2019
 ### Added
- - Implementado optimiza√ß√£o JIT em comandos estaticos ao invez de utilizar a linguagem C++; (ALPHA)
+ - Implementado optimizacao JIT em comandos estaticos ao invez de utilizar a linguagem C++; (ALPHA)
 
 
 ## [0.0.2] - 04-05-2019
@@ -22,5 +23,5 @@
 ## [0.0.1] - 10-04-2019
 ### Added
  - Interpretada totalmente;
- - Optimiza√ß√£o vetorial para acesso ao comando;
+ - Optimizacao vetorial para acesso ao comando;
  
