@@ -227,10 +227,11 @@
 //System Call commands
 	#define PRINT_OUT_CHAR SYSTEM_CALL+1 //Printa o char da workspace
 	#define PRINT_OUT_NUM SYSTEM_CALL+2  //Printa o num da workspace
-	#define PRINT_OUT_STRING SYSTEM_CALL+3 //Printa a string do ponteiro da workspace
-	#define LOAD_CONTEXT SYSTEM_CALL+4 //Carrega contexto
-	#define GET_CONTEXT_ID SYSTEM_CALL+5 //Retorna o id do contexto
-	#define CHECK_CONTEXT_ID SYSTEM_CALL+5 //Confere o id do contexto, caso falso, zera a variavel passada como parametro
+	#define PRINT_OUT_STRING_MMW SYSTEM_CALL+3 //Printa a string do ponteiro da workspace
+	#define PRINT_OUT_STRING_M SYSTEM_CALL+4 //Printa a string do ponteiro da workspace
+	#define LOAD_CONTEXT SYSTEM_CALL+5 //Carrega contexto
+	#define GET_CONTEXT_ID SYSTEM_CALL+6 //Retorna o id do contexto
+	#define CHECK_CONTEXT_ID SYSTEM_CALL+7 //Confere o id do contexto, caso falso, zera a variavel passada como parametro
 
 
 #endif /* OPCODES_OPCODE_H_ */

@@ -128,8 +128,12 @@
 				delete[] bytecode;
 			}
 
-			void mov(GeralMemory *g1,GeralMemory *g2);
-			void inc(GeralMemory *g1);
+			void mov(GeralMemory*,GeralMemory*);
+			void inc(GeralMemory*);
+			void setString(GeralMemory*,char*);
+			void printNum(GeralMemory*);
+			void printChar(GeralMemory*);
+			void printString(GeralMemory*);
 
 			void setDevVersion(uint64 x);
 			void setGeralName(const char*);
@@ -334,11 +338,15 @@
 				set16(PRINT_OUT_NUM);
 				set8(m1);
 			}
-			void print_out_string_mw(uint8 m1){
-				set16(PRINT_OUT_STRING);
+			void print_out_string_mmw(uint8 m1,uint32 inc){
+				set16(PRINT_OUT_STRING_MMW);
 				set8(m1);
+				set32(inc);
 			}
-
+			void print_out_string_m(uint48 m1){
+				set16(PRINT_OUT_STRING_M);
+				set48(m1);
+			}
 			void set_flag_enter_optimization(){
 				if(jit_pos==1)return;
 				set16(JIT_FLAG_ENTER_CODE);

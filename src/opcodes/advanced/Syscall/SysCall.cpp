@@ -26,10 +26,19 @@ void print_out_num_w(Thread &t){
 	if(debg==0) cout << t.workspace[aux];
 	else cout << "[OUTPUT] - {number:" << t.workspace[aux] << "}" << endl;
 }
-void print_out_string_mw(Thread &t){
+void print_out_string_mmw(Thread &t){
 	if(t.checkUseCode(3))return;
 	uint8 aux=t.getNext8();
 	uint64 b=t.workspace[aux]&0x0000FFFFFFFFFFFF;
+	b+=t.getNext32();
+	uint8 *str=&t.mem[b];
+	uint8 debg=t.getVirtualMachine().getDebugLevel();
+	if(debg==0) cout << str;
+	else cout << "[OUTPUT] - {string:" << str << "}" << endl;
+}
+void print_out_string_m(Thread &t){
+	if(t.checkUseCode(3))return;
+	uint64 b=t.getNext48().toInt();
 	uint8 *str=&t.mem[b];
 	uint8 debg=t.getVirtualMachine().getDebugLevel();
 	if(debg==0) cout << str;

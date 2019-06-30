@@ -97,32 +97,12 @@
 		}
 	};
 
-
-	Workspace* W(uint8 pos){
-		Workspace *w=new Workspace(pos);
-		return w;
-	}
-	GeralMemory* W_(uint8 pos){
-		Workspace *w=new Workspace(pos);
-		return (GeralMemory*)w;
-	}
-	GeralMemory* M_(uint48 pos){
-		Memoria *w=new Memoria(pos);
-		return (GeralMemory*)w;
-	}
-	GeralMemory* ptr_(Workspace *r,uint32 inc=0){
-		MemoriaPtr *w=new MemoriaPtr(r,inc);
-		return (GeralMemory*)w;
-	}
-	GeralMemory* ptr_(Workspace *reg,Workspace *regIndex,uint8 shift=0,uint32 inc=0){
-		MemoriaPtr *w=new MemoriaPtr(reg,regIndex,shift,inc);
-		return (GeralMemory*)w;
-	}
-	GeralMemory* imd_(uint64 dado){
-		ImediateData *id=new ImediateData(dado);
-		return (GeralMemory*)id;
-	}
-
+	Workspace* W(uint8 pos);
+	GeralMemory* W_(uint8 pos);
+	GeralMemory* M_(uint48 pos);
+	GeralMemory* ptr_(Workspace *r,uint32 inc);
+	GeralMemory* ptr_(Workspace *reg,Workspace *regIndex,uint8 shift,uint32 inc);
+	GeralMemory* imd_(uint64 dado);
 	/*
 	 * Tipos diferentes de gerais:
 	 * m - memoria estática

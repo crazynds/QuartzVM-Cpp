@@ -98,7 +98,7 @@ uint32 VirtualMachine::run(){
 			}
 		}
 	}while(th.size()!=0);
-	std::cout << "$$ Mensagens da execução da VM terminada. $$"<< std::endl;
+	std::cout << std::endl << "$$ Mensagens da execução da VM terminada. $$"<< std::endl;
 	return flags;
 }
 
@@ -236,7 +236,8 @@ void VirtualMachine::setGerais(){
 
 	VET[PRINT_OUT_CHAR]=(void*)print_out_char_w;
 	VET[PRINT_OUT_NUM]=(void*)print_out_num_w;
-	VET[PRINT_OUT_STRING]=(void*)print_out_string_mw;
+	VET[PRINT_OUT_STRING_MMW]=(void*)print_out_string_mmw;
+	VET[PRINT_OUT_STRING_M]=(void*)print_out_string_m;
 	VET[LOAD_CONTEXT]=(void*)load_context_w_mw;
 	VET[GET_CONTEXT_ID]=(void*)get_context_id_w;
 	VET[CHECK_CONTEXT_ID]=(void*)check_context_id_w;

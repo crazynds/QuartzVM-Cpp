@@ -117,16 +117,16 @@ void Wordcoder::mov(GeralMemory *g1,GeralMemory *g2){
 void Wordcoder::inc(GeralMemory *g1){
 	switch(g1->getType()){
 	case 'I':{
-		std::cout << "WordCoder: Não é possivel usar valor estatico como destino de comando!" << std::endl;
+		std::cout << "WordCoder: Não é possivel incrementar um valor estatico!" << std::endl;
 	}break;
 	case 'm':{
 		Memoria *m=(Memoria*)g1;
 		inc_m(m->getPos());
 	}break;
-	case 'P':{
-	}break;
-	case 'M':{
-	}break;
+	case 'P':
+	case 'M':
+		std::cout << "WordCoder: Não é possivel incrementar um valor dinamico baseado em registradores!" << std::endl;
+	break;
 	case 'W':{
 		Workspace *w=(Workspace*)g1;
 		inc_w(w->getPos());
@@ -147,3 +147,111 @@ void Wordcoder::setGeralName(const char *a){
 	addCabecalho8(a[x]);
 	while(a[x++]!='\0')addCabecalho8(a[x]);
 }
+void Wordcoder::setString(GeralMemory *g1, char *str){
+	switch(g1->getType()){
+	case 'I':{
+		std::cout << "WordCoder: Não é possivel setar a string em um valor estatico!" << std::endl;
+	}break;
+	case 'm':{
+		Memoria *m=(Memoria*)g1;
+		set_string_m(str,m->getPos().toInt());
+	}break;
+	case 'P':
+	case 'M':
+	case 'W':
+		std::cout << "WordCoder: Não é possivel setar uma string baseado em um valor dinamico baseado em registradores!" << std::endl;
+	break;
+	}
+	delete g1;
+}
+
+void Wordcoder::printNum(GeralMemory *g1){
+	switch(g1->getType()){
+	case 'I':
+		std::cout << "WordCoder: Não é possivel printar um numero com esse método!" << std::endl;
+		break;
+	case 'm':
+		std::cout << "WordCoder: Não é possivel printar um numero com esse método!" << std::endl;
+		break;
+	case 'P':
+		std::cout << "WordCoder: Não é possivel printar um numero com esse método!" << std::endl;
+		break;
+	case 'M':
+		std::cout << "WordCoder: Não é possivel printar um numero com esse método!" << std::endl;
+		break;
+	case 'W':{
+		Workspace *w=(Workspace*)g1;
+		print_out_num_w(w->getPos());
+	}break;
+	}
+	delete g1;
+}
+void Wordcoder::printChar(GeralMemory *g1){
+	switch(g1->getType()){
+	case 'I':
+		std::cout << "WordCoder: Não é possivel printar um caracter com esse método!" << std::endl;
+		break;
+	case 'm':
+		std::cout << "WordCoder: Não é possivel printar um caracter com esse método!" << std::endl;
+		break;
+	case 'P':
+		std::cout << "WordCoder: Não é possivel printar um caracter com esse método!" << std::endl;
+		break;
+	case 'M':
+		std::cout << "WordCoder: Não é possivel printar um caracter com esse método!" << std::endl;
+		break;
+	case 'W':{
+		Workspace *w=(Workspace*)g1;
+		print_out_char_w(w->getPos());
+	}break;
+	}
+	delete g1;
+}
+void Wordcoder::printString(GeralMemory *g1){
+	switch(g1->getType()){
+	case 'I':
+		std::cout << "WordCoder: Não é possivel printar uma string com esse método!" << std::endl;
+		break;
+	case 'P':{
+		MemoriaPtr *m=(MemoriaPtr*)g1;
+		print_out_string_mmw(m->getPosIndex(),m->getIncrement());
+	}break;
+	case 'm':{
+		Memoria *m=(Memoria*)g1;
+		print_out_string_m(m->getPos());
+	}break;
+	case 'M':
+		std::cout << "WordCoder: Não é possivel printar uma string com esse método!" << std::endl;
+		break;
+	case 'W':
+		std::cout << "WordCoder: Não é possivel printar uma string com esse método!" << std::endl;
+		break;
+	}
+	delete g1;
+}
+Workspace* W(uint8 pos){
+	Workspace *w=new Workspace(pos);
+	return w;
+}
+GeralMemory* W_(uint8 pos){
+	Workspace *w=new Workspace(pos);
+	return (GeralMemory*)w;
+}
+GeralMemory* M_(uint48 pos){
+	Memoria *w=new Memoria(pos);
+	return (GeralMemory*)w;
+}
+GeralMemory* ptr_(Workspace *r,uint32 inc=0){
+	MemoriaPtr *w=new MemoriaPtr(r,inc);
+	return (GeralMemory*)w;
+}
+GeralMemory* ptr_(Workspace *reg,Workspace *regIndex,uint8 shift=0,uint32 inc=0){
+	MemoriaPtr *w=new MemoriaPtr(reg,regIndex,shift,inc);
+	return (GeralMemory*)w;
+}
+GeralMemory* imd_(uint64 dado){
+	ImediateData *id=new ImediateData(dado);
+	return (GeralMemory*)id;
+}
+
+

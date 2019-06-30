@@ -39,7 +39,7 @@ int main(int argc, char **argv) {
 		}
 	}
 	{
-		vm=new VirtualMachine(3);
+		vm=new VirtualMachine(0);
 		uint16 context=vm->loadContexto(c->getCode(),c->getTam());
 		vm->createThread(context,0);
 	}
