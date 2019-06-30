@@ -15,19 +15,25 @@ using namespace std;
 void print_out_char_w(Thread &t){
 	if(t.checkUseCode(3))return;
 	uint8 aux=t.getNext8();
-	cout << "[OUTPUT] - {char:" << (char)t.workspace[aux] << "}" << endl;
+	uint8 debg=t.getVirtualMachine().getDebugLevel();
+	if(debg==0) cout << (char)t.workspace[aux];
+	else cout << "[OUTPUT] - {char:" << (char)t.workspace[aux] << "}" << endl;
 }
 void print_out_num_w(Thread &t){
 	if(t.checkUseCode(3))return;
 	uint8 aux=t.getNext8();
-	cout << "[OUTPUT] - {number:" << t.workspace[aux] << "}" << endl;
+	uint8 debg=t.getVirtualMachine().getDebugLevel();
+	if(debg==0) cout << t.workspace[aux];
+	else cout << "[OUTPUT] - {number:" << t.workspace[aux] << "}" << endl;
 }
 void print_out_string_mw(Thread &t){
 	if(t.checkUseCode(3))return;
 	uint8 aux=t.getNext8();
 	uint64 b=t.workspace[aux]&0x0000FFFFFFFFFFFF;
 	uint8 *str=&t.mem[b];
-	cout << "[OUTPUT] - {string:" << str << "}" << endl;
+	uint8 debg=t.getVirtualMachine().getDebugLevel();
+	if(debg==0) cout << str;
+	else cout << "[OUTPUT] - {string:" << str << "}" << endl;
 }
 void load_context_w_mw(Thread &t){
 	if(t.checkUseCode(4))return;

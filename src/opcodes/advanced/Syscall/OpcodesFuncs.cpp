@@ -57,7 +57,6 @@ void test_func(Thread &t){
 	for(int p=1;p<20;p++)std::cout<< "," << (uint64)t.workspace[p];
 	std::cout << "}" << std::endl;
 
-
 #ifndef _FAST_MODE
 	t.checkUseCode(2);
 #endif
