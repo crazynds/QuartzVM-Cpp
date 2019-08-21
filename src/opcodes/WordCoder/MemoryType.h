@@ -100,8 +100,8 @@
 	Workspace* W(uint8 pos);
 	GeralMemory* W_(uint8 pos);
 	GeralMemory* M_(uint48 pos);
-	GeralMemory* ptr_(Workspace *r,uint32 inc);
-	GeralMemory* ptr_(Workspace *reg,Workspace *regIndex,uint8 shift,uint32 inc);
+	GeralMemory* ptr_(Workspace *r,uint32 inc=0);
+	GeralMemory* ptr_(Workspace *reg,Workspace *regIndex,uint8 shift=0,uint32 inc=0);
 	GeralMemory* imd_(uint64 dado);
 	/*
 	 * Tipos diferentes de gerais:

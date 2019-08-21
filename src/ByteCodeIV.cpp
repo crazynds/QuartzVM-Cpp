@@ -14,6 +14,7 @@
 #include <iostream>
 #include <algorithm>
 
+#define DEBUG 0
 
 using namespace std;
 
@@ -23,8 +24,8 @@ int main(int argc, char **argv) {
 	FileLoader *c;
 	cout << "$$$$$ INICIANDO $$$$$" << endl;
 	{
-		if(argc>1)c=new FileLoader(argv[1]);
-		else c=new FileLoader((char*)"../codes/code.bt");
+		if(argc>1)c=new FileLoader(argv[1],DEBUG);
+		else c=new FileLoader((char*)"../codes/code.bt",DEBUG);
 		if(c->getTam()==0){
 			cout << "[ERROR] - Não foi possivel carregar o código, máquina virtual desligada!";
 			getchar();
@@ -39,7 +40,7 @@ int main(int argc, char **argv) {
 		}
 	}
 	{
-		vm=new VirtualMachine(0);
+		vm=new VirtualMachine(DEBUG);
 		uint16 context=vm->loadContexto(c->getCode(),c->getTam());
 		vm->createThread(context,0);
 	}

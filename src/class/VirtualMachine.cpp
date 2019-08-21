@@ -25,7 +25,7 @@ VirtualMachine::VirtualMachine(uint8 debug){
 
 	funcs=0;
 	func_pos=(uint16*)calloc(1,2);
-	if(getDebugLevel()>=1)std::cout << "[LOG] - Definidas as variaveis hambientes!"<< std::endl;
+	if(getDebugLevel()>=2)std::cout << "[LOG] - Definidas as variaveis hambientes!"<< std::endl;
 
 
 	VET[0]=(void*)end_running;
@@ -43,9 +43,9 @@ VirtualMachine::VirtualMachine(uint8 debug){
 	setArit();
 	setCmp();
 	setStack();
-	if(getDebugLevel()>=1)std::cout << "[LOG] - Carregado as intruções!"<< std::endl;
+	if(getDebugLevel()>=2)std::cout << "[LOG] - Carregado as intruções!"<< std::endl;
 
-	std::cout << "[LOG] - Criado a virtual machine!"<< std::endl;
+	if(getDebugLevel()>=1)std::cout << "[LOG] - Criado a virtual machine!"<< std::endl;
 }
 
 VirtualMachine::~VirtualMachine(){
@@ -56,25 +56,25 @@ VirtualMachine::~VirtualMachine(){
 		delete &th[x].getFirst();
 	}
 	th.clear();
-	if(getDebugLevel()>=1)std::cout << "[LOG] -10%- Liberado todas as threads!" << std::endl;
+	if(getDebugLevel()>=2)std::cout << "[LOG] -10%- Liberado todas as threads!" << std::endl;
 
 	for(uint16 x=0;x<funcs;x++){
 		if(func_pos[x]==0)continue;
-		if(getDebugLevel()>=3)std::cout << "[LOG] -" << 10+70*((x+1)/float(funcs+1)) << "%- Liberando Instrução N: " << func_pos[x] << std::endl;
+		if(getDebugLevel()>=3)std::cout << "[LOG] -" << 10+65*((x+1)/float(funcs+1)) << "%- Liberando Instrução N: " << func_pos[x] << std::endl;
 		rt.release(VET[func_pos[x]]);
 	}
 	free(func_pos);
-	if(getDebugLevel()>=1)std::cout << "[LOG] -70%- Liberado todas as instruções!" << std::endl;
+	if(getDebugLevel()>=2)std::cout << "[LOG] -77%- Liberado todas as instruções!" << std::endl;
 	for(uint64 x=0;x<ct.size();x++){
-		if(getDebugLevel()>=3)std::cout << "[LOG] -" << (70+28*((x+1)/float(ct.size()+1))) << "%- Liberando Contexto N: " << ct[x].getSecond() << std::endl;
+		if(getDebugLevel()>=3)std::cout << "[LOG] -" << (77+21*((x+1)/float(ct.size()+1))) << "%- Liberando Contexto N: " << ct[x].getSecond() << std::endl;
 		ct[x].getFirst().clearFunctions(rt);
 		delete &ct[x].getFirst();
 	}
 	ct.clear();
-	if(getDebugLevel()>=1)std::cout << "[LOG] -98%- Liberado os Contextos!" << std::endl;
+	if(getDebugLevel()>=2)std::cout << "[LOG] -98%- Liberado os Contextos!" << std::endl;
 
 	if(getDebugLevel()>=1)std::cout << "[LOG] -100%- Maquina virtual liberada completamente" << std::endl;
-	std::cout << "[LOG] - Maquina virtual desligada!" << std::endl;
+	if(getDebugLevel()>=1)std::cout << "[LOG] - Maquina virtual desligada!" << std::endl;
 }
 
 uint8 VirtualMachine::getDebugLevel(){
@@ -83,7 +83,7 @@ uint8 VirtualMachine::getDebugLevel(){
 
 uint32 VirtualMachine::run(){
 	uint32 flags=0;
-	std::cout << "[LOG] - Executando maquina virtual!"<< std::endl;
+	if(getDebugLevel()>=1)std::cout << "[LOG] - Executando maquina virtual!"<< std::endl;
 	std::cout << "$$ A partir daqui, todas as mensagem serão referente a execução da VM. $$"<< std::endl;
 	do{
 		for(uint16 x=0;x<th.size();x++){
@@ -93,12 +93,13 @@ uint32 VirtualMachine::run(){
 				flags=t.isFinalized();
 				t.~Thread();
 				th.erase(th.begin()+x);
+				std::cout << std::endl;
 				if(getDebugLevel()>=2)std::cout << "[LOG] - Finalizada thread de numero: " << th[x].getSecond() << std::endl;
-				if(getDebugLevel()>=1)finalize(flags);
+				finalize(flags);
 			}
 		}
 	}while(th.size()!=0);
-	std::cout << std::endl << "$$ Mensagens da execução da VM terminada. $$"<< std::endl;
+	std::cout << "$$ Mensagens da execução da VM terminada. $$"<< std::endl;
 	return flags;
 }
 
@@ -116,7 +117,7 @@ uint32 VirtualMachine::runCommand(){
 			th.erase(th.begin()+x);
 		}
 	}
-	if(getDebugLevel()>=1)finalize(flags);
+	finalize(flags);
 	return flags;
 }
 

@@ -241,11 +241,11 @@ GeralMemory* M_(uint48 pos){
 	Memoria *w=new Memoria(pos);
 	return (GeralMemory*)w;
 }
-GeralMemory* ptr_(Workspace *r,uint32 inc=0){
+GeralMemory* ptr_(Workspace *r,uint32 inc){
 	MemoriaPtr *w=new MemoriaPtr(r,inc);
 	return (GeralMemory*)w;
 }
-GeralMemory* ptr_(Workspace *reg,Workspace *regIndex,uint8 shift=0,uint32 inc=0){
+GeralMemory* ptr_(Workspace *reg,Workspace *regIndex,uint8 shift,uint32 inc){
 	MemoriaPtr *w=new MemoriaPtr(reg,regIndex,shift,inc);
 	return (GeralMemory*)w;
 }

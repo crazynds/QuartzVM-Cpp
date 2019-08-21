@@ -52,7 +52,7 @@ void load_context_w_mw(Thread &t){
 		uint64 x=t.workspace[t.getNext8()]&0x0000FFFFFFFFFFFF;
 		n=(char*)&(t.mem[x]);
 	}
-	FileLoader cl(n);
+	FileLoader cl(n,t.getVirtualMachine().getDebugLevel());
 	if(cl.getTam()==0)t.workspace[pos]=0;
 	else{
 		VirtualMachine &vm=t.getVirtualMachine();

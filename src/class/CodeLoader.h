@@ -16,10 +16,10 @@ class FileLoader {
 		uint8 *code;
 		uint32 tam;
 	public:
-		FileLoader(char *a){
+		FileLoader(char *a,uint8 debug){
 			FILE *arq;
 			uint8 *vet;
-			printf("[INFO] - Iniciando a busca do arquivo!\n");
+			if(debug>1)printf("[INFO] - Iniciando a busca do arquivo!\n");
 			vet=new uint8[TAM_READ];
 			uint32 max=0;
 			uint32 res;
@@ -30,7 +30,7 @@ class FileLoader {
 				code=NULL;
 				return;
 			}
-			printf("[SUCESS] - Arquivo '%s' encontrado!\n",a);
+			if(debug>0)printf("[SUCESS] - Arquivo '%s' encontrado!\n",a);
 			res = fread (vet, sizeof(uint8), TAM_READ, arq);
 			max+=res;
 			while(res==TAM_READ){
