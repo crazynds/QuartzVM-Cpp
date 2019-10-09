@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
 		if(argc>1)c=new FileLoader(argv[1],DEBUG);
 		else c=new FileLoader((char*)"../codes/code.bt",DEBUG);
 		if(c->getTam()==0){
-			cout << "[ERROR] - Não foi possivel carregar o código, máquina virtual desligada!";
+			cout << "[ERROR] - Não foi possivel carregar o código, máquina virtual desligando!";
 			getchar();
 			return 0;
 		}

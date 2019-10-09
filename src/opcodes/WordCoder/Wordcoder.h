@@ -13,6 +13,23 @@
 	#include "VERSION.h"
 	#include "MemoryType.h"
 
+	#define WAX w_(0)
+	#define WBX w_(1)
+	#define WCX w_(2)
+	#define WDX w_(3)
+	#define WEX w_(4)
+	#define WFX w_(5)
+	#define WGX w_(6)
+	#define WHX w_(7)
+	#define WIX w_(8)
+	#define WJX w_(9)
+	#define WKX w_(10)
+	#define WLX w_(11)
+	#define WMX w_(12)
+	#define WNX w_(13)
+	#define WOX w_(14)
+	#define WPX w_(15)
+
 	class Wordcoder{
 		private:
 			uint8 *bytecode;
@@ -107,48 +124,51 @@
 			void setIn64(uint32 ponto, uint64 valor){
 				*((uint64*)&bytecode[ponto])=valor;
 			}
-		public:
 
-			Wordcoder(int x=0){
-				bytecode=new uint8[256];
-				tam=0;
-				maxTam=256;
-
-				atual=P_UINT8;
-				if(x==0){
-					set16(0);
-					set16(VERSION_VM);
-					set8(CORRECION_VM);
-					set32(2);
-					set16(0);
-				}
-				localLastCab=getTam();
+			void inc_w(uint8 m1){
+				set16(INC_W);
+				set8(m1);
 			}
-			~Wordcoder(){
-				delete[] bytecode;
+			void dec_w(uint8 m1){
+				set16(DEC_W);
+				set8(m1);
+			}
+			void inc_m(uint48 m1){
+				set16(INC_M);
+				set48(m1);
+			}
+			void dec_m(uint48 m1){
+				set16(DEC_M);
+				set48(m1);
 			}
 
-			void mov(GeralMemory*,GeralMemory*);
-			void inc(GeralMemory*);
-			void setString(GeralMemory*,char*);
-			void printNum(GeralMemory*);
-			void printChar(GeralMemory*);
-			void printString(GeralMemory*);
-
-			void setDevVersion(uint64 x);
-			void setGeralName(const char*);
-
-			void setIn32(uint32 ponto, uint32 valor){
-				*((uint32*)&bytecode[ponto])=valor;
+			void call_c(uint32 m1){
+				set16(CALL_C);
+				set32(m1);
 			}
-			void set16(uint16 x){
-				if(tam+2>=maxTam)expand();
-				uint16 *p=(uint16*)&bytecode[tam];
-				*p=x;
-				tam+=2;
+			void call_m(uint48 m1){
+				set16(CALL_M);
+				set48(m1);
 			}
-			void finalize(){
-				set16(0);
+			void call_w(uint8 m1){
+				set16(CALL_W);
+				set8(m1);
+			}
+			void ret(){
+				set16(RETURN);
+			}
+
+			void push_w(uint8 m1){
+				set16(PUSH_W);
+				set8(m1);
+			}
+			void push_c(uint64 m1){
+				set16(PUSH_C);
+				set64(m1);
+			}
+			void pop_w(uint8 m1){
+				set16(POP_W);
+				set8(m1);
 			}
 
 			void mov_mmww_c(uint8 base,uint8 index,uint8 shift,uint32 inc,uint64 value){
@@ -157,7 +177,7 @@
 				set8(base);
 				set8(index);
 				set8(shift);
-				setAtual(value);
+				set64(value);
 			}
 			void mov_mmww_w(uint8 base,uint8 index,uint8 shift,uint32 inc,uint8 val){
 				set16(atual+MOV_MMWW_W);
@@ -185,6 +205,124 @@
 				set8(base2);
 				set8(index2);
 				set8(shift2);
+			}
+			void mov_mmw_mmw(uint8 m1,uint32 inc1, uint8 m2, uint32 inc2){
+				set16(atual+MOV_MMW_MMW);
+				set32(inc1);
+				set8((uint8)m1);
+				set32(inc2);
+				set8((uint8)m2);
+			}
+			void mov_w_mmw(uint8 m1, uint8 m2, uint32 inc2){
+				set16(atual+MOV_W_MMW);
+				set8((uint8)m1);
+				set32(inc2);
+				set8((uint8)m2);
+			}
+			void mov_mmw_w(uint8 m1,uint32 inc1, uint8 m2){
+				set16(atual+MOV_MMW_W);
+				set32(inc1);
+				set8((uint8)m1);
+				set8((uint8)m2);
+			}
+			void mov_mmw_c(uint8 m1,uint32 inc,uint64 m2){
+				set16(atual+MOV_MMW_C);
+				set32(inc);
+				set8(m1);
+				setAtual(m2);
+			}
+
+			void mov_mmw_m(uint8 m1,uint32 inc,uint48 m2){
+				set16(atual+MOV_MMW_M);
+				set32(inc);
+				set8(m1);
+				set48(m2);
+			}
+			void mov_m_mmw(uint48 m1,uint8 m2,uint32 inc){
+				set16(atual+MOV_M_MMW);
+				set48(m1);
+				set32(inc);
+				set8(m2);
+			}
+
+			void mov_m_c(uint48 m1,uint64 m2){
+				set16(atual+MOV_M_C);
+				set48(m1);
+				setAtual(m2);
+			}
+			void mov_m_m(uint48 m1,uint48 m2){
+				set16(atual+MOV_M_M);
+				set48(m1);
+				set48(m2);
+			}
+			void mov_m_w(uint48 m1,uint8 m2){
+				set16(atual+MOV_M_W);
+				set48(m1);
+				set8(m2);
+			}
+			void mov_w_c(uint8 m1,uint64 m2){
+				set16(atual+MOV_W_C);
+				set8(m1);
+				setAtual(m2);
+			}
+			void mov_w_m(uint8 m1,uint48 m2){
+				set16(atual+MOV_W_M);
+				set8(m1);
+				set48(m2);
+			}
+			void mov_w_w(uint8 m1,uint8 m2){
+				set16(atual+MOV_W_W);
+				set8(m1);
+				set8(m2);
+			}
+		public:
+
+			Wordcoder(int x=0){
+				bytecode=new uint8[256];
+				tam=0;
+				maxTam=256;
+
+				atual=P_UINT8;
+				if(x==0){
+					set16(0);
+					set16(VERSION_VM);
+					set8(CORRECION_VM);
+					set32(2);
+					set16(0);
+				}
+				localLastCab=getTam();
+			}
+			~Wordcoder(){
+				delete[] bytecode;
+			}
+
+			void mov(GeralMemory*,GeralMemory*);
+			void add(GeralMemory*,GeralMemory*);
+			void sub(GeralMemory*,GeralMemory*);
+			void inc(GeralMemory*);
+			void dec(GeralMemory*);
+			void call(GeralMemory*);
+			void pop(GeralMemory*);
+			void push(GeralMemory*);
+			void setString(GeralMemory*,char*);
+			void printNum(GeralMemory*);
+			void printChar(GeralMemory*);
+			void printString(GeralMemory*);
+
+			void setDevVersion(uint64 x);
+			void setGeralName(const char*);
+
+			void setIn32(uint32 ponto, uint32 valor){
+				*((uint32*)&bytecode[ponto])=valor;
+			}
+			void set16(uint16 x){
+				if(tam+2>=maxTam)expand();
+				uint16 *p=(uint16*)&bytecode[tam];
+				*p=x;
+				tam+=2;
+			}
+			void finalize(){
+				set16(0);
 			}
 
 			void copy_m_m_c(uint48 m1,uint48 m2,uint32 m3){
@@ -310,26 +448,6 @@
 				set8(m1);
 			}
 
-			void mov_mmw_mmw(uint8 m1,uint32 inc1, uint8 m2, uint32 inc2){
-				set16(atual+MOV_MMW_MMW);
-				set32(inc1);
-				set8((uint8)m1);
-				set32(inc2);
-				set8((uint8)m2);
-			}
-			void mov_w_mmw(uint8 m1, uint8 m2, uint32 inc2){
-				set16(atual+MOV_W_MMW);
-				set8((uint8)m1);
-				set32(inc2);
-				set8((uint8)m2);
-			}
-			void mov_mmw_w(uint8 m1,uint32 inc1, uint8 m2){
-				set16(atual+MOV_MMW_W);
-				set32(inc1);
-				set8((uint8)m1);
-				set8((uint8)m2);
-			}
-
 			void print_out_char_w(uint8 m1){
 				set16(PRINT_OUT_CHAR);
 				set8(m1);
@@ -363,9 +481,9 @@
 			}
 			void dd_w_w(uint8 m1,uint8 m2){
 				if(atual<=P_INT128){
-					set16(atual+DD_W_C);
+					set16(atual+DD_W_W);
 				}else{
-					set16(P_UINT64+DD_W_C);
+					set16(P_UINT64+DD_W_W);
 				}
 				set8(m1);
 				set8(m2);
@@ -387,52 +505,6 @@
 				}
 				set8(m1);
 				set8(m2);
-			}
-
-			void inc_w(uint8 m1){
-				set16(INC_W);
-				set8(m1);
-			}
-			void dec_w(uint8 m1){
-				set16(DEC_W);
-				set8(m1);
-			}
-			void inc_m(uint48 m1){
-				set16(INC_M);
-				set48(m1);
-			}
-			void dec_m(uint48 m1){
-				set16(DEC_M);
-				set48(m1);
-			}
-
-			void call_c(uint32 m1){
-				set16(CALL_C);
-				set32(m1);
-			}
-			void call_m(uint32 m1){
-				set16(CALL_M);
-				set32(m1);
-			}
-			void call_w(uint32 m1){
-				set16(CALL_W);
-				set32(m1);
-			}
-			void ret(){
-				set16(RETURN);
-			}
-
-			void push_w(uint8 m1){
-				set16(PUSH_W);
-				set8(m1);
-			}
-			void push_c(uint64 m1){
-				set16(PUSH_C);
-				set64(m1);
-			}
-			void pop_w(uint8 m1){
-				set16(POP_W);
-				set8(m1);
 			}
 
 			void lea_w__w_w_c(uint8 m1,uint8 m2,uint8 m3,uint64 m4){
@@ -685,56 +757,7 @@
 				set8(m1);
 				set8(m2);
 			}
-			void mov_mmw_c(uint8 m1,uint32 inc,uint64 m2){
-				set16(atual+MOV_MMW_C);
-				set32(inc);
-				set8(m1);
-				setAtual(m2);
-			}
 
-			void mov_mmw_m(uint8 m1,uint32 inc,uint48 m2){
-				set16(atual+MOV_MMW_M);
-				set32(inc);
-				set8(m1);
-				set48(m2);
-			}
-			void mov_m_mmw(uint48 m1,uint8 m2,uint32 inc){
-				set16(atual+MOV_M_MMW);
-				set48(m1);
-				set32(inc);
-				set8(m2);
-			}
-
-			void mov_m_c(uint48 m1,uint64 m2){
-				set16(atual+MOV_M_C);
-				set48(m1);
-				setAtual(m2);
-			}
-			void mov_m_m(uint48 m1,uint48 m2){
-				set16(atual+MOV_M_M);
-				set48(m1);
-				set48(m2);
-			}
-			void mov_m_w(uint48 m1,uint8 m2){
-				set16(atual+MOV_M_W);
-				set48(m1);
-				set8(m2);
-			}
-			void mov_w_c(uint8 m1,uint64 m2){
-				set16(atual+MOV_W_C);
-				set8(m1);
-				setAtual(m2);
-			}
-			void mov_w_m(uint8 m1,uint48 m2){
-				set16(atual+MOV_W_M);
-				set8(m1);
-				set48(m2);
-			}
-			void mov_w_w(uint8 m1,uint8 m2){
-				set16(atual+MOV_W_W);
-				set8(m1);
-				set8(m2);
-			}
 
 
 			void soma_m_c(uint48 m1,uint64 m2){

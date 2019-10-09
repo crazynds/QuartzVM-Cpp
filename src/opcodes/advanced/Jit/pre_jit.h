@@ -125,8 +125,6 @@ std::vector<Dupla<Label,uint32>>* pre_check_jig(Thread &t,Assembler &a){
 		case P_UINT48+MOV_W_W:
 		case P_INT64+MOV_W_W:
 		case P_UINT64+MOV_W_W:
-		case P_INT8+MOV_MMW_C:
-		case P_UINT8+MOV_MMW_C:
 		case P_UINT8+CMP_W_W:
 		case P_INT8+CMP_W_W:
 		case P_UINT16+CMP_W_W:
@@ -236,8 +234,6 @@ std::vector<Dupla<Label,uint32>>* pre_check_jig(Thread &t,Assembler &a){
 		case P_INT32+CMP_W_C:
 		case P_UINT32+DIV_W_C:
 		case P_INT32+DIV_W_C:
-		case P_INT16+MOV_MMW_C:
-		case P_UINT16+MOV_MMW_C:
 			{if(t.checkUseCode(5))return 0;t.setPontCode(t.getPontCode()+5);}break;
 		case P_UINT8+MOV_W_MMW:
 		case P_INT8+MOV_W_MMW:
@@ -259,6 +255,10 @@ std::vector<Dupla<Label,uint32>>* pre_check_jig(Thread &t,Assembler &a){
 		case P_INT48+MOV_MMW_W:
 		case P_UINT64+MOV_MMW_W:
 		case P_INT64+MOV_MMW_W:
+		case P_INT8+MOV_MMW_C:
+		case P_UINT8+MOV_MMW_C:
+		case INC_M:
+		case DEC_M:
 			{if(t.checkUseCode(6))return 0;t.setPontCode(t.getPontCode()+6);}break;
 		case P_UINT8+CMP_M_C:
 		case P_INT8+CMP_M_C:
@@ -364,8 +364,8 @@ std::vector<Dupla<Label,uint32>>* pre_check_jig(Thread &t,Assembler &a){
 		case P_INT64+DIV_W_M:
 		case P_UINT8+DIV_M_C:
 		case P_INT8+DIV_M_C:
-		case P_INT32+MOV_MMW_C:
-		case P_UINT32+MOV_MMW_C:
+		case P_INT16+MOV_MMW_C:
+		case P_UINT16+MOV_MMW_C:
 			{if(t.checkUseCode(7))return 0;t.setPontCode(t.getPontCode()+7);}break;
 		case P_UINT16+CMP_M_C:
 		case P_INT16+CMP_M_C:
@@ -392,6 +392,33 @@ std::vector<Dupla<Label,uint32>>* pre_check_jig(Thread &t,Assembler &a){
 		case P_INT64+CMP_W_C:
 		case P_UINT64+DIV_W_C:
 		case P_INT64+DIV_W_C:
+		case P_INT32+MOV_MMW_C:
+		case P_UINT32+MOV_MMW_C:
+			{if(t.checkUseCode(9))return 0;t.setPontCode(t.getPontCode()+9);}break;
+		case P_UINT32+CMP_M_C:
+		case P_INT32+CMP_M_C:
+		case P_INT32+MOV_M_C:
+		case P_UINT32+MOV_M_C:
+		case P_UINT32+MUL_M_C:
+		case P_UINT32+SOMA_M_C:
+		case P_UINT32+SUB_M_C:
+		case P_INT32+MUL_M_C:
+		case P_INT32+SOMA_M_C:
+		case P_INT32+SUB_M_C:
+		case P_UINT32+DIV_M_C:
+		case P_INT32+DIV_M_C:
+		case P_UINT8+MOV_MMW_MMW:
+		case P_INT8+MOV_MMW_MMW:
+		case P_UINT16+MOV_MMW_MMW:
+		case P_INT16+MOV_MMW_MMW:
+		case P_UINT32+MOV_MMW_MMW:
+		case P_INT32+MOV_MMW_MMW:
+		case P_UINT48+MOV_MMW_MMW:
+		case P_INT48+MOV_MMW_MMW:
+		case P_UINT64+MOV_MMW_MMW:
+		case P_INT64+MOV_MMW_MMW:
+			{if(t.checkUseCode(10))return 0;t.setPontCode(t.getPontCode()+10);}break;
+		case LEA_W__W_W_C:
 		case P_INT48+MOV_MMW_C:
 		case P_UINT48+MOV_MMW_C:
 		case P_INT8+MOV_MMW_M:
@@ -414,21 +441,6 @@ std::vector<Dupla<Label,uint32>>* pre_check_jig(Thread &t,Assembler &a){
 		case P_UINT48+MOV_M_MMW:
 		case P_INT64+MOV_M_MMW:
 		case P_UINT64+MOV_M_MMW:
-			{if(t.checkUseCode(9))return 0;t.setPontCode(t.getPontCode()+9);}break;
-		case P_UINT32+CMP_M_C:
-		case P_INT32+CMP_M_C:
-		case P_INT32+MOV_M_C:
-		case P_UINT32+MOV_M_C:
-		case P_UINT32+MUL_M_C:
-		case P_UINT32+SOMA_M_C:
-		case P_UINT32+SUB_M_C:
-		case P_INT32+MUL_M_C:
-		case P_INT32+SOMA_M_C:
-		case P_INT32+SUB_M_C:
-		case P_UINT32+DIV_M_C:
-		case P_INT32+DIV_M_C:
-			{if(t.checkUseCode(10))return 0;t.setPontCode(t.getPontCode()+10);}break;
-		case LEA_W__W_W_C:
 			{if(t.checkUseCode(11))return 0;t.setPontCode(t.getPontCode()+11);}break;
 		case P_INT48+MOV_M_C:
 		case P_UINT48+MOV_M_C:

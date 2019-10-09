@@ -9,6 +9,7 @@
 #define SRC_OPCODES_WORDCODER_MEMORYTYPE_H_
 
 	#include "../../lib/Types.h"
+	#define RAX W
 
 	class GeralMemory{
 	protected:
@@ -97,12 +98,11 @@
 		}
 	};
 
-	Workspace* W(uint8 pos);
-	GeralMemory* W_(uint8 pos);
-	GeralMemory* M_(uint48 pos);
-	GeralMemory* ptr_(Workspace *r,uint32 inc=0);
-	GeralMemory* ptr_(Workspace *reg,Workspace *regIndex,uint8 shift=0,uint32 inc=0);
-	GeralMemory* imd_(uint64 dado);
+	GeralMemory* w_(uint8 pos);
+	GeralMemory* m_(uint48 pos);
+	GeralMemory* c_(uint64 dado);
+	GeralMemory* ptr_(GeralMemory *r,uint32 inc);
+	GeralMemory* ptr_(Workspace *reg,Workspace *regIndex,uint8 shift,uint32 inc);
 	/*
 	 * Tipos diferentes de gerais:
 	 * m - memoria estática

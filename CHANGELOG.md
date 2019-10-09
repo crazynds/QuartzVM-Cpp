@@ -1,3 +1,9 @@
+## [0.1.1] - 17-06-2019
+### Added
+ - Atualização do wordcoder para utilização dinamica das chamadas das funções;
+### Changed
+### Removed
+
 ## [0.1.0] - 17-06-2019
 ### Added
  - Implementado Optimizacao no reaproveitamento dos registradores (RAX,RBX,RCX,RDX) para melhora de performance; (BETA)

@@ -237,9 +237,9 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		else{
 			a.mov(rax,ptr(workspace,dst*8));
 			a.shl(rax,val);
-			a.mov(ptr(workspace,dst*8+2),eax);
+			a.mov(ptr(workspace,dst*8),eax);
 			a.shr(rax,32);
-			a.mov(ptr(workspace,dst*8),ax);
+			a.mov(ptr(workspace,dst*8+4),ax);
 		}
 	}break;
 	case P_UINT64+DE_W_W:
@@ -508,11 +508,12 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		else a.mov(rbx,ptr(workspace,val*8));
 
 		if(dst<8){
-			a.mov(rcx,qreg[dst]);
-			a.add(rcx,rbx);
-			a.and_(qreg[dst],0xFFFF000000000000);
-			a.and_(rcx,0x0000FFFFFFFFFFFF);
-			a.or_(qreg[dst],rcx);
+			a.mov(rcx,0x0000FFFFFFFFFFFF);
+			a.mov(rax,qreg[dst]);
+			a.add(rax,rbx);
+			a.andn(qreg[dst],rcx,qreg[dst]);
+			a.and_(rax,rcx);
+			a.or_(qreg[dst],rax);
 		}else{
 			a.mov(rax,ptr(workspace,dst*8));
 			a.add(rax,rbx);

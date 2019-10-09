@@ -180,7 +180,6 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 
 
 		Gp reg2_aux64=a.getNextRegister64();
-		Gp reg1_aux8=a.getNextRegister8();
 
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
 		if(dst<8)a.mov(reg2_aux64,qreg[dst]);
@@ -188,6 +187,7 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		a.and_(reg2_aux64,rcx);
 		if(val<8)a.mov(ptr(memory,reg2_aux64,0,valinc),breg[val]);
 		else{
+			Gp reg1_aux8=a.getNextRegister8();
 			a.mov(reg1_aux8,ptr(workspace,val*8));
 			a.mov(ptr(memory,reg2_aux64,0,valinc),reg1_aux8);
 		}
@@ -198,7 +198,6 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		uint8 valinc=t.getNext32();
 		uint8 dst=t.getNext8();
 		uint8 val=t.getNext8();
-
 		Gp reg2_aux64=a.getNextRegister64();
 
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
@@ -227,8 +226,9 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		a.and_(reg2_aux64,rcx);
 		if(val<8)a.mov(ptr(memory,reg2_aux64,0,valinc),dreg[val]);
 		else{
-			a.mov(eax,ptr(workspace,val*8));
-			a.mov(ptr(memory,reg2_aux64,0,valinc),eax);
+			Gp reg_aux32=a.getNextRegister32();
+			a.mov(reg_aux32,ptr(workspace,val*8));
+			a.mov(ptr(memory,reg2_aux64,0,valinc),reg_aux32);
 		}
 	}break;
 	case P_UINT48+MOV_MMW_W:
@@ -277,11 +277,10 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 	case P_UINT8+MOV_W_MMW:
 	case P_INT8+MOV_W_MMW:{
 		uint8 dst=t.getNext8();
-		uint8 valinc=t.getNext32();
+		uint32 valinc=t.getNext32();
 		uint8 val=t.getNext8();
 
 		Gp reg2_aux64=a.getNextRegister64();
-		Gp reg1_aux8=a.getNextRegister8();
 
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
 		if(val<8)a.mov(reg2_aux64,qreg[val]);
@@ -289,6 +288,7 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		a.and_(reg2_aux64,rcx);
 		if(dst<8)a.mov(breg[dst],ptr(memory,reg2_aux64,0,valinc));
 		else{
+			Gp reg1_aux8=a.getNextRegister8();
 			a.mov(reg1_aux8,ptr(memory,reg2_aux64,0,valinc));
 			a.mov(ptr(workspace,dst*8),reg1_aux8);
 		}
@@ -297,7 +297,7 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 	case P_UINT16+MOV_W_MMW:
 	case P_INT16+MOV_W_MMW:{
 		uint8 dst=t.getNext8();
-		uint8 valinc=t.getNext32();
+		uint32 valinc=t.getNext32();
 		uint8 val=t.getNext8();
 
 		Gp reg2_aux64=a.getNextRegister64();
@@ -312,30 +312,29 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 			a.mov(reg1_aux16,ptr(memory,reg2_aux64,0,valinc));
 			a.mov(ptr(workspace,dst*8),reg1_aux16);
 		}
-
 	}break;
 	case P_UINT32+MOV_W_MMW:
 	case P_INT32+MOV_W_MMW:{
 		uint8 dst=t.getNext8();
-		uint8 valinc=t.getNext32();
+		uint32 valinc=t.getNext32();
 		uint8 val=t.getNext8();
 
 		Gp reg2_aux64=a.getNextRegister64();
-
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
 		if(val<8)a.mov(reg2_aux64,qreg[val]);
 		else a.mov(reg2_aux64,qword_ptr(workspace,val*8));
 		a.and_(reg2_aux64,rcx);
 		if(dst<8)a.mov(dreg[dst],ptr(memory,reg2_aux64,0,valinc));
 		else{
-			a.mov(eax,ptr(memory,reg2_aux64,0,valinc));
-			a.mov(ptr(workspace,dst*8),eax);
+			Gp reg1_aux=a.getNextRegister32();
+			a.mov(reg1_aux,ptr(memory,reg2_aux64,0,valinc));
+			a.mov(ptr(workspace,dst*8),reg1_aux);
 		}
 	}break;
 	case P_UINT48+MOV_W_MMW:
 	case P_INT48+MOV_W_MMW:{
 		uint8 dst=t.getNext8();
-		uint8 valinc=t.getNext32();
+		uint32 valinc=t.getNext32();
 		uint8 val=t.getNext8();
 
 
@@ -360,10 +359,9 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 	case P_UINT64+MOV_W_MMW:
 	case P_INT64+MOV_W_MMW:{
 		uint8 dst=t.getNext8();
-		uint8 valinc=t.getNext32();
+		uint32 valinc=t.getNext32();
 		uint8 val=t.getNext8();
 
-		Gp reg1_aux64=a.getNextRegister64();
 		Gp reg2_aux64=a.getNextRegister64();
 
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
@@ -372,6 +370,7 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		a.and_(reg2_aux64,rcx);
 		if(dst<8)a.mov(qreg[dst],ptr(memory,reg2_aux64,0,valinc));
 		else{
+			Gp reg1_aux64=a.getNextRegister64();
 			a.mov(reg1_aux64,ptr(memory,reg2_aux64,0,valinc));
 			a.mov(ptr(workspace,dst*8),reg1_aux64);
 		}
@@ -565,8 +564,9 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		uint64 val=t.getNext48().toInt();
 		if(mem<8)a.mov(dreg[mem],dword_ptr(memory,val));
 		else{
-			a.mov(eax,dword_ptr(memory,val));
-			a.mov(dword_ptr(workspace,mem*8),eax);
+			Gp reg1_aux32=a.getNextRegister32();
+			a.mov(reg1_aux32,dword_ptr(memory,val));
+			a.mov(dword_ptr(workspace,mem*8),reg1_aux32);
 		}
 	}break;
 	case P_UINT48+MOV_W_M:
@@ -757,13 +757,14 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 
 
 		Gp reg2_aux64=a.getNextRegister64();
+		Gp reg_aux32=a.getNextRegister32();
 
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
 		if(mem<8)a.mov(reg2_aux64,qreg[mem]);
 		else a.mov(reg2_aux64,qword_ptr(workspace,mem*8));
-		a.mov(eax,dword_ptr(memory,val));
+		a.mov(reg_aux32,dword_ptr(memory,val));
 		a.and_(reg2_aux64,rcx);
-		a.mov(dword_ptr(memory,reg2_aux64,0,inc),eax);
+		a.mov(dword_ptr(memory,reg2_aux64,0,inc),reg_aux32);
 
 	}break;
 	case P_UINT48+MOV_MMW_M:
@@ -772,18 +773,15 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		uint8 mem=t.getNext8();
 		uint64 val=t.getNext48().toInt();
 
-		Gp reg2_aux64=a.getNextRegister64();
-
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
-		if(mem<8)a.mov(reg2_aux64,qreg[mem]);
-		else a.mov(reg2_aux64,qword_ptr(workspace,mem*8));
+		if(mem<8)a.mov(rbx,qreg[mem]);
+		else a.mov(rbx,qword_ptr(workspace,mem*8));
 		a.mov(eax,dword_ptr(memory,val));
+		a.and_(rbx,rcx);
 		a.mov(dx,word_ptr(memory,val+4));
-		a.and_(reg2_aux64,rcx);
 
-		a.mov(dword_ptr(memory,reg2_aux64,0,inc),eax);
-		a.add(reg2_aux64,4);
-		a.mov(word_ptr(memory,reg2_aux64,0,inc),dx);
+		a.mov(dword_ptr(memory,rbx,0,inc),eax);
+		a.mov(word_ptr(memory,rbx,0,inc+4),dx);
 
 	}break;
 	case P_UINT64+MOV_MMW_M:
@@ -844,13 +842,14 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		uint8 val=t.getNext8();
 
 		Gp reg2_aux64=a.getNextRegister64();
+		Gp reg_aux32=a.getNextRegister32();
 
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
 		if(val<8)a.mov(reg2_aux64,qreg[val]);
 		else a.mov(reg2_aux64,qword_ptr(workspace,val));
 		a.and_(reg2_aux64,rcx);
-		a.mov(eax,dword_ptr(memory,reg2_aux64,0,inc));
-		a.mov(dword_ptr(memory,mem),eax);
+		a.mov(reg_aux32,dword_ptr(memory,reg2_aux64,0,inc));
+		a.mov(dword_ptr(memory,mem),reg_aux32);
 
 	}break;
 	case P_UINT48+MOV_M_MMW:
@@ -859,15 +858,12 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		uint32 inc=t.getNext32();
 		uint8 val=t.getNext8();
 
-		Gp reg2_aux64=a.getNextRegister64();
-
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
-		if(val<8)a.mov(reg2_aux64,qreg[val]);
-		else a.mov(reg2_aux64,qword_ptr(workspace,val));
-		a.and_(reg2_aux64,rcx);
-		a.mov(eax,dword_ptr(memory,reg2_aux64,0,inc));
-		a.add(reg2_aux64,4);
-		a.mov(dx,word_ptr(memory,reg2_aux64,0,inc));
+		if(val<8)a.mov(rbx,qreg[val]);
+		else a.mov(rbx,qword_ptr(workspace,val));
+		a.and_(rbx,rcx);
+		a.mov(eax,dword_ptr(memory,rbx,0,inc));
+		a.mov(dx,word_ptr(memory,rbx,0,inc+4));
 		a.mov(dword_ptr(memory,mem),eax);
 		a.mov(word_ptr(memory,mem+4),dx);
 
@@ -890,6 +886,112 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 
 
 	}break;
+	case P_UINT8+MOV_MMW_MMW:
+	case P_INT8+MOV_MMW_MMW:{
+		uint32 inc=t.getNext32();
+		uint8 mem=t.getNext8();
+		uint32 inc2=t.getNext32();
+		uint8 mem2=t.getNext8();
+
+		Gp reg2_aux64=a.getNextRegister64();
+		Gp reg1_aux64=a.getNextRegister64();
+		Gp auxReg=a.getNextRegister8();
+
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		if(mem2<8)a.mov(reg1_aux64,qreg[mem2]);
+		else a.mov(reg1_aux64,qword_ptr(workspace,mem2*8));
+		a.and_(reg1_aux64,rcx);
+		if(mem<8)a.mov(reg2_aux64,qreg[mem]);
+		else a.mov(reg2_aux64,qword_ptr(workspace,mem*8));
+		a.mov(auxReg,byte_ptr(memory,reg1_aux64,0,inc2));
+		a.and_(reg2_aux64,rcx);
+		a.mov(byte_ptr(memory,reg2_aux64,0,inc),auxReg);
+	}break;
+	case P_UINT16+MOV_MMW_MMW:
+	case P_INT16+MOV_MMW_MMW:{
+		uint32 inc=t.getNext32();
+		uint8 mem=t.getNext8();
+		uint32 inc2=t.getNext32();
+		uint8 mem2=t.getNext8();
+		Gp reg2_aux64=a.getNextRegister64();
+		Gp reg1_aux64=a.getNextRegister64();
+		Gp auxReg=a.getNextRegister16();
+
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		if(mem2<8)a.mov(reg1_aux64,qreg[mem2]);
+		else a.mov(reg1_aux64,qword_ptr(workspace,mem2*8));
+		a.and_(reg1_aux64,rcx);
+		if(mem<8)a.mov(reg2_aux64,qreg[mem]);
+		else a.mov(reg2_aux64,qword_ptr(workspace,mem*8));
+		a.mov(auxReg,word_ptr(memory,reg1_aux64,0,inc2));
+		a.and_(reg2_aux64,rcx);
+		a.mov(word_ptr(memory,reg2_aux64,0,inc),auxReg);
+	}break;
+	case P_UINT32+MOV_MMW_MMW:
+	case P_INT32+MOV_MMW_MMW:{
+		uint32 inc=t.getNext32();
+		uint8 mem=t.getNext8();
+		uint32 inc2=t.getNext32();
+		uint8 mem2=t.getNext8();
+
+		Gp reg2_aux64=a.getNextRegister64();
+		Gp reg1_aux64=a.getNextRegister64();
+		Gp auxReg=a.getNextRegister32();
+
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		if(mem2<8)a.mov(reg1_aux64,qreg[mem2]);
+		else a.mov(reg1_aux64,qword_ptr(workspace,mem2*8));
+		a.and_(reg1_aux64,rcx);
+		if(mem<8)a.mov(reg2_aux64,qreg[mem]);
+		else a.mov(reg2_aux64,qword_ptr(workspace,mem*8));
+		a.mov(auxReg,dword_ptr(memory,reg1_aux64,0,inc2));
+		a.and_(reg2_aux64,rcx);
+		a.mov(dword_ptr(memory,reg2_aux64,0,inc),auxReg);
+	}break;
+	case P_UINT48+MOV_MMW_MMW:
+	case P_INT48+MOV_MMW_MMW:{
+		uint32 inc=t.getNext32();
+		uint8 mem=t.getNext8();
+		uint32 inc2=t.getNext32();
+		uint8 mem2=t.getNext8();
+
+		Gp reg2_aux64=rax;
+		Gp reg1_aux64=rbx;
+		Gp auxReg=rdx;
+
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		if(mem2<8)a.mov(reg1_aux64,qreg[mem2]);
+		else a.mov(reg1_aux64,qword_ptr(workspace,mem2*8));
+		a.and_(reg1_aux64,rcx);
+		if(mem<8)a.mov(reg2_aux64,qreg[mem]);
+		else a.mov(reg2_aux64,qword_ptr(workspace,mem*8));
+		a.mov(auxReg,dword_ptr(memory,reg1_aux64,0,inc2));
+		a.and_(reg2_aux64,rcx);
+		a.mov(dword_ptr(memory,reg2_aux64,0,inc),edx);
+		a.shr(rdx,32);
+		a.mov(dword_ptr(memory,reg2_aux64,0,inc+4),dx);
+	}break;
+	case P_UINT64+MOV_MMW_MMW:
+	case P_INT64+MOV_MMW_MMW:{
+		uint32 inc=t.getNext32();
+		uint8 mem=t.getNext8();
+		uint32 inc2=t.getNext32();
+		uint8 mem2=t.getNext8();
+
+		Gp reg2_aux64=a.getNextRegister64();
+		Gp reg1_aux64=a.getNextRegister64();
+		Gp auxReg=a.getNextRegister64();
+
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		if(mem2<8)a.mov(reg1_aux64,qreg[mem2]);
+		else a.mov(reg1_aux64,qword_ptr(workspace,mem2*8));
+		a.and_(reg1_aux64,rcx);
+		if(mem<8)a.mov(reg2_aux64,qreg[mem]);
+		else a.mov(reg2_aux64,qword_ptr(workspace,mem*8));
+		a.mov(auxReg,qword_ptr(memory,reg1_aux64,0,inc2));
+		a.and_(reg2_aux64,rcx);
+		a.mov(qword_ptr(memory,reg2_aux64,0,inc),auxReg);
+	}break;
 	case P_UINT8+MOV_MMW_C:
 	case P_INT8+MOV_MMW_C:{
 		uint32 inc=t.getNext32();
@@ -903,7 +1005,6 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		else a.mov(reg2_aux64,qword_ptr(workspace,mem*8));
 		a.and_(reg2_aux64,rcx);
 		a.mov(byte_ptr(memory,reg2_aux64,0,inc),val);
-
 
 	}break;
 	case P_UINT16+MOV_MMW_C:

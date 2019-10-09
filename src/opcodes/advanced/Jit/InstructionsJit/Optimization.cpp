@@ -508,6 +508,14 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Labe
 		if(mem<8)a.dec(qreg[mem]);
 		else a.dec(qword_ptr(workspace,mem*8));
 	}break;
+	case INC_M:{
+		uint64 mem=t.getNext48().toInt();
+		a.inc(qword_ptr(memory,mem));
+	}break;
+	case DEC_M:{
+		uint64 mem=t.getNext48().toInt();
+		a.dec(qword_ptr(memory,mem));
+	}break;
 	case LEA_W__W_W_C:{
 		uint8 dst=t.getNext8();
 		uint8 src1=t.getNext8();
