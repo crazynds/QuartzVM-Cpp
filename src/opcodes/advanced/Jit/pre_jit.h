@@ -55,6 +55,48 @@ std::vector<Dupla<Label,uint32>>* pre_check_jig(Thread &t,Assembler &a){
 			v[aux].setFirst(jmp);
 			v[aux].setSecond(idLabel);
 			}break;
+		case CALL_C:{
+			if(t.checkUseCode(4))return 0;
+			int b=0;
+			uint32 idLabel=t.getNext32();
+			for(int x=0;x<v.size();x++){
+				if(v[x].getSecond()==idLabel){
+					b=1;
+					break;
+				}
+			}
+			if(!b){
+				Label *jmp=new Label();
+				*jmp=a.newLabel();
+				uint32 aux=v.size();
+				v.resize(aux+1);
+				v[aux].setFirst(jmp);
+				v[aux].setSecond(idLabel);
+			}
+
+			//Set re-entry
+			b=0;
+			idLabel=t.getPontCode();
+			for(int x=0;x<v.size();x++){
+				if(v[x].getSecond()==idLabel){
+					b=1;
+					a.cmp(rax,idLabel);
+					a.je(v[x].getFirst());
+					break;
+				}
+			}
+			if(!b){
+				Label *jmp=new Label();
+				*jmp=a.newLabel();
+				uint32 aux=v.size();
+				v.resize(aux+1);
+				v[aux].setFirst(jmp);
+				v[aux].setSecond(idLabel);
+				a.cmp(rax,idLabel);
+				a.je(*jmp);
+			}
+
+			}break;
 		case LOOP_C_W:{
 			if(t.checkUseCode(5))return 0;
 			int b=0;
@@ -74,6 +116,8 @@ std::vector<Dupla<Label,uint32>>* pre_check_jig(Thread &t,Assembler &a){
 			v[aux].setFirst(jmp);
 			v[aux].setSecond(idLabel);
 			}break;
+		case RETURN:
+			{}break;
 		case INC_W:
 		case DEC_W:
 			{if(t.checkUseCode(1))return 0;t.setPontCode(t.getPontCode()+1);}break;

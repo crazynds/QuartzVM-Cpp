@@ -37,6 +37,7 @@ void Thread::savePoint(){
 }
 
 void Thread::saveInStack(uint64 p){
+	std::cout << "Excecutou um salvamento de valor na stack: " << p << std::endl;
 	if(stack_pointer>=stack_max){
 		incrementStack();
 		if(error_flags&MAX_LIMIT_STACK_){
@@ -48,6 +49,7 @@ void Thread::saveInStack(uint64 p){
 uint64 Thread::recoverInStack(){
 	if(stack_pointer!=0){
 		if(stack_pointer<(stack_max/2)-64)decrementStack();
+		std::cout << "Excecutou um resgate de valor na stack: " << stack[stack_pointer-1] << std::endl;
 		return stack[--stack_pointer];
 	}
 	return 0;
@@ -71,6 +73,21 @@ void Thread::recoverPoint(){
 		return;
 	}
 	error_flags|=MAX_LIMIT_STACK_;
+}
+
+void Thread::setPontCodeCtx(uint48 val){
+	uint64 p=val.toInt();
+	register uint16 k=uint16(p>>32);
+	if(ct->getCodContext()!=k){
+		if(vt->checkContexto(k)==0){
+			error_flags|=INVALID_CHANGE_CONTEXT_;
+			std::cout << "[ERROR] - Erro ao retornar para um contexto que não existe mais. (ID= " << k << ")" << std::endl;
+			return;
+		}
+		Contexto &c=vt->getContexto(k);
+		changeContexto(c);
+	}
+	cod_pointer=uint32(p);
 }
 
 void Thread::prepare(VirtualMachine &v,Contexto &ct,uint16 cntx,uint32 pos){
@@ -114,6 +131,14 @@ uint16 Thread::getNextTwo8(){
 	register uint16 x=*((uint16*)(&cod[cod_pointer]));
 	cod_pointer+=2;
 	return x;
+}
+void Thread::set16InCode(uint32 pont,uint16 val){
+	register uint16* x=((uint16*)(&cod[pont]));
+	*x=val;
+}
+void Thread::set32InCode(uint32 pont,uint32 val){
+	register uint32* x=((uint32*)(&cod[pont]));
+	*x=val;
 }
 uint16 Thread::getNext16(){
 	register uint16 x=*((uint16*)(&cod[cod_pointer]));

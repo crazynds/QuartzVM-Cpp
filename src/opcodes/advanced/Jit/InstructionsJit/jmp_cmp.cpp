@@ -7,7 +7,7 @@
 
 #include "../Jit.h"
 
-uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,std::vector<Dupla<Label,uint32>> &v){
+uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,std::vector<Dupla<Label,uint32>> &v,uint32 startCode){
 	Gp memory=rdi;
 	Gp workspace=rsi;
 
@@ -17,6 +17,49 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &en
 	Gp breg[8];breg[0]=r8b;breg[1]=r9b;breg[2]=r10b;breg[3]=r11b;breg[4]=r12b;breg[5]=r13b;breg[6]=r14b;breg[7]=r15b;
 
 	switch(jcontent.opcode){
+	case CALL_C:{
+		uint32 posAtual=t.getPontCode();
+		// empurra a posição atual na pilha
+		t.set16InCode(t.getPontCode()-2,JIT_FLAG_ENTER_CODE);
+		uint32 aux=t.getNext32();
+
+		a.pop(rcx);
+		a.push(rcx);
+		pushRegisters(a);
+		a.mov(rdx,t.getPontCode());
+		a.sub(rsp,0x8);
+		a.call(uint64((void*)Thread::saveInStack));
+		a.add(rsp,0x8);
+		popRegisters(a);
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
+
+		if(aux>=jcontent.maxCode|| aux<jcontent.minCode){
+			a.mov(rax,uint64(aux));
+			a.jmp(end);
+		}else for(uint32 x=0;x<v.size();x++){
+			if(v[x].getSecond()==aux){
+				a.jmp(v[x].getFirst());
+				break;
+			}
+		}
+		t.set32InCode(t.getPontCode()-4,startCode);
+	}break;
+	case RETURN:{
+
+		a.pop(rcx);
+		a.push(rcx);
+		pushRegisters(a);
+		a.sub(rsp,0x8);
+		a.call(uint64((void*)Thread::recoverInStack));
+		a.add(rsp,0x8);
+		popRegisters(a);
+
+		//posição atual é retornada em RAX;
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
+
+
+		a.jmp(end);
+	}break;
 	case JMP_C:{
 		uint32 aux=t.getNext32();
 		if(aux>=jcontent.maxCode|| aux<jcontent.minCode){

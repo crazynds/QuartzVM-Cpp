@@ -27,7 +27,7 @@
 	using namespace asmjit;
 
 
-	typedef uint64 (*FuncJit)(uint8 **pontMem,uint64 *pontWork,uint32 goTo);
+	typedef uint64 (*FuncJit)(uint8 **pontMem,uint64 *pontWork,Thread &t,uint32 goTo);
 
 
 	class Contexto{

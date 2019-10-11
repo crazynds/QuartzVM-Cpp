@@ -69,7 +69,6 @@
 			void createFunction(uint16,CodeHolder&);
 			Contexto& getContexto(uint16);
 			JitRuntime& getJitRuntime();
-
 	};
 
 

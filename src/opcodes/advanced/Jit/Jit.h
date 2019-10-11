@@ -44,5 +44,8 @@
 	uint32 getWorkspace();
 
 
+	void pushRegisters(AssemblerJIT &a);
+
+	void popRegisters(AssemblerJIT &a);
 
 #endif /* SRC_OPCODES_JIT_H_ */

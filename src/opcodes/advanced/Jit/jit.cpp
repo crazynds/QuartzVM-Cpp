@@ -18,7 +18,7 @@
 	uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,std::vector<Dupla<Label,uint32>> &v);
 	uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,std::vector<Dupla<Label,uint32>> &v);
 	uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,std::vector<Dupla<Label,uint32>> &v);
-	uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,std::vector<Dupla<Label,uint32>> &v);
+	uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,std::vector<Dupla<Label,uint32>> &v,uint32 startCode);
 
 	void init_jit(Thread &t){
 		if(t.checkUseCode(2))return;
@@ -45,17 +45,27 @@
 			t.error_flags|=INTERNAL_ERROR_;
 			return;
 		}
-		uint64 result= fn(t.mem.getPointerMem(),t.workspace,0);
-		uint32 flags=result>>32;
+		uint64 result= fn(t.mem.getPointerMem(),t.workspace,t,0);
+		uint16 flags=result>>48;
 		switch(flags){
-		case ERROR_JMP_ENTER_JIT_STATE:
+		case ERROR_JMP_ENTER_JIT_STATE:{
 			t.error_flags|=INVALID_JMP_JIT_;
-			t.setPontCode((uint32)result);
-			break;
+			uint16 ctx=(uint16)(result>>32);
+			if(ctx==0){
+				t.setPontCode((uint32)result);
+			}else{
+				t.setPontCodeCtx((uint48)result);
+			}
+		}break;
 		case OK_JIT_STATE:
-		default:
-			t.setPontCode((uint32)result);
-			break;
+		default:{
+			uint16 ctx=(uint16)(result>>32);
+			if(ctx==0){
+				t.setPontCode((uint32)result);
+			}else{
+				t.setPontCodeCtx((uint48)result);
+			}
+		}break;
 		}
 		if(t.checkUseCode(2))return;
 	}
@@ -88,20 +98,28 @@
 			fn=f;
 		}
 
-		uint64 result= fn(t.mem.getPointerMem(),t.workspace,enter);
-		uint32 flags=result>>32;
+		uint64 result= fn(t.mem.getPointerMem(),t.workspace,t,enter);
+		uint16 flags=result>>48;
 		switch(flags){
-		case ERROR_JMP_ENTER_JIT_STATE:
+		case ERROR_JMP_ENTER_JIT_STATE:{
 			t.error_flags|=INVALID_JMP_JIT_;
-			t.setPontCode((uint32)result);
-			break;
+			uint16 ctx=(uint16)(result>>32);
+			if(ctx==0){
+				t.setPontCode((uint32)result);
+			}else{
+				t.setPontCodeCtx((uint48)result);
+			}
+		}break;
 		case OK_JIT_STATE:
-		default:
-			t.setPontCode((uint32)result);
-			break;
+		default:{
+			uint16 ctx=(uint16)(result>>32);
+			if(ctx==0){
+				t.setPontCode((uint32)result);
+			}else{
+				t.setPontCodeCtx((uint48)result);
+			}
+		}break;
 		}
-
-
 		if(t.checkUseCode(2))return;
 	}
 
@@ -116,20 +134,29 @@
 			return;
 		}
 
-		uint64 result= fn(t.mem.getPointerMem(),t.workspace,0);
+		uint64 result= fn(t.mem.getPointerMem(),t.workspace,t,0);
 
-		uint32 flags=result>>32;
+		uint16 flags=result>>48;
 		switch(flags){
-		case ERROR_JMP_ENTER_JIT_STATE:
+		case ERROR_JMP_ENTER_JIT_STATE:{
 			t.error_flags|=INVALID_JMP_JIT_;
-			t.setPontCode((uint32)result);
-			break;
+			uint16 ctx=(uint16)(result>>32);
+			if(ctx==0){
+				t.setPontCode((uint32)result);
+			}else{
+				t.setPontCodeCtx((uint48)result);
+			}
+		}break;
 		case OK_JIT_STATE:
-		default:
-			t.setPontCode((uint32)result);
-			break;
+		default:{
+			uint16 ctx=(uint16)(result>>32);
+			if(ctx==0){
+				t.setPontCode((uint32)result);
+			}else{
+				t.setPontCodeCtx((uint48)result);
+			}
+		}break;
 		}
-
 		if(t.checkUseCode(2))return;
 	}
 
@@ -159,16 +186,19 @@
 		Gp wreg[8];wreg[0]=r8w;wreg[1]=r9w;wreg[2]=r10w;wreg[3]=r11w;wreg[4]=r12w;wreg[5]=r13w;wreg[6]=r14w;wreg[7]=r15w;
 		Gp breg[8];breg[0]=r8b;breg[1]=r9b;breg[2]=r10b;breg[3]=r11b;breg[4]=r12b;breg[5]=r13b;breg[6]=r14b;breg[7]=r15b;
 		a.mov(workspace,rdx); // RSI - WORKSPACE THREAD
+		a.prefetcht1(ptr(workspace,8));	//Move a workspace para perto do processador nos caches.
+
 		a.mov(memory,qword_ptr(rcx)); //RDI - MEMORIA CONTEXTO
-		a.mov(rax,r8); // PRAMETRO goTo
+		a.push(r8);	// THREAD - ARMAZENADA
+		a.mov(rax,r9); // PRAMETRO goTo
 		for(uint16 x=0;x<8;x++)a.mov(qreg[x],qword_ptr(workspace,x*8));
 		a.cld();
-		a.prefetchnta(ptr(workspace,8*8));	//Move a workspace para perto do processador nos caches.
 
 		Label auxiLabel=a.newLabel();
 		Label end=a.newLabel();
 		a.cmp(rax,0);
 		a.jz(auxiLabel);
+		uint32 startCode=t.getPontCode();
 
 		std::vector<Dupla<Label,uint32>> &v=*pre_check_jig(t,a);
 		if(t.isFinalized()){//Caso encontrado algum erro, é finalizado o processo.
@@ -184,7 +214,7 @@
 
 
 		a.mov(rax,ERROR_JMP_ENTER_JIT_STATE);  //Caso não tenha encontrado nenhuma opção para entrar no programa, sai da função e retorna um erro.
-		a.shl(rax,32);
+		a.shl(rax,48);
 		a.mov(eax,jcontent.maxCode);
 		a.jmp(end);
 
@@ -209,7 +239,7 @@
 				if(mov(jcontent,t,a,end,v))break;
 				if(aritimetic(jcontent,t,a,end,v))break;
 				if(optimization(jcontent,t,a,end,v))break;
-				if(jmp_cmp(jcontent,t,a,end,v))break;
+				if(jmp_cmp(jcontent,t,a,end,v,startCode))break;
 				if(cmov(jcontent,t,a,end,v))break;
 				t.error_flags|=INVALID_OPCODE_JIT_;
 				return;
@@ -224,6 +254,9 @@
 		for(uint16 x=0;x<8;x++)a.mov(qword_ptr(workspace,x*8),qreg[x]);
 
 		//recover registers
+
+		a.add(rsp,0x8);
+
 		a.pop(r15);
 		a.pop(r14);
 		a.pop(r13);
@@ -241,5 +274,17 @@
 
 	}
 
+	void pushRegisters(AssemblerJIT &a){
+		a.push(r8);
+		a.push(r9);
+		a.push(r10);
+		a.push(r11);
+	}
+	void popRegisters(AssemblerJIT &a){
+		a.pop(r11);
+		a.pop(r10);
+		a.pop(r9);
+		a.pop(r8);
+	}
 
 #endif /* SRC_OPCODES_JIT_H_ */

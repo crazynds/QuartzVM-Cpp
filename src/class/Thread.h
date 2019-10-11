@@ -107,6 +107,8 @@
 			Thread();
 			~Thread();
 
+			void set16InCode(uint32,uint16);
+			void set32InCode(uint32,uint32);
 			void savePoint();
 			void saveInStack(uint64);
 			uint64 recoverInStack();
@@ -133,6 +135,7 @@
 			uint64 getNextTwo32();
 
 			void setPontCode(uint32);
+			void setPontCodeCtx(uint48);
 
 			JitRuntime& getJitRuntime();
 	};

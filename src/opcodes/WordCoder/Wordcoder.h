@@ -154,9 +154,6 @@
 				set16(CALL_W);
 				set8(m1);
 			}
-			void ret(){
-				set16(RETURN);
-			}
 
 			void push_w(uint8 m1){
 				set16(PUSH_W);
@@ -170,7 +167,46 @@
 				set16(POP_W);
 				set8(m1);
 			}
-
+			void soma_m_c(uint48 m1,uint64 m2){
+				set16(atual+SOMA_M_C);
+				set48(m1);
+				setAtual(m2);
+			}
+			void soma_w_c(uint8 m1,uint64 m2){
+				set16(atual+SOMA_W_C);
+				set8(m1);
+				setAtual(m2);
+			}
+			void soma_w_m(uint8 m1,uint48 m2){
+				set16(atual+SOMA_W_M);
+				set8(m1);
+				set48(m2);
+			}
+			void soma_w_w(uint8 m1,uint8 m2){
+				set16(atual+SOMA_W_W);
+				set8(m1);
+				set8(m2);
+			}
+			void sub_m_c(uint48 m1,uint64 m2){
+				set16(atual+SUB_M_C);
+				set48(m1);
+				setAtual(m2);
+			}
+			void sub_w_c(uint8 m1,uint64 m2){
+				set16(atual+SUB_W_C);
+				set8(m1);
+				setAtual(m2);
+			}
+			void sub_w_m(uint8 m1,uint48 m2){
+				set16(atual+SUB_W_M);
+				set8(m1);
+				set48(m2);
+			}
+			void sub_w_w(uint8 m1,uint8 m2){
+				set16(atual+SUB_W_W);
+				set8(m1);
+				set8(m2);
+			}
 			void mov_mmww_c(uint8 base,uint8 index,uint8 shift,uint32 inc,uint64 value){
 				set16(atual+MOV_MMWW_C);
 				set32(inc);
@@ -386,6 +422,11 @@
 
 			uint32 getTam(){
 				return tam;
+			}
+
+
+			void ret(){
+				set16(RETURN);
 			}
 
 			uint8* getBytecode(){
@@ -754,50 +795,6 @@
 			}
 			void cmp_w_w(uint8 m1,uint8 m2){
 				set16(atual+CMP_W_W);
-				set8(m1);
-				set8(m2);
-			}
-
-
-
-			void soma_m_c(uint48 m1,uint64 m2){
-				set16(atual+SOMA_M_C);
-				set48(m1);
-				setAtual(m2);
-			}
-			void soma_w_c(uint8 m1,uint64 m2){
-				set16(atual+SOMA_W_C);
-				set8(m1);
-				setAtual(m2);
-			}
-			void soma_w_m(uint8 m1,uint48 m2){
-				set16(atual+SOMA_W_M);
-				set8(m1);
-				set48(m2);
-			}
-			void soma_w_w(uint8 m1,uint8 m2){
-				set16(atual+SOMA_W_W);
-				set8(m1);
-				set8(m2);
-			}
-
-			void sub_m_c(uint48 m1,uint64 m2){
-				set16(atual+SUB_M_C);
-				set48(m1);
-				setAtual(m2);
-			}
-			void sub_w_c(uint8 m1,uint64 m2){
-				set16(atual+SUB_W_C);
-				set8(m1);
-				setAtual(m2);
-			}
-			void sub_w_m(uint8 m1,uint48 m2){
-				set16(atual+SUB_W_M);
-				set8(m1);
-				set48(m2);
-			}
-			void sub_w_w(uint8 m1,uint8 m2){
-				set16(atual+SUB_W_W);
 				set8(m1);
 				set8(m2);
 			}
