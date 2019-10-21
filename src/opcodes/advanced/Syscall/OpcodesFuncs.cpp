@@ -60,6 +60,7 @@ void test_func(Thread &t){
 #ifndef _FAST_MODE
 	t.checkUseCode(2);
 #endif
+	getchar();
 }
 
 /*

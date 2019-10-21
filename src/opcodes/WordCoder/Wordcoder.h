@@ -863,7 +863,7 @@
 			}
 			void set_flag_optimization(){
 				set16(JIT_FLAG_START);
-				jit_pos=getTam();
+				jit_pos=getPos();
 			}
 			void set_end_flag_optimization(){
 				if(jit_pos==1)return;

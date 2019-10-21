@@ -16,8 +16,8 @@ Thread::Thread(){
 	cod=0;
 	compare_flags=0;
 	stack_pointer=0;
-	stack=new uint64[256];
-	stack_max=256;
+	stack=new uint64[THREAD_STACK_SIZE];
+	stack_max=THREAD_STACK_SIZE;
 	for(int x=0;x<256;x++)workspace[x]=0;
 	vt=0;
 }
@@ -37,9 +37,9 @@ void Thread::savePoint(){
 }
 
 void Thread::saveInStack(uint64 p){
-	std::cout << "Excecutou um salvamento de valor na stack: " << p << std::endl;
 	if(stack_pointer>=stack_max){
 		incrementStack();
+		std::cout << "Stack máxima: " << stack_max << std::endl;
 		if(error_flags&MAX_LIMIT_STACK_){
 			return;
 		}
@@ -48,8 +48,7 @@ void Thread::saveInStack(uint64 p){
 }
 uint64 Thread::recoverInStack(){
 	if(stack_pointer!=0){
-		if(stack_pointer<(stack_max/2)-64)decrementStack();
-		std::cout << "Excecutou um resgate de valor na stack: " << stack[stack_pointer-1] << std::endl;
+		if(stack_max>THREAD_STACK_SIZE)if(stack_pointer<(stack_max>>4)-64)decrementStack();
 		return stack[--stack_pointer];
 	}
 	return 0;
@@ -57,7 +56,7 @@ uint64 Thread::recoverInStack(){
 
 void Thread::recoverPoint(){
 	if(stack_pointer!=0){
-		if(stack_pointer<(stack_max/2)-64)decrementStack();
+		if(stack_max>THREAD_STACK_SIZE)if(stack_pointer<(stack_max>>4)-64)decrementStack();
 		register uint64 p=stack[--stack_pointer];
 		register uint16 k=uint16(p>>32);
 		if(ct->getCodContext()!=k){

@@ -141,7 +141,7 @@ void mov_mmww_w16(Thread& t){
 
 	uint64 dst=t.workspace[base1]+(t.workspace[index1]<<shift1)+inc1;
 	dst&=0x0000FFFFFFFFFFFF;
-	*(uint32*)&t.mem[dst]=*(uint32*)&t.workspace[base2];
+	*(uint16*)&t.mem[dst]=*(uint32*)&t.workspace[base2];
 }
 void mov_mmww_w32(Thread& t){
 #ifndef _FAST_MODE

@@ -102,7 +102,7 @@
 	GeralMemory* m_(uint48 pos);
 	GeralMemory* c_(uint64 dado);
 	GeralMemory* ptr_(GeralMemory *r,uint32 inc);
-	GeralMemory* ptr_(Workspace *reg,Workspace *regIndex,uint8 shift,uint32 inc);
+	GeralMemory* ptr_(GeralMemory *reg,GeralMemory *regIndex,uint8 shift,uint32 inc);
 	/*
 	 * Tipos diferentes de gerais:
 	 * m - memoria estática

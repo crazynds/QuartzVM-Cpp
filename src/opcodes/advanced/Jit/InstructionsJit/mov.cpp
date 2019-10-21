@@ -8,13 +8,6 @@
 #include "../Jit.h"
 
 uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,std::vector<Dupla<Label,uint32>> &v){
-	Gp memory=rdi;
-	Gp workspace=rsi;
-
-	Gp qreg[8];qreg[0]=r8;qreg[1]=r9;qreg[2]=r10;qreg[3]=r11;qreg[4]=r12;qreg[5]=r13;qreg[6]=r14;qreg[7]=r15;
-	Gp dreg[8];dreg[0]=r8d;dreg[1]=r9d;dreg[2]=r10d;dreg[3]=r11d;dreg[4]=r12d;dreg[5]=r13d;dreg[6]=r14d;dreg[7]=r15d;
-	Gp wreg[8];wreg[0]=r8w;wreg[1]=r9w;wreg[2]=r10w;wreg[3]=r11w;wreg[4]=r12w;wreg[5]=r13w;wreg[6]=r14w;wreg[7]=r15w;
-	Gp breg[8];breg[0]=r8b;breg[1]=r9b;breg[2]=r10b;breg[3]=r11b;breg[4]=r12b;breg[5]=r13b;breg[6]=r14b;breg[7]=r15b;
 
 	switch(jcontent.opcode){
 	case P_UINT8+MOV_MMWW_C:
@@ -29,7 +22,9 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		Gp reg1_aux64=a.getNextRegister64();
 		Gp reg2_aux64=a.getNextRegister64();
 
+#ifndef _FAST_MODE
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(base1<8){
 			if(index1<8)a.lea(reg1_aux64,ptr(qreg[base1],qreg[index1],shift1,inc1));
 			else{
@@ -45,7 +40,9 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 				a.lea(reg1_aux64,ptr(reg1_aux64,reg2_aux64,shift1,inc1));
 			}
 		}
+#ifndef _FAST_MODE
 		a.and_(reg1_aux64,rcx);
+#endif
 		a.mov(byte_ptr(memory,reg1_aux64),val);
 
 	}break;
@@ -61,7 +58,9 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		Gp reg1_aux64=a.getNextRegister64();
 		Gp reg2_aux64=a.getNextRegister64();
 
-		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(base1<8){
 			if(index1<8)a.lea(reg1_aux64,ptr(qreg[base1],qreg[index1],shift1,inc1));
 			else{
@@ -77,7 +76,9 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 				a.lea(reg1_aux64,ptr(reg1_aux64,reg2_aux64,shift1,inc1));
 			}
 		}
+#ifndef _FAST_MODE
 		a.and_(reg1_aux64,rcx);
+#endif
 		a.mov(word_ptr(memory,reg1_aux64),val);
 	}break;
 	case P_UINT32+MOV_MMWW_C:
@@ -91,7 +92,9 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		Gp reg1_aux64=a.getNextRegister64();
 		Gp reg2_aux64=a.getNextRegister64();
 
+#ifndef _FAST_MODE
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(base1<8){
 			if(index1<8)a.lea(reg1_aux64,ptr(qreg[base1],qreg[index1],shift1,inc1));
 			else{
@@ -107,7 +110,9 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 				a.lea(reg1_aux64,ptr(reg1_aux64,reg2_aux64,shift1,inc1));
 			}
 		}
+#ifndef _FAST_MODE
 		a.and_(reg1_aux64,rcx);
+#endif
 		a.mov(dword_ptr(memory,reg1_aux64),val);
 	}break;
 	case P_UINT48+MOV_MMWW_C:
@@ -122,7 +127,9 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		Gp reg1_aux64=a.getNextRegister64();
 		Gp reg2_aux64=a.getNextRegister64();
 
+#ifndef _FAST_MODE
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(base1<8){
 			if(index1<8)a.lea(reg1_aux64,ptr(qreg[base1],qreg[index1],shift1,inc1));
 			else{
@@ -138,7 +145,9 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 				a.lea(reg1_aux64,ptr(reg1_aux64,reg2_aux64,shift1,inc1));
 			}
 		}
+#ifndef _FAST_MODE
 		a.and_(reg1_aux64,rcx);
+#endif
 		a.mov(dword_ptr(memory,reg1_aux64),val);
 		a.mov(word_ptr(memory,reg1_aux64,0,4),val2);
 	}break;
@@ -153,7 +162,9 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		Gp reg1_aux64=a.getNextRegister64();
 		Gp reg2_aux64=a.getNextRegister64();
 
+#ifndef _FAST_MODE
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(base1<8){
 			if(index1<8)a.lea(reg1_aux64,ptr(qreg[base1],qreg[index1],shift1,inc1));
 			else{
@@ -169,7 +180,9 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 				a.lea(reg1_aux64,ptr(reg1_aux64,reg2_aux64,shift1,inc1));
 			}
 		}
+#ifndef _FAST_MODE
 		a.and_(reg1_aux64,rcx);
+#endif
 		a.mov(qword_ptr(memory,reg1_aux64),val);
 	}break;
 	case P_UINT8+MOV_MMW_W:
@@ -181,10 +194,14 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 
 		Gp reg2_aux64=a.getNextRegister64();
 
+#ifndef _FAST_MODE
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(dst<8)a.mov(reg2_aux64,qreg[dst]);
 		else a.mov(reg2_aux64,qword_ptr(workspace,dst*8));
+#ifndef _FAST_MODE
 		a.and_(reg2_aux64,rcx);
+#endif
 		if(val<8)a.mov(ptr(memory,reg2_aux64,0,valinc),breg[val]);
 		else{
 			Gp reg1_aux8=a.getNextRegister8();
@@ -200,7 +217,9 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		uint8 val=t.getNext8();
 		Gp reg2_aux64=a.getNextRegister64();
 
+#ifndef _FAST_MODE
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(dst<8)a.mov(reg2_aux64,qreg[dst]);
 		else a.mov(reg2_aux64,qword_ptr(workspace,dst*8));
 		a.and_(reg2_aux64,rcx);
@@ -220,10 +239,14 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 
 		Gp reg2_aux64=a.getNextRegister64();
 
+#ifndef _FAST_MODE
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(dst<8)a.mov(reg2_aux64,qreg[dst]);
 		else a.mov(reg2_aux64,qword_ptr(workspace,dst*8));
+#ifndef _FAST_MODE
 		a.and_(reg2_aux64,rcx);
+#endif
 		if(val<8)a.mov(ptr(memory,reg2_aux64,0,valinc),dreg[val]);
 		else{
 			Gp reg_aux32=a.getNextRegister32();
@@ -237,10 +260,14 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		uint8 dst=t.getNext8();
 		uint8 val=t.getNext8();
 
+#ifndef _FAST_MODE
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(dst<8)a.mov(rbx,qreg[dst]);
 		else a.mov(rbx,qword_ptr(workspace,dst*8));
+#ifndef _FAST_MODE
 		a.and_(rbx,rcx);
+#endif
 		if(val<8){
 			a.mov(rax,qreg[val]);
 			a.mov(ptr(memory,rbx,0,valinc),eax);
@@ -263,10 +290,14 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		Gp reg1_aux64=a.getNextRegister64();
 		Gp reg2_aux64=a.getNextRegister64();
 
+#ifndef _FAST_MODE
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(dst<8)a.mov(reg2_aux64,qreg[dst]);
 		else a.mov(reg2_aux64,qword_ptr(workspace,dst*8));
+#ifndef _FAST_MODE
 		a.and_(reg2_aux64,rcx);
+#endif
 		if(val<8)a.mov(ptr(memory,reg2_aux64,0,valinc),qreg[val]);
 		else{
 			a.mov(reg1_aux64,ptr(workspace,val*8));
@@ -282,10 +313,14 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 
 		Gp reg2_aux64=a.getNextRegister64();
 
+#ifndef _FAST_MODE
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(val<8)a.mov(reg2_aux64,qreg[val]);
 		else a.mov(reg2_aux64,qword_ptr(workspace,val*8));
+#ifndef _FAST_MODE
 		a.and_(reg2_aux64,rcx);
+#endif
 		if(dst<8)a.mov(breg[dst],ptr(memory,reg2_aux64,0,valinc));
 		else{
 			Gp reg1_aux8=a.getNextRegister8();
@@ -302,10 +337,14 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 
 		Gp reg2_aux64=a.getNextRegister64();
 
+#ifndef _FAST_MODE
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(val<8)a.mov(reg2_aux64,qreg[val]);
 		else a.mov(reg2_aux64,qword_ptr(workspace,val*8));
+#ifndef _FAST_MODE
 		a.and_(reg2_aux64,rcx);
+#endif
 		if(dst<8)a.mov(wreg[dst],ptr(memory,reg2_aux64,0,valinc));
 		else{
 			Gp reg1_aux16=a.getNextRegister16();
@@ -320,10 +359,14 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		uint8 val=t.getNext8();
 
 		Gp reg2_aux64=a.getNextRegister64();
+#ifndef _FAST_MODE
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(val<8)a.mov(reg2_aux64,qreg[val]);
 		else a.mov(reg2_aux64,qword_ptr(workspace,val*8));
+#ifndef _FAST_MODE
 		a.and_(reg2_aux64,rcx);
+#endif
 		if(dst<8)a.mov(dreg[dst],ptr(memory,reg2_aux64,0,valinc));
 		else{
 			Gp reg1_aux=a.getNextRegister32();
@@ -341,7 +384,9 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
 		if(val<8)a.mov(rbx,qreg[val]);
 		else a.mov(rbx,qword_ptr(workspace,val*8));
+#ifndef _FAST_MODE
 		a.and_(rbx,rcx);
+#endif
 		if(dst<8){
 			a.mov(eax,ptr(memory,rbx,0,valinc+2));
 			a.shl(rax,32);
@@ -364,10 +409,14 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 
 		Gp reg2_aux64=a.getNextRegister64();
 
+#ifndef _FAST_MODE
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(val<8)a.mov(reg2_aux64,qreg[val]);
 		else a.mov(reg2_aux64,qword_ptr(workspace,val*8));
+#ifndef _FAST_MODE
 		a.and_(reg2_aux64,rcx);
+#endif
 		if(dst<8)a.mov(qreg[dst],ptr(memory,reg2_aux64,0,valinc));
 		else{
 			Gp reg1_aux64=a.getNextRegister64();
@@ -434,7 +483,9 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		if(mem<8){
 			uint64 aux=t.getNext48().toInt();
 			Gp reg1_aux64=a.getNextRegister64();
-			a.mov(rcx,0x0000FFFFFFFFFFFF);
+			#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 			a.mov(reg1_aux64,aux);
 			a.andn(qreg[mem],rcx,qreg[mem]);
 			a.add(qreg[mem],reg1_aux64);
@@ -504,7 +555,9 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		uint8 mem=t.getNext8();
 		uint8 val=t.getNext8();
 
-		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(val<8){
 			a.mov(rax,qreg[val]);
 		}else{
@@ -722,12 +775,15 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		Gp reg2_aux64=a.getNextRegister64();
 		Gp reg1_aux8=a.getNextRegister8();
 
+#ifndef _FAST_MODE
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(mem<8)a.mov(reg2_aux64,qreg[mem]);
 		else a.mov(reg2_aux64,qword_ptr(workspace,mem*8));
 		a.mov(reg1_aux8,byte_ptr(memory,val));
+#ifndef _FAST_MODE
 		a.and_(reg2_aux64,rcx);
-
+#endif
 		a.mov(byte_ptr(memory,reg2_aux64,0,inc),reg1_aux8);
 
 	}break;
@@ -740,12 +796,15 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		Gp reg2_aux64=a.getNextRegister64();
 		Gp reg1_aux16=a.getNextRegister16();
 
+#ifndef _FAST_MODE
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(mem<8)a.mov(reg2_aux64,qreg[mem]);
 		else a.mov(reg2_aux64,qword_ptr(workspace,mem*8));
 		a.mov(reg1_aux16,word_ptr(memory,val));
+#ifndef _FAST_MODE
 		a.and_(reg2_aux64,rcx);
-
+#endif
 		a.mov(word_ptr(memory,reg2_aux64,0,inc),reg1_aux16);
 
 	}break;
@@ -759,11 +818,15 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		Gp reg2_aux64=a.getNextRegister64();
 		Gp reg_aux32=a.getNextRegister32();
 
+#ifndef _FAST_MODE
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(mem<8)a.mov(reg2_aux64,qreg[mem]);
 		else a.mov(reg2_aux64,qword_ptr(workspace,mem*8));
 		a.mov(reg_aux32,dword_ptr(memory,val));
+#ifndef _FAST_MODE
 		a.and_(reg2_aux64,rcx);
+#endif
 		a.mov(dword_ptr(memory,reg2_aux64,0,inc),reg_aux32);
 
 	}break;
@@ -773,11 +836,15 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		uint8 mem=t.getNext8();
 		uint64 val=t.getNext48().toInt();
 
+#ifndef _FAST_MODE
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(mem<8)a.mov(rbx,qreg[mem]);
 		else a.mov(rbx,qword_ptr(workspace,mem*8));
 		a.mov(eax,dword_ptr(memory,val));
+#ifndef _FAST_MODE
 		a.and_(rbx,rcx);
+#endif
 		a.mov(dx,word_ptr(memory,val+4));
 
 		a.mov(dword_ptr(memory,rbx,0,inc),eax);
@@ -793,11 +860,15 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 
 		Gp reg2_aux64=a.getNextRegister64();
 
+#ifndef _FAST_MODE
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(mem<8)a.mov(reg2_aux64,qreg[mem]);
 		else a.mov(reg2_aux64,qword_ptr(workspace,mem*8));
 		a.mov(reg1_aux64,qword_ptr(memory,val));
+#ifndef _FAST_MODE
 		a.and_(reg2_aux64,rcx);
+#endif
 		a.mov(qword_ptr(memory,reg2_aux64,0,inc),reg1_aux64);
 
 	}break;
@@ -810,10 +881,14 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		Gp reg2_aux64=a.getNextRegister64();
 		Gp reg1_aux8=a.getNextRegister8();
 
+#ifndef _FAST_MODE
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(val<8)a.mov(reg2_aux64,qreg[val]);
 		else a.mov(reg2_aux64,qword_ptr(workspace,val));
+#ifndef _FAST_MODE
 		a.and_(reg2_aux64,rcx);
+#endif
 		a.mov(reg1_aux8,byte_ptr(memory,reg2_aux64,0,inc));
 		a.mov(byte_ptr(memory,mem),reg1_aux8);
 
@@ -827,10 +902,14 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		Gp reg2_aux64=a.getNextRegister64();
 		Gp reg1_aux16=a.getNextRegister16();
 
+#ifndef _FAST_MODE
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(val<8)a.mov(reg2_aux64,qreg[val]);
 		else a.mov(reg2_aux64,qword_ptr(workspace,val));
+#ifndef _FAST_MODE
 		a.and_(reg2_aux64,rcx);
+#endif
 		a.mov(reg1_aux16,word_ptr(memory,reg2_aux64,0,inc));
 		a.mov(word_ptr(memory,mem),reg1_aux16);
 
@@ -844,10 +923,14 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		Gp reg2_aux64=a.getNextRegister64();
 		Gp reg_aux32=a.getNextRegister32();
 
+#ifndef _FAST_MODE
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(val<8)a.mov(reg2_aux64,qreg[val]);
 		else a.mov(reg2_aux64,qword_ptr(workspace,val));
+#ifndef _FAST_MODE
 		a.and_(reg2_aux64,rcx);
+#endif
 		a.mov(reg_aux32,dword_ptr(memory,reg2_aux64,0,inc));
 		a.mov(dword_ptr(memory,mem),reg_aux32);
 
@@ -858,10 +941,14 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		uint32 inc=t.getNext32();
 		uint8 val=t.getNext8();
 
-		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(val<8)a.mov(rbx,qreg[val]);
 		else a.mov(rbx,qword_ptr(workspace,val));
+#ifndef _FAST_MODE
 		a.and_(rbx,rcx);
+#endif
 		a.mov(eax,dword_ptr(memory,rbx,0,inc));
 		a.mov(dx,word_ptr(memory,rbx,0,inc+4));
 		a.mov(dword_ptr(memory,mem),eax);
@@ -877,10 +964,14 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 
 		Gp reg2_aux64=a.getNextRegister64();
 
+#ifndef _FAST_MODE
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(val<8)a.mov(reg2_aux64,qreg[val]);
 		else a.mov(reg2_aux64,qword_ptr(workspace,val));
+#ifndef _FAST_MODE
 		a.and_(reg2_aux64,rcx);
+#endif
 		a.mov(reg1_aux64,qword_ptr(memory,reg2_aux64,0,inc));
 		a.mov(qword_ptr(memory,mem),reg1_aux64);
 
@@ -897,14 +988,20 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		Gp reg1_aux64=a.getNextRegister64();
 		Gp auxReg=a.getNextRegister8();
 
+#ifndef _FAST_MODE
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(mem2<8)a.mov(reg1_aux64,qreg[mem2]);
 		else a.mov(reg1_aux64,qword_ptr(workspace,mem2*8));
+#ifndef _FAST_MODE
 		a.and_(reg1_aux64,rcx);
+#endif
 		if(mem<8)a.mov(reg2_aux64,qreg[mem]);
 		else a.mov(reg2_aux64,qword_ptr(workspace,mem*8));
 		a.mov(auxReg,byte_ptr(memory,reg1_aux64,0,inc2));
+#ifndef _FAST_MODE
 		a.and_(reg2_aux64,rcx);
+#endif
 		a.mov(byte_ptr(memory,reg2_aux64,0,inc),auxReg);
 	}break;
 	case P_UINT16+MOV_MMW_MMW:
@@ -917,14 +1014,20 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		Gp reg1_aux64=a.getNextRegister64();
 		Gp auxReg=a.getNextRegister16();
 
+#ifndef _FAST_MODE
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(mem2<8)a.mov(reg1_aux64,qreg[mem2]);
 		else a.mov(reg1_aux64,qword_ptr(workspace,mem2*8));
+#ifndef _FAST_MODE
 		a.and_(reg1_aux64,rcx);
+#endif
 		if(mem<8)a.mov(reg2_aux64,qreg[mem]);
 		else a.mov(reg2_aux64,qword_ptr(workspace,mem*8));
 		a.mov(auxReg,word_ptr(memory,reg1_aux64,0,inc2));
+#ifndef _FAST_MODE
 		a.and_(reg2_aux64,rcx);
+#endif
 		a.mov(word_ptr(memory,reg2_aux64,0,inc),auxReg);
 	}break;
 	case P_UINT32+MOV_MMW_MMW:
@@ -938,14 +1041,20 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		Gp reg1_aux64=a.getNextRegister64();
 		Gp auxReg=a.getNextRegister32();
 
+#ifndef _FAST_MODE
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(mem2<8)a.mov(reg1_aux64,qreg[mem2]);
 		else a.mov(reg1_aux64,qword_ptr(workspace,mem2*8));
+#ifndef _FAST_MODE
 		a.and_(reg1_aux64,rcx);
+#endif
 		if(mem<8)a.mov(reg2_aux64,qreg[mem]);
 		else a.mov(reg2_aux64,qword_ptr(workspace,mem*8));
 		a.mov(auxReg,dword_ptr(memory,reg1_aux64,0,inc2));
+#ifndef _FAST_MODE
 		a.and_(reg2_aux64,rcx);
+#endif
 		a.mov(dword_ptr(memory,reg2_aux64,0,inc),auxReg);
 	}break;
 	case P_UINT48+MOV_MMW_MMW:
@@ -959,14 +1068,20 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		Gp reg1_aux64=rbx;
 		Gp auxReg=rdx;
 
+#ifndef _FAST_MODE
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(mem2<8)a.mov(reg1_aux64,qreg[mem2]);
 		else a.mov(reg1_aux64,qword_ptr(workspace,mem2*8));
+#ifndef _FAST_MODE
 		a.and_(reg1_aux64,rcx);
+#endif
 		if(mem<8)a.mov(reg2_aux64,qreg[mem]);
 		else a.mov(reg2_aux64,qword_ptr(workspace,mem*8));
 		a.mov(auxReg,dword_ptr(memory,reg1_aux64,0,inc2));
+#ifndef _FAST_MODE
 		a.and_(reg2_aux64,rcx);
+#endif
 		a.mov(dword_ptr(memory,reg2_aux64,0,inc),edx);
 		a.shr(rdx,32);
 		a.mov(dword_ptr(memory,reg2_aux64,0,inc+4),dx);
@@ -982,14 +1097,20 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		Gp reg1_aux64=a.getNextRegister64();
 		Gp auxReg=a.getNextRegister64();
 
+#ifndef _FAST_MODE
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(mem2<8)a.mov(reg1_aux64,qreg[mem2]);
 		else a.mov(reg1_aux64,qword_ptr(workspace,mem2*8));
+#ifndef _FAST_MODE
 		a.and_(reg1_aux64,rcx);
+#endif
 		if(mem<8)a.mov(reg2_aux64,qreg[mem]);
 		else a.mov(reg2_aux64,qword_ptr(workspace,mem*8));
 		a.mov(auxReg,qword_ptr(memory,reg1_aux64,0,inc2));
+#ifndef _FAST_MODE
 		a.and_(reg2_aux64,rcx);
+#endif
 		a.mov(qword_ptr(memory,reg2_aux64,0,inc),auxReg);
 	}break;
 	case P_UINT8+MOV_MMW_C:
@@ -1000,10 +1121,14 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 
 		Gp reg2_aux64=a.getNextRegister64();
 
+#ifndef _FAST_MODE
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(mem<8)a.mov(reg2_aux64,qreg[mem]);
 		else a.mov(reg2_aux64,qword_ptr(workspace,mem*8));
+#ifndef _FAST_MODE
 		a.and_(reg2_aux64,rcx);
+#endif
 		a.mov(byte_ptr(memory,reg2_aux64,0,inc),val);
 
 	}break;
@@ -1015,10 +1140,14 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 
 		Gp reg2_aux64=a.getNextRegister64();
 
+#ifndef _FAST_MODE
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(mem<8)a.mov(reg2_aux64,qreg[mem]);
 		else a.mov(reg2_aux64,qword_ptr(workspace,mem*8));
+#ifndef _FAST_MODE
 		a.and_(reg2_aux64,rcx);
+#endif
 		a.mov(word_ptr(memory,reg2_aux64,0,inc),val);
 
 
@@ -1031,10 +1160,14 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 
 		Gp reg2_aux64=a.getNextRegister64();
 
+#ifndef _FAST_MODE
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(mem<8)a.mov(reg2_aux64,qreg[mem]);
 		else a.mov(reg2_aux64,qword_ptr(workspace,mem*8));
+#ifndef _FAST_MODE
 		a.and_(reg2_aux64,rcx);
+#endif
 		a.mov(dword_ptr(memory,reg2_aux64,0,inc),val);
 
 	}break;
@@ -1047,10 +1180,14 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 
 		Gp reg2_aux64=a.getNextRegister64();
 
+#ifndef _FAST_MODE
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(mem<8)a.mov(reg2_aux64,qreg[mem]);
 		else a.mov(reg2_aux64,qword_ptr(workspace,mem*8));
+#ifndef _FAST_MODE
 		a.and_(reg2_aux64,rcx);
+#endif
 		a.mov(dword_ptr(memory,reg2_aux64,0,inc),val1);
 		a.add(reg2_aux64,4);
 		a.mov(word_ptr(memory,reg2_aux64,0,inc),val2);
@@ -1064,10 +1201,14 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 
 		Gp reg2_aux64=a.getNextRegister64();
 
+#ifndef _FAST_MODE
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(mem<8)a.mov(reg2_aux64,qreg[mem]);
 		else a.mov(reg2_aux64,qword_ptr(workspace,mem*8));
+#ifndef _FAST_MODE
 		a.and_(reg2_aux64,rcx);
+#endif
 		a.mov(qword_ptr(memory,reg2_aux64,0,inc),val);
 
 	}break;

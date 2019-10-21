@@ -6,13 +6,6 @@
 
 
 uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,std::vector<Dupla<Label,uint32>> &v){
-	Gp memory=rdi;
-	Gp workspace=rsi;
-
-	Gp qreg[8];qreg[0]=r8;qreg[1]=r9;qreg[2]=r10;qreg[3]=r11;qreg[4]=r12;qreg[5]=r13;qreg[6]=r14;qreg[7]=r15;
-	Gp dreg[8];dreg[0]=r8d;dreg[1]=r9d;dreg[2]=r10d;dreg[3]=r11d;dreg[4]=r12d;dreg[5]=r13d;dreg[6]=r14d;dreg[7]=r15d;
-	Gp wreg[8];wreg[0]=r8w;wreg[1]=r9w;wreg[2]=r10w;wreg[3]=r11w;wreg[4]=r12w;wreg[5]=r13w;wreg[6]=r14w;wreg[7]=r15w;
-	Gp breg[8];breg[0]=r8b;breg[1]=r9b;breg[2]=r10b;breg[3]=r11b;breg[4]=r12b;breg[5]=r13b;breg[6]=r14b;breg[7]=r15b;
 
 	switch(jcontent.opcode){
 	case CMOV_IG_W_C+P_UINT8:
@@ -61,7 +54,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,s
 		a.jne(l);
 		if(mem<8){
 			uint64 aux=t.getNext48().toInt();
-			a.mov(rcx,0x0000FFFFFFFFFFFF);
+			#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 			a.mov(rax,aux);
 			a.andn(qreg[mem],rcx,qreg[mem]);
 			a.add(qreg[mem],rax);
@@ -163,7 +158,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,s
 		uint8 val=t.getNext8();
 		Label l=a.newLabel();
 		a.jne(l);
-		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(val<8){
 			a.mov(rax,qreg[val]);
 		}else{
@@ -253,7 +250,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,s
 		a.je(l);
 		if(mem<8){
 			uint64 aux=t.getNext48().toInt();
-			a.mov(rcx,0x0000FFFFFFFFFFFF);
+			#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 			a.mov(rax,aux);
 			a.andn(qreg[mem],rcx,qreg[mem]);
 			a.add(rax,qreg[mem]);
@@ -357,7 +356,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,s
 		uint8 val=t.getNext8();
 		Label l=a.newLabel();
 		a.je(l);
-		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(val<8){
 			a.mov(rax,qreg[val]);
 		}else{
@@ -452,7 +453,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,s
 		else a.jle(l);
 		if(mem<8){
 			uint64 aux=t.getNext48().toInt();
-			a.mov(rcx,0x0000FFFFFFFFFFFF);
+			#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 			a.mov(rax,aux);
 			a.andn(qreg[mem],rcx,qreg[mem]);
 			a.add(rax,qreg[mem]);
@@ -567,7 +570,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,s
 		Label l=a.newLabel();
 		if(jcontent.type=='u')a.jbe(l);
 		else a.jle(l);
-		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(val<8){
 			a.mov(rax,qreg[val]);
 		}else{
@@ -667,7 +672,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,s
 		else a.jge(l);
 		if(mem<8){
 			uint64 aux=t.getNext48().toInt();
-			a.mov(rcx,0x0000FFFFFFFFFFFF);
+			#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 			a.mov(rax,aux);
 			a.andn(qreg[mem],rcx,qreg[mem]);
 			a.add(rax,qreg[mem]);
@@ -783,7 +790,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,s
 		Label l=a.newLabel();
 		if(jcontent.type=='u')a.jae(l);
 		else a.jge(l);
-		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(val<8){
 			a.mov(rax,qreg[val]);
 		}else{
@@ -883,7 +892,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,s
 		else a.jg(l);
 		if(mem<8){
 			uint64 aux=t.getNext48().toInt();
-			a.mov(rcx,0x0000FFFFFFFFFFFF);
+			#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 			a.mov(rax,aux);
 			a.andn(qreg[mem],rcx,qreg[mem]);
 			a.add(rax,qreg[mem]);
@@ -998,7 +1009,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,s
 		Label l=a.newLabel();
 		if(jcontent.type=='u')a.ja(l);
 		else a.jg(l);
-		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(val<8){
 			a.mov(rax,qreg[val]);
 		}else{
@@ -1098,7 +1111,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,s
 		else a.jl(l);
 		if(mem<8){
 			uint64 aux=t.getNext48().toInt();
-			a.mov(rcx,0x0000FFFFFFFFFFFF);
+			#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 			a.mov(rax,aux);
 			a.andn(qreg[mem],rcx,qreg[mem]);
 			a.add(rax,qreg[mem]);
@@ -1212,7 +1227,9 @@ uint8 cmov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,s
 		Label l=a.newLabel();
 		if(jcontent.type=='u')a.jb(l);
 		else a.jl(l);
-		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(val<8){
 			a.mov(rax,qreg[val]);
 		}else{

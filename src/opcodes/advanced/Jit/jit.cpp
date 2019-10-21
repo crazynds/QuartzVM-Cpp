@@ -18,7 +18,7 @@
 	uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,std::vector<Dupla<Label,uint32>> &v);
 	uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,std::vector<Dupla<Label,uint32>> &v);
 	uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,std::vector<Dupla<Label,uint32>> &v);
-	uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,std::vector<Dupla<Label,uint32>> &v,uint32 startCode);
+	uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,std::vector<Dupla<Label,uint32>> &v,uint32 startCode,Label reentrada);
 
 	void init_jit(Thread &t){
 		if(t.checkUseCode(2))return;
@@ -74,7 +74,6 @@
 		uint32 pos=t.getNext32();
 		uint32 enter=t.getPontCode();
 		FuncJit fn=t.getContexto().getFunction(pos);
-
 		if(fn==0){
 			t.setPontCode(pos);
 			if(t.checkUseCode(2))return;
@@ -96,6 +95,8 @@
 				return;
 			}
 			fn=f;
+			std::cout << "Criou jit no enter" << std::endl;
+			getchar();
 		}
 
 		uint64 result= fn(t.mem.getPointerMem(),t.workspace,t,enter);
@@ -161,7 +162,8 @@
 	}
 
 	void end_jit(Thread &t){
-		std::cout << "Executou o fim" << std::endl;
+
+		std::cout << "Executou o fim: " << t.getPontCode() << std::endl;
 		if(t.checkUseCode(2))return;
 	}
 
@@ -179,15 +181,8 @@
 		//qreg free for use r8-r15(8) para workspace
 		//rax - rbx - rcx - rdx  para calculos normais
 		//rdi - rsi para uso de ponteiros para mem e workspace
-		Gp memory=rdi;
-		Gp workspace=rsi;
-		Gp qreg[8];qreg[0]=r8;qreg[1]=r9;qreg[2]=r10;qreg[3]=r11;qreg[4]=r12;qreg[5]=r13;qreg[6]=r14;qreg[7]=r15;
-		Gp dreg[8];dreg[0]=r8d;dreg[1]=r9d;dreg[2]=r10d;dreg[3]=r11d;dreg[4]=r12d;dreg[5]=r13d;dreg[6]=r14d;dreg[7]=r15d;
-		Gp wreg[8];wreg[0]=r8w;wreg[1]=r9w;wreg[2]=r10w;wreg[3]=r11w;wreg[4]=r12w;wreg[5]=r13w;wreg[6]=r14w;wreg[7]=r15w;
-		Gp breg[8];breg[0]=r8b;breg[1]=r9b;breg[2]=r10b;breg[3]=r11b;breg[4]=r12b;breg[5]=r13b;breg[6]=r14b;breg[7]=r15b;
 		a.mov(workspace,rdx); // RSI - WORKSPACE THREAD
-		a.prefetcht1(ptr(workspace,8));	//Move a workspace para perto do processador nos caches.
-
+		for(uint16 x=1;x<256/8;x++)a.prefetcht0(ptr(workspace,8*x));	//Move a workspace para perto do processador nos caches.
 		a.mov(memory,qword_ptr(rcx)); //RDI - MEMORIA CONTEXTO
 		a.push(r8);	// THREAD - ARMAZENADA
 		a.mov(rax,r9); // PRAMETRO goTo
@@ -196,9 +191,14 @@
 
 		Label auxiLabel=a.newLabel();
 		Label end=a.newLabel();
-		a.cmp(rax,0);
-		a.jz(auxiLabel);
+
+
+		a.cmp(rax,0);			//RAX = posição que tem q entrar no código.
+		a.jz(auxiLabel);		//RBX = Verificador se ele tem q soltar um erro ou não.
 		uint32 startCode=t.getPontCode();
+		a.xor_(rbx,rbx);
+		Label reentrada=a.newLabel();
+		a.bind(reentrada);
 
 		std::vector<Dupla<Label,uint32>> &v=*pre_check_jig(t,a);
 		if(t.isFinalized()){//Caso encontrado algum erro, é finalizado o processo.
@@ -212,7 +212,12 @@
 		jcontent.minCode=t.getPontCode();
 		v.erase(v.begin()+v.size()-1);
 
-
+		Label cond=a.newLabel();
+		a.cmp(rbx,1);
+		a.jne(cond);
+		a.sub(rax,6);
+		a.jmp(end);
+		a.bind(cond);
 		a.mov(rax,ERROR_JMP_ENTER_JIT_STATE);  //Caso não tenha encontrado nenhuma opção para entrar no programa, sai da função e retorna um erro.
 		a.shl(rax,48);
 		a.mov(eax,jcontent.maxCode);
@@ -239,7 +244,7 @@
 				if(mov(jcontent,t,a,end,v))break;
 				if(aritimetic(jcontent,t,a,end,v))break;
 				if(optimization(jcontent,t,a,end,v))break;
-				if(jmp_cmp(jcontent,t,a,end,v,startCode))break;
+				if(jmp_cmp(jcontent,t,a,end,v,startCode,reentrada))break;
 				if(cmov(jcontent,t,a,end,v))break;
 				t.error_flags|=INVALID_OPCODE_JIT_;
 				return;
@@ -272,19 +277,30 @@
 		}
 		delete &v;
 
+		std::cout << "Montou JIT!!" << std::endl;
+		getchar();
 	}
 
 	void pushRegisters(AssemblerJIT &a){
+		//a.prefetcht0(ptr(workspace));
+		//a.push(rdi);
+		//a.push(rsi);
+		//for(uint16 x=0;x<8;x++)a.mov(qword_ptr(workspace,x*8),qreg[x]);
 		a.push(r8);
 		a.push(r9);
 		a.push(r10);
 		a.push(r11);
+		a.sub(rsp,0x08);
 	}
 	void popRegisters(AssemblerJIT &a){
+		a.add(rsp,0x08);
+		//for(uint16 x=0;x<8;x++)a.mov(qreg[x],qword_ptr(workspace,x*8));
 		a.pop(r11);
 		a.pop(r10);
 		a.pop(r9);
 		a.pop(r8);
+		//a.pop(rsi);
+		//a.pop(rdi);
 	}
 
 #endif /* SRC_OPCODES_JIT_H_ */

@@ -9,8 +9,8 @@
 
 
 Contexto::Contexto(){
-	mem=new uint8[MEMORY_BASE_CONTEXT];
-	max_mem=MEMORY_BASE_CONTEXT;
+	mem=new uint8[MEMORY_BASE_CONTEXT*2];
+	max_mem=MEMORY_BASE_CONTEXT*2;
 	for(uint64 x=0;x<max_mem;x++){
 		mem[x]=0;
 	}

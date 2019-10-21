@@ -9,16 +9,20 @@
 
 #include "../Jit.h"
 
+void test_func(Thread&);
 uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,std::vector<Dupla<Label,uint32>> &v){
-	Gp memory=rdi;
-	Gp workspace=rsi;
-
-	Gp qreg[8];qreg[0]=r8;qreg[1]=r9;qreg[2]=r10;qreg[3]=r11;qreg[4]=r12;qreg[5]=r13;qreg[6]=r14;qreg[7]=r15;
-	Gp dreg[8];dreg[0]=r8d;dreg[1]=r9d;dreg[2]=r10d;dreg[3]=r11d;dreg[4]=r12d;dreg[5]=r13d;dreg[6]=r14d;dreg[7]=r15d;
-	Gp wreg[8];wreg[0]=r8w;wreg[1]=r9w;wreg[2]=r10w;wreg[3]=r11w;wreg[4]=r12w;wreg[5]=r13w;wreg[6]=r14w;wreg[7]=r15w;
-	Gp breg[8];breg[0]=r8b;breg[1]=r9b;breg[2]=r10b;breg[3]=r11b;breg[4]=r12b;breg[5]=r13b;breg[6]=r14b;breg[7]=r15b;
 
 	switch(jcontent.opcode){
+	case 1:{
+		a.pop(rcx);
+		a.push(rcx);
+		pushRegisters(a);
+		a.call(uint64((void*)test_func));
+		popRegisters(a);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
+	}break;
 	case P_UINT8+COPY_MW_MW_C:
 	case P_INT8+COPY_MW_MW_C:{
 		uint8 dst=t.getNext8();

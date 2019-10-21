@@ -12,6 +12,7 @@
 	#include <stdio.h>
 
 	#define ASMJIT_STATIC
+	#define ASMJIT_NO_LOGGING
 	#include "../../../asmjit/asmjit.h"
 	using namespace asmjit;
 	using namespace asmjit::x86;
@@ -47,5 +48,13 @@
 	void pushRegisters(AssemblerJIT &a);
 
 	void popRegisters(AssemblerJIT &a);
+
+	static Gp memory=rdi;
+	static Gp workspace=rsi;
+
+	static Gp qreg[8]= {r8,r9,r10,r11,r12,r13,r14,r15};
+	static Gp dreg[8]= {r8d,r9d,r10d,r11d,r12d,r13d,r14d,r15d};
+	static Gp wreg[8]= {r8w,r9w,r10w,r11w,r12w,r13w,r14w,r15w};
+	static Gp breg[8]= {r8b,r9b,r10b,r11b,r12b,r13b,r14b,r15b};
 
 #endif /* SRC_OPCODES_JIT_H_ */

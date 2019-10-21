@@ -7,36 +7,76 @@
 
 #include "../Jit.h"
 
-uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,std::vector<Dupla<Label,uint32>> &v,uint32 startCode){
-	Gp memory=rdi;
-	Gp workspace=rsi;
-
-	Gp qreg[8];qreg[0]=r8;qreg[1]=r9;qreg[2]=r10;qreg[3]=r11;qreg[4]=r12;qreg[5]=r13;qreg[6]=r14;qreg[7]=r15;
-	Gp dreg[8];dreg[0]=r8d;dreg[1]=r9d;dreg[2]=r10d;dreg[3]=r11d;dreg[4]=r12d;dreg[5]=r13d;dreg[6]=r14d;dreg[7]=r15d;
-	Gp wreg[8];wreg[0]=r8w;wreg[1]=r9w;wreg[2]=r10w;wreg[3]=r11w;wreg[4]=r12w;wreg[5]=r13w;wreg[6]=r14w;wreg[7]=r15w;
-	Gp breg[8];breg[0]=r8b;breg[1]=r9b;breg[2]=r10b;breg[3]=r11b;breg[4]=r12b;breg[5]=r13b;breg[6]=r14b;breg[7]=r15b;
+uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,std::vector<Dupla<Label,uint32>> &v,uint32 startCode,Label reenter){
 
 	switch(jcontent.opcode){
+	case PUSH_C:{
+		uint64 aux=t.getNext64();
+
+		a.mov(rcx,ptr(rsp));
+		pushRegisters(a);
+		a.mov(rdx,aux);
+		a.call(uint64((void*)Thread::saveInStack));
+		popRegisters(a);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
+
+	}break;
+	case PUSH_W:{
+		uint8 aux=t.getNext8();
+
+		a.mov(rcx,ptr(rsp));
+		pushRegisters(a);
+		if(aux<8){
+			a.mov(rdx,qreg[aux]);
+		}else{
+			a.mov(rdx,ptr(workspace,aux*8));
+		}
+		a.call(uint64((void*)Thread::saveInStack));
+		popRegisters(a);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
+
+	}break;
+	case POP_W:{
+		uint8 aux=t.getNext8();
+
+		a.mov(rcx,ptr(rsp));
+		pushRegisters(a);
+		a.call(uint64((void*)Thread::recoverInStack));
+		popRegisters(a);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
+
+		if(aux<8){
+			a.mov(qreg[aux],rax);
+		}else{
+			a.mov(ptr(workspace,aux*8),rax);
+		}
+
+	}break;
 	case CALL_C:{
-		uint32 posAtual=t.getPontCode();
+		uint32 posAtua=t.getPontCode()-2;
 		// empurra a posição atual na pilha
-		t.set16InCode(t.getPontCode()-2,JIT_FLAG_ENTER_CODE);
+		t.set16InCode(posAtua,JIT_FLAG_ENTER_CODE);
 		uint32 aux=t.getNext32();
 
-		a.pop(rcx);
-		a.push(rcx);
+		a.mov(rcx,ptr(rsp));
 		pushRegisters(a);
-		a.mov(rdx,t.getPontCode());
-		a.sub(rsp,0x8);
+		a.mov(rdx,((uint64)t.getContexto().getCodContext()<<32)+posAtua);
 		a.call(uint64((void*)Thread::saveInStack));
-		a.add(rsp,0x8);
 		popRegisters(a);
-		a.mov(rcx,0x0000FFFFFFFFFFFF);
 
 		if(aux>=jcontent.maxCode|| aux<jcontent.minCode){
 			a.mov(rax,uint64(aux));
 			a.jmp(end);
 		}else for(uint32 x=0;x<v.size();x++){
+			#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 			if(v[x].getSecond()==aux){
 				a.jmp(v[x].getFirst());
 				break;
@@ -45,20 +85,22 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &en
 		t.set32InCode(t.getPontCode()-4,startCode);
 	}break;
 	case RETURN:{
-
-		a.pop(rcx);
-		a.push(rcx);
+		a.mov(rcx,ptr(rsp));
 		pushRegisters(a);
-		a.sub(rsp,0x8);
 		a.call(uint64((void*)Thread::recoverInStack));
-		a.add(rsp,0x8);
+		a.mov(rdx,rax);
+		a.shr(rdx,32);
 		popRegisters(a);
-
 		//posição atual é retornada em RAX;
-		a.mov(rcx,0x0000FFFFFFFFFFFF);
-
-
-		a.jmp(end);
+		a.cmp(dx,t.getContexto().getCodContext());
+		a.jne(end);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
+		a.cdqe();
+		a.mov(rbx,1);
+		a.add(rax,6);
+		a.jmp(reenter);
 	}break;
 	case JMP_C:{
 		uint32 aux=t.getNext32();
@@ -260,7 +302,9 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &en
 		}else{
 			a.mov(rax,ptr(workspace,aux*8));
 		}
-		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		a.and_(rax,rcx);
 		a.and_(rbx,rcx);
 		a.cmp(rax,rbx);
@@ -397,7 +441,9 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &en
 	case P_UINT48+CMP_M_W:{
 		uint64 val=t.getNext48().toInt();
 		uint8 aux=t.getNext8();
-		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(aux<8){
 			a.mov(rax,qreg[aux]);
 		}else{
@@ -415,7 +461,9 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &en
 		uint64 val=t.getNext48().toInt();
 		uint8 aux=t.getNext8();
 
-		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(aux<8){
 			a.mov(rax,qreg[aux]);
 		}else{
@@ -505,7 +553,9 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &en
 	case P_UINT48+CMP_M_M:{
 		uint64 val=t.getNext48().toInt();
 		uint64 aux=t.getNext48().toInt();
-		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		a.mov(rax,ptr(memory,aux));
 		a.mov(rbx,ptr(memory,val));
 		a.and_(rax,rcx);
@@ -518,7 +568,9 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &en
 	case P_INT48+CMP_M_M:{
 		uint64 val=t.getNext48().toInt();
 		uint64 aux=t.getNext48().toInt();
-		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		a.mov(rax,ptr(memory,aux));
 		a.mov(rbx,ptr(memory,val));
 		a.and_(rax,rcx);
@@ -607,7 +659,9 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &en
 	case P_UINT48+CMP_W_C:{
 		uint8 aux=t.getNext8();
 		uint64 val=t.getNext48().toInt();
-		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(aux<8){
 			a.mov(rax,qreg[aux]);
 			a.and_(rax,rcx);
@@ -708,7 +762,9 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &en
 	case P_UINT48+CMP_M_C:{
 		uint64 aux=t.getNext48().toInt();
 		uint64 val=t.getNext48().toInt();
-		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		a.mov(rax,ptr(memory,aux));
 		a.and_(rax,rcx);
 		a.cmp(rax,val);
@@ -720,7 +776,9 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &en
 	case P_INT48+CMP_M_C:{
 		uint64 aux=t.getNext48().toInt();
 		uint64 val=t.getNext48().toInt();
-		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		a.mov(rax,ptr(memory,aux));
 		a.and_(rax,rcx);
 		a.cmp(rax,val);
@@ -863,7 +921,9 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &en
 	case P_UINT48+CMP_W_W:{
 		uint8 aux=t.getNext8();
 		uint8 val=t.getNext8();
-		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(aux<8){
 			a.mov(rax,qreg[aux]);
 		}else{

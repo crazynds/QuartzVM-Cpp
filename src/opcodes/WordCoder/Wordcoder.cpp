@@ -400,7 +400,7 @@ void Wordcoder::pop(GeralMemory *g1){
 	break;
 	case 'W':{
 		Workspace *w=(Workspace*)g1;
-		push_w(w->getPos());
+		pop_w(w->getPos());
 	}break;
 	}
 	delete g1;
@@ -508,7 +508,7 @@ GeralMemory* m_(uint48 pos){
 	Memoria *w=new Memoria(pos);
 	return (GeralMemory*)w;
 }
-GeralMemory* ptr_(GeralMemory *r,uint32 inc){
+GeralMemory* ptr_(GeralMemory *r,uint32 inc=0){
 	if(r->getType()=='W'){
 		MemoriaPtr *w=new MemoriaPtr((Workspace*)r,inc);
 		return (GeralMemory*)w;
@@ -517,7 +517,7 @@ GeralMemory* ptr_(GeralMemory *r,uint32 inc){
 		return NULL;
 	}
 }
-GeralMemory* ptr_(GeralMemory *reg,GeralMemory *regIndex,uint8 shift,uint32 inc){
+GeralMemory* ptr_(GeralMemory *reg,GeralMemory *regIndex,uint8 shift=0,uint32 inc=0){
 	if(reg->getType()=='W' && regIndex->getType()=='W'){
 		MemoriaPtr *w=new MemoriaPtr((Workspace*)reg,(Workspace*)regIndex,shift,inc);
 		return (GeralMemory*)w;

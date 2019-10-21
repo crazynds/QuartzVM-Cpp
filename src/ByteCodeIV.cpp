@@ -18,6 +18,7 @@
 
 using namespace std;
 
+
 int main(int argc, char **argv) {
 	VirtualMachine *vm;
 	uint8 debug=0;
@@ -51,8 +52,9 @@ int main(int argc, char **argv) {
 		if(debug){
 			while(!flag)flag=vm->runCommand();
 		}else flag=vm->run();
-		cout<<"[INFO] - Duração total: "<< ( clock() - max )/(double)CLOCKS_PER_SEC <<'\n';
+		cout<<"[INFO] - Duração total: "<< ( clock() - max )/(double)CLOCKS_PER_SEC << endl;
 	}
+
 
 	delete vm;
 	getchar();

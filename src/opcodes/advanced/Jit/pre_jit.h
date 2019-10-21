@@ -4,9 +4,9 @@ std::vector<Dupla<Label,uint32>>* pre_check_jig(Thread &t,Assembler &a){
 	uint32 save_point=t.getPontCode();
 	std::vector<Dupla<Label,uint32>> *vt=new std::vector<Dupla<Label,uint32>>;
 	std::vector<Dupla<Label,uint32>> &v=*vt;
-	uint16 p=t.getNext16();
+	register uint16 p=t.getNext16();
+	uint32 auxi=t.getPontCode();
 	while(p!=JIT_FLAG_END){
-		uint32 auxi=t.getPontCode();
 		switch(p){
 		case JIT_FLAG_ENTER_CODE:{
 			if(t.checkUseCode(4))return 0;
@@ -95,7 +95,6 @@ std::vector<Dupla<Label,uint32>>* pre_check_jig(Thread &t,Assembler &a){
 				a.cmp(rax,idLabel);
 				a.je(*jmp);
 			}
-
 			}break;
 		case LOOP_C_W:{
 			if(t.checkUseCode(5))return 0;
@@ -117,9 +116,12 @@ std::vector<Dupla<Label,uint32>>* pre_check_jig(Thread &t,Assembler &a){
 			v[aux].setSecond(idLabel);
 			}break;
 		case RETURN:
+		case 1:
 			{}break;
 		case INC_W:
 		case DEC_W:
+		case POP_W:
+		case PUSH_W:
 			{if(t.checkUseCode(1))return 0;t.setPontCode(t.getPontCode()+1);}break;
 		case P_UINT8+MUL_W_C:
 		case P_UINT8+SOMA_W_C:
@@ -423,6 +425,7 @@ std::vector<Dupla<Label,uint32>>* pre_check_jig(Thread &t,Assembler &a){
 		case P_INT16+SUB_M_C:
 		case P_UINT16+DIV_M_C:
 		case P_INT16+DIV_M_C:
+		case PUSH_C:
 			{if(t.checkUseCode(8))return 0;t.setPontCode(t.getPontCode()+8);}break;
 		case P_INT64+MOV_W_C:
 		case P_UINT64+MOV_W_C:
@@ -562,7 +565,9 @@ std::vector<Dupla<Label,uint32>>* pre_check_jig(Thread &t,Assembler &a){
 			return 0;
 		}
 		if(t.checkUseCode(2))return 0;
+
 		p=t.getNext16();
+		auxi=t.getPontCode();
 	}
 	if(t.isFinalized())return 0;
 	{

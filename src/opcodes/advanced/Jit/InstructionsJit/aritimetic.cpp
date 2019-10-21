@@ -8,14 +8,6 @@
 #include "../Jit.h"
 
 uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,std::vector<Dupla<Label,uint32>> &v){
-	Gp memory=rdi;
-	Gp workspace=rsi;
-
-	Gp qreg[8];qreg[0]=r8;qreg[1]=r9;qreg[2]=r10;qreg[3]=r11;qreg[4]=r12;qreg[5]=r13;qreg[6]=r14;qreg[7]=r15;
-	Gp dreg[8];dreg[0]=r8d;dreg[1]=r9d;dreg[2]=r10d;dreg[3]=r11d;dreg[4]=r12d;dreg[5]=r13d;dreg[6]=r14d;dreg[7]=r15d;
-	Gp wreg[8];wreg[0]=r8w;wreg[1]=r9w;wreg[2]=r10w;wreg[3]=r11w;wreg[4]=r12w;wreg[5]=r13w;wreg[6]=r14w;wreg[7]=r15w;
-	Gp breg[8];breg[0]=r8b;breg[1]=r9b;breg[2]=r10b;breg[3]=r11b;breg[4]=r12b;breg[5]=r13b;breg[6]=r14b;breg[7]=r15b;
-
 	switch(jcontent.opcode){
 	case P_UINT8+DD_W_W:
 	case P_INT8+DD_W_W:{
@@ -508,7 +500,9 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		else a.mov(rbx,ptr(workspace,val*8));
 
 		if(dst<8){
-			a.mov(rcx,0x0000FFFFFFFFFFFF);
+			#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 			a.mov(rax,qreg[dst]);
 			a.add(rax,rbx);
 			a.andn(qreg[dst],rcx,qreg[dst]);
@@ -1094,7 +1088,9 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 	case P_UINT48+MUL_W_W:{
 		uint8 dst=t.getNext8();
 		uint8 val=t.getNext8();
-		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(val<8){
 			a.mov(rbx,qreg[val]);
 		}else{
@@ -1165,7 +1161,9 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 	case P_INT48+MUL_M_C:{
 		uint64 dst=t.getNext48().toInt();
 		uint64 val=t.getNext48().toInt();
-		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		a.mov(rax,ptr(memory,dst));
 		a.and_(rax,rcx);//0x0000ff..
 		a.bt(rax,47);
@@ -1239,7 +1237,9 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 	case P_INT48+MUL_W_C:{
 		uint8 dst=t.getNext8();
 		uint64 val=t.getNext48().toInt();
-		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(dst<8){
 			a.mov(rax,qreg[dst]);
 			a.and_(rax,rcx);//0x0000ff..
@@ -1342,7 +1342,9 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 	case P_INT48+MUL_W_M:{
 		uint8 dst=t.getNext8();
 		uint64 val=t.getNext48().toInt();
-		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(dst<8){
 			a.mov(rax,qreg[dst]);
 			a.and_(rax,rcx);//0x0000ff..
@@ -1453,7 +1455,9 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 	case P_INT48+MUL_W_W:{
 		uint8 dst=t.getNext8();
 		uint8 val=t.getNext8();
-		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(val<8)a.mov(rbx,qreg[val]);
 		else a.mov(rbx,ptr(workspace,val*8));
 		a.and_(rbx,rcx);//0x0000ff..
@@ -1561,7 +1565,9 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		uint64 val=t.getNext48().toInt();
 		a.mov(rbx,val);
 		a.xor_(rdx,rdx);
-		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(dst<8){
 			a.mov(rax,qreg[dst]);
 			a.and_(rax,rcx);
@@ -1623,7 +1629,9 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		uint64 val=t.getNext48().toInt();
 		a.mov(rbx,val);
 		a.xor_(rdx,rdx);
-		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		a.mov(rax,ptr(memory,dst));
 		a.and_(rax,rcx);
 		a.div(rbx);
@@ -1686,7 +1694,9 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		uint8 dst=t.getNext8();
 		uint64 pos=t.getNext48().toInt();
 		a.mov(rbx,ptr(memory,pos));
-		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		a.xor_(rdx,rdx);
 		a.and_(rbx,rcx);
 		if(dst<8){
@@ -1767,7 +1777,9 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 	case P_INT48+DIV_W_C:{
 		uint8 dst=t.getNext8();
 		uint64 val=t.getNext48().toInt();
-		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(dst<8){
 			a.mov(rax,qreg[dst]);
 			a.and_(rax,rcx); // 0x0000ff..
@@ -1853,7 +1865,9 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 	case P_INT48+DIV_M_C:{
 		uint64 dst=t.getNext48().toInt();
 		uint64 val=t.getNext48().toInt();
-		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		a.mov(rax,ptr(memory,dst));
 		a.and_(rax,rcx);//0x0000ff..
 		a.bt(rax,47);
@@ -1928,7 +1942,9 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 	case P_INT48+DIV_W_M:{
 		uint8 dst=t.getNext8();
 		uint64 val=t.getNext48().toInt();
-		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(dst<8){
 			a.mov(rax,qreg[dst]);
 			a.and_(rax,rcx);//0x0000ff..
@@ -2060,7 +2076,9 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		uint8 dst=t.getNext8();
 		uint8 val=t.getNext8();
 		a.xor_(rdx,rdx);
-		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(val<8){
 			a.mov(rbx,qreg[val]);
 		}else{
@@ -2176,7 +2194,9 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 	case P_INT48+DIV_W_W:{
 		uint8 dst=t.getNext8();
 		uint8 val=t.getNext8();
-		a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(val<8)a.mov(rbx,qreg[val]);
 		else a.mov(rbx,ptr(workspace,val*8));
 		a.and_(rbx,rcx);//0x0000ff..

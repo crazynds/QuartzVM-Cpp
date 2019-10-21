@@ -21,6 +21,8 @@
 	#define INTERNAL_ERROR_ 1<<7
 	#define INVALID_CHANGE_CONTEXT_ 1<<8
 
+	#define THREAD_STACK_SIZE 2048
+
 	class MemoryAcess{
 		private:
 			uint8 **mem;
@@ -56,8 +58,8 @@
 			uint64 *stack;
 
 			// stack ponteiros
-			uint16 stack_max;
-			uint16 stack_pointer;
+			uint32 stack_max;
+			uint32 stack_pointer;
 
 			uint32 cod_pointer;
 
@@ -65,9 +67,9 @@
 
 			void incrementStack(){
 				uint32 pos_stack=(uint32)stack_max*2;
-				if((uint64)pos_stack>65535){
+				if(pos_stack>1<<28){
 					pos_stack=stack_max+2048;
-					if(pos_stack>65535){
+					if(pos_stack>1<<28){
 						error_flags|=MAX_LIMIT_STACK_;
 						return;
 					}
@@ -76,20 +78,19 @@
 				for(uint32 x=0;x<stack_max;x++){
 					aux[x]=stack[x];
 				}
-				stack_max=(uint16)pos_stack;
+				stack_max=pos_stack;
 
 				delete[] stack;
 				stack=aux;
 			}
 
 			void decrementStack(){
-				if(stack_max<512)return;
-				uint32 pos_stack=(uint32)stack_max/2;
+				uint32 pos_stack=(uint32)stack_max>>1;
 				uint64 *aux=new uint64[pos_stack];
 				for(uint32 x=0;x<pos_stack;x++){
 					aux[x]=stack[x];
 				}
-				stack_max=(uint16)pos_stack;
+				stack_max=pos_stack;
 
 				delete[] stack;
 				stack=aux;
