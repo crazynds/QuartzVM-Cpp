@@ -39,7 +39,6 @@ void Thread::savePoint(){
 void Thread::saveInStack(uint64 p){
 	if(stack_pointer>=stack_max){
 		incrementStack();
-		std::cout << "Stack máxima: " << stack_max << std::endl;
 		if(error_flags&MAX_LIMIT_STACK_){
 			return;
 		}

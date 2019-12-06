@@ -20,9 +20,8 @@
 	uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,std::vector<Dupla<Label,uint32>> &v);
 	uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,std::vector<Dupla<Label,uint32>> &v,uint32 startCode,Label reentrada);
 
-	void init_jit(Thread &t){
-		if(t.checkUseCode(2))return;
-
+	uint64 create_jit(Thread &t,uint32 enter){
+		if(t.checkUseCode(2))return 0;
 		uint32 posInit=t.getPontCode();
 		{
 			uint16 *pt=(uint16*)&t.getContexto().cod[posInit-2];
@@ -35,7 +34,7 @@
 		code.init(rt.codeInfo());
 		//Create code
 		laco_jit(t,&code);
-		if(t.isFinalized())return;
+		if(t.isFinalized())return 0;
 		//Save code
 		FuncJit& fn=t.getContexto().createFunction(posInit);
 		//Generate executable code
@@ -43,9 +42,18 @@
 		if (err){
 			std::cout << "[ERROR] - Deu um erro importante aqui! " << err <<  std::endl;
 			t.error_flags|=INTERNAL_ERROR_;
+			return 0;
+		}
+		return fn(t.mem.getPointerMem(),t.workspace,t,enter);
+
+	}
+
+
+	void init_jit(Thread &t){
+		uint64 result=create_jit(t,0);
+		if(result==0){
 			return;
 		}
-		uint64 result= fn(t.mem.getPointerMem(),t.workspace,t,0);
 		uint16 flags=result>>48;
 		switch(flags){
 		case ERROR_JMP_ENTER_JIT_STATE:{
@@ -74,32 +82,13 @@
 		uint32 pos=t.getNext32();
 		uint32 enter=t.getPontCode();
 		FuncJit fn=t.getContexto().getFunction(pos);
+		uint64 result;
 		if(fn==0){
 			t.setPontCode(pos);
-			if(t.checkUseCode(2))return;
-			uint32 posInit=t.getPontCode();
-			{
-				uint16 *pt=(uint16*)&t.getContexto().cod[posInit-2];
-				*pt=JIT_FLAG_EXECUTE;
-			}
-			JitRuntime& rt=t.getJitRuntime();
-			CodeHolder code;
-			code.init(rt.codeInfo());
-			laco_jit(t,&code);
-			if(t.isFinalized())return;
-			FuncJit &f=t.getContexto().createFunction(posInit);
-			Error err = rt.add(&fn, &code);
-			if (err){
-				std::cout << "[ERROR] - Deu um erro importante aqui! " << err <<  std::endl;
-				t.error_flags|=INTERNAL_ERROR_;
-				return;
-			}
-			fn=f;
-			std::cout << "Criou jit no enter" << std::endl;
-			getchar();
+			result=create_jit(t,enter);
+		}else{
+			result=fn(t.mem.getPointerMem(),t.workspace,t,enter);
 		}
-
-		uint64 result= fn(t.mem.getPointerMem(),t.workspace,t,enter);
 		uint16 flags=result>>48;
 		switch(flags){
 		case ERROR_JMP_ENTER_JIT_STATE:{
@@ -256,6 +245,7 @@
 		a.mov(eax,t.getPontCode()); // return values
 
 		a.bind(end);
+
 		for(uint16 x=0;x<8;x++)a.mov(qword_ptr(workspace,x*8),qreg[x]);
 
 		//recover registers
@@ -276,9 +266,6 @@
 			delete &v[x].getFirst();
 		}
 		delete &v;
-
-		std::cout << "Montou JIT!!" << std::endl;
-		getchar();
 	}
 
 	void pushRegisters(AssemblerJIT &a){
@@ -290,10 +277,10 @@
 		a.push(r9);
 		a.push(r10);
 		a.push(r11);
-		a.sub(rsp,0x08);
+		a.sub(rsp,0x18);
 	}
 	void popRegisters(AssemblerJIT &a){
-		a.add(rsp,0x08);
+		a.add(rsp,0x18);
 		//for(uint16 x=0;x<8;x++)a.mov(qreg[x],qword_ptr(workspace,x*8));
 		a.pop(r11);
 		a.pop(r10);
