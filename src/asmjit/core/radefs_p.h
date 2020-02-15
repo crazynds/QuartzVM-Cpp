@@ -953,7 +953,6 @@ public:
     //! Marked for stack argument reassignment.
     kFlagStackArgToStack = 0x00000008u,
 
-    // TODO: Used?
     kFlagDirtyStats       = 0x80000000u
   };
 

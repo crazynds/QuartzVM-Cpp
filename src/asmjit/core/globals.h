@@ -87,7 +87,7 @@ constexpr uint32_t kMaxTreeHeight = (ASMJIT_ARCH_BITS == 32 ? 30 : 61) + 1;
 //! Maximum number of operands per a single instruction.
 constexpr uint32_t kMaxOpCount = 6;
 
-// TODO: Use this one.
+//
 constexpr uint32_t kMaxFuncArgs = 16;
 
 //! Maximum number of physical registers AsmJit can use per register group.

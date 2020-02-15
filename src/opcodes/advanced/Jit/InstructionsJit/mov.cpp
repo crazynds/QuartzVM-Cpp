@@ -40,11 +40,10 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 				a.lea(reg1_aux64,ptr(reg1_aux64,reg2_aux64,shift1,inc1));
 			}
 		}
-#ifndef _FAST_MODE
+		#ifndef _FAST_MODE
 		a.and_(reg1_aux64,rcx);
-#endif
+		#endif
 		a.mov(byte_ptr(memory,reg1_aux64),val);
-
 	}break;
 	case P_UINT16+MOV_MMWW_C:
 	case P_INT16+MOV_MMWW_C:{
@@ -222,7 +221,9 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 #endif
 		if(dst<8)a.mov(reg2_aux64,qreg[dst]);
 		else a.mov(reg2_aux64,qword_ptr(workspace,dst*8));
+#ifndef _FAST_MODE
 		a.and_(reg2_aux64,rcx);
+#endif
 		if(val<8)a.mov(ptr(memory,reg2_aux64,0,valinc),wreg[val]);
 		else{
 			Gp reg1_aux16=a.getNextRegister16();
@@ -270,14 +271,14 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 #endif
 		if(val<8){
 			a.mov(rax,qreg[val]);
-			a.mov(ptr(memory,rbx,0,valinc),eax);
-			a.shr(rax,32);
-			a.mov(ptr(memory,rbx,0,valinc+4),ax);
+			a.mov(dx,ptr(memory,rbx,0,valinc+6));
+			a.mov(ptr(memory,rbx,0,valinc),rax);
+			a.mov(ptr(memory,rbx,0,valinc+6),dx);
 		}else{
 			a.mov(rax,ptr(workspace,val*8));
-			a.mov(ptr(memory,rbx,0,valinc),eax);
-			a.shr(rax,32);
-			a.mov(ptr(memory,rbx,0,valinc+4),ax);
+			a.mov(dx,ptr(memory,rbx,0,valinc+6));
+			a.mov(ptr(memory,rbx,0,valinc),rax);
+			a.mov(ptr(memory,rbx,0,valinc+6),dx);
 		}
 
 	}break;
@@ -381,7 +382,9 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		uint8 val=t.getNext8();
 
 
+#ifndef _FAST_MODE
 		a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
 		if(val<8)a.mov(rbx,qreg[val]);
 		else a.mov(rbx,qword_ptr(workspace,val*8));
 #ifndef _FAST_MODE
@@ -391,14 +394,13 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 			a.mov(eax,ptr(memory,rbx,0,valinc+2));
 			a.shl(rax,32);
 			a.mov(ax,ptr(memory,rbx,0,valinc));
-			a.not_(rcx);
-			a.and_(qreg[dst],rcx);
+			a.andn(qreg[dst],rcx,qreg[dst]);
 			a.or_(qreg[dst],rax);
 		}else{
 			a.mov(rax,ptr(memory,rbx,0,valinc));
-			a.mov(ptr(workspace,dst*8),eax);
-			a.shr(rax,32);
-			a.mov(ptr(workspace,dst*8+4),ax);
+			a.mov(dx,ptr(workspace,dst*8+6));
+			a.mov(ptr(workspace,dst*8),rax);
+			a.mov(ptr(workspace,dst*8+6),dx);
 		}
 	}break;
 	case P_UINT64+MOV_W_MMW:
@@ -483,7 +485,7 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		if(mem<8){
 			uint64 aux=t.getNext48().toInt();
 			Gp reg1_aux64=a.getNextRegister64();
-			#ifndef _FAST_MODE
+#ifndef _FAST_MODE
 	a.mov(rcx,0x0000FFFFFFFFFFFF);
 #endif
 			a.mov(reg1_aux64,aux);
@@ -555,7 +557,7 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		uint8 mem=t.getNext8();
 		uint8 val=t.getNext8();
 
-		#ifndef _FAST_MODE
+#ifndef _FAST_MODE
 	a.mov(rcx,0x0000FFFFFFFFFFFF);
 #endif
 		if(val<8){
@@ -568,9 +570,9 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 			a.andn(qreg[mem],rcx,qreg[mem]);
 			a.add(qreg[mem],rax);
 		}else{
-			a.mov(dword_ptr(workspace,mem*8),eax);
-			a.shr(rax,32);
-			a.mov(word_ptr(workspace,(mem*8)+4),ax);
+			a.mov(dx,ptr(workspace,mem*8+6));
+			a.mov(ptr(workspace,mem*8),rax);
+			a.mov(ptr(workspace,mem*8+6),dx);
 		}
 	}break;
 	case P_UINT64+MOV_W_W:
@@ -626,19 +628,17 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 	case P_INT48+MOV_W_M:{
 		uint8 mem=t.getNext8();
 		uint64 val=t.getNext48().toInt();
+
+
 		if(mem<8){
-			//OPTIMIZATION - Incluido um sistema de economia de 2 clocks
 			Gp reg1_aux64=a.getNextRegister64();
-			Gp reg2_aux64=a.getNextRegister64();
-			a.xor_(reg1_aux64,reg1_aux64);
-			a.xor_(reg2_aux64,reg2_aux64);
-			a.mov(eax,dword_ptr(memory,val));
-			a.mov(bx,word_ptr(memory,val+4));
-			//
-			a.and_(qreg[mem],0xFFFF000000000000);
-			a.shl(reg2_aux64,32);
-			a.add(reg1_aux64,reg2_aux64);
-			a.add(qreg[mem],reg1_aux64);
+			a.mov(reg1_aux64,ptr(memory,val));
+#ifndef _FAST_MODE
+	a.mov(rcx,0x0000FFFFFFFFFFFF);
+#endif
+			a.andn(qreg[mem],rcx,qreg[mem]);
+			a.and_(reg1_aux64,rcx);
+			a.or_(qreg[mem],reg1_aux64);
 		}else {
 			//Necessário para optimização acima
 			a.mov(eax,dword_ptr(memory,val));
@@ -696,11 +696,9 @@ uint8 mov(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,st
 		uint64 mem=t.getNext48().toInt();
 		uint8 val=t.getNext8();
 		if(val<8){
-			Gp reg2_aux64=a.getNextRegister64();
-			a.mov(reg2_aux64,qreg[val]);
-			a.mov(eax,ebx);
-			a.shr(reg2_aux64,32);
-			a.mov(dx,bx);
+			a.mov(rdx,qreg[val]);
+			a.mov(eax,edx);
+			a.shr(rdx,32);
 		}else{
 			a.mov(eax,dword_ptr(workspace,val*8));
 			a.mov(dx,word_ptr(workspace,(val*8)+4));

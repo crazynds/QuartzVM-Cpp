@@ -58,8 +58,6 @@ ASMJIT_FAVOR_SIZE Error ArchUtils::typeIdToRegInfo(uint32_t archId, uint32_t& ty
 
   // Zero the signature so it's clear in case that typeId is not invalid.
   regInfo._signature = 0;
-
-  // TODO: Move to X86 backend.
   #ifdef ASMJIT_BUILD_X86
   if (ArchInfo::isX86Family(archId)) {
     // Passed RegType instead of TypeId?

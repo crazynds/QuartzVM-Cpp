@@ -744,3 +744,115 @@ void mov_mmw_mmw64(Thread &t){
 	*x=*((uint64*)&t.mem[y]);
 }
 
+
+
+#define createFuncUINT(B) B(uint8,8);\
+		B(uint16,16);\
+		B(uint32,32);\
+		B(uint48,48);\
+		B(uint64,64);
+
+#ifndef _FAST_MODE
+#define func_mov_rrw_w(B,C) void mov_rrw_w##C(Thread& t){	\
+		if(t.checkUseCode(10))return;			\
+	uint32 inc = t.getNext32();					\
+	uint8 base = t.getNext8();					\
+	uint8 index = t.getNext8();					\
+	uint8 shift = t.getNext8();					\
+	uint8 ori = t.getNext8();					\
+	B *ptr=(B*)(t.workspace[base]+(t.workspace[index]<<shift)+inc);\
+	B *ptr2=(B*)&t.workspace[ori];\
+	*ptr=*ptr2;}
+#else
+#define func_mov_rrw_w(B,C) void mov_rrw_w##C(Thread& t){	\
+	uint32 inc = t.getNext32();					\
+	uint8 base = t.getNext8();					\
+	uint8 index = t.getNext8();					\
+	uint8 shift = t.getNext8();					\
+	uint8 ori = t.getNext8();					\
+	B *ptr=(B*)(t.workspace[base]+(t.workspace[index]<<shift)+inc);\
+	B *ptr2=(B*)&t.workspace[ori];\
+	*ptr=*ptr2;}
+#endif
+
+#ifndef _FAST_MODE
+#define func_mov_w_rrw(B,C) void mov_w_rrw##C(Thread& t){	\
+		if(t.checkUseCode(10))return;			\
+	uint8 ori = t.getNext8();					\
+	uint32 inc = t.getNext32();					\
+	uint8 base = t.getNext8();					\
+	uint8 index = t.getNext8();					\
+	uint8 shift = t.getNext8();					\
+	B *ptr=(B*)(t.workspace[base]+(t.workspace[index]<<shift)+inc);\
+	B *ptr2=(B*)&t.workspace[ori];\
+	*ptr2=*ptr;}
+#else
+#define func_mov_w_rrw(B,C) void mov_w_rrw##C(Thread& t){	\
+	uint8 ori = t.getNext8();					\
+	uint32 inc = t.getNext32();					\
+	uint8 base = t.getNext8();					\
+	uint8 index = t.getNext8();					\
+	uint8 shift = t.getNext8();					\
+	B *ptr=(B*)(t.workspace[base]+(t.workspace[index]<<shift)+inc);\
+	B *ptr2=(B*)&t.workspace[ori];\
+	*ptr2=*ptr;}
+#endif
+
+#ifndef _FAST_MODE
+#define func_mov_rrw_rrw(B,C) void mov_rrw_rrw##C(Thread& t){	\
+	if(t.checkUseCode(14))return;			\
+	uint32 inc = t.getNext32();					\
+	uint8 base = t.getNext8();					\
+	uint8 index = t.getNext8();					\
+	uint8 shift = t.getNext8();					\
+	uint32 inc2 = t.getNext32();				\
+	uint8 base2 = t.getNext8();					\
+	uint8 index2 = t.getNext8();				\
+	uint8 shift2 = t.getNext8();				\
+	B *ptr=(B*)(t.workspace[base]+(t.workspace[index]<<shift)+inc);\
+	B *ptr2=(B*)(t.workspace[base2]+(t.workspace[index2]<<shift2)+inc2);\
+	*ptr=*ptr2;}
+#else
+#define func_mov_rrw_rrw(B,C) void mov_rrw_rrw##C(Thread& t){	\
+	uint32 inc = t.getNext32();					\
+	uint8 base = t.getNext8();					\
+	uint8 index = t.getNext8();					\
+	uint8 shift = t.getNext8();					\
+	uint32 inc2 = t.getNext32();				\
+	uint8 base2 = t.getNext8();					\
+	uint8 index2 = t.getNext8();				\
+	uint8 shift2 = t.getNext8();				\
+	B *ptr=(B*)(t.workspace[base]+(t.workspace[index]<<shift)+inc);\
+	B *ptr2=(B*)(t.workspace[base2]+(t.workspace[index2]<<shift2)+inc2);\
+	*ptr=*ptr2;}
+#endif
+
+#ifndef _FAST_MODE
+#define func_mov_rrw_c(B,C) void mov_rrw_c##C(Thread& t){	\
+	if(t.checkUseCode(10 + ( C / 8 )))return;				\
+	uint32 inc = t.getNext32();					\
+	uint8 base = t.getNext8();					\
+	uint8 index = t.getNext8();					\
+	uint8 shift = t.getNext8();					\
+	B val = t.getNext##C();						\
+	B *ptr=(B*)(t.workspace[base]+(t.workspace[index]<<shift)+inc);\
+	*ptr=val;}
+#else
+#define func_mov_rrw_c(B,C) void mov_rrw_c##C(Thread& t){	\
+	uint32 inc = t.getNext32();					\
+	uint8 base = t.getNext8();					\
+	uint8 index = t.getNext8();					\
+	uint8 shift = t.getNext8();					\
+	B val = t.getNext##C();						\
+	B *ptr=(B*)(t.workspace[base]+(t.workspace[index]<<shift)+inc);\
+	*ptr=val;}
+#endif
+
+createFuncUINT(func_mov_rrw_w);
+createFuncUINT(func_mov_w_rrw);
+createFuncUINT(func_mov_rrw_rrw);
+createFuncUINT(func_mov_rrw_c);
+
+
+
+

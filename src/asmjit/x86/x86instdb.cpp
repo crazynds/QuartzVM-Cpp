@@ -5279,7 +5279,7 @@ ASMJIT_FAVOR_SIZE Error InstInternal::validate(uint32_t archId, const BaseInst& 
         // that the register is virtual and its index will be assigned later
         // by the register allocator. We must pass unless asked to disallow
         // virtual registers.
-        // TODO: We need an option to refuse virtual regs here.
+        //
         uint32_t regId = op.id();
         if (regId < Operand::kVirtIdMin) {
           if (ASMJIT_UNLIKELY(regId >= 32))
@@ -5297,7 +5297,7 @@ ASMJIT_FAVOR_SIZE Error InstInternal::validate(uint32_t archId, const BaseInst& 
         break;
       }
 
-      // TODO: Validate base and index and combine these with `combinedRegMask`.
+      //
       case Operand::kOpMem: {
         const Mem& m = op.as<Mem>();
         memOp = &m;
@@ -6312,7 +6312,7 @@ static const uint64_t rwRegGroupByteMask[Reg::kGroupCount] = {
   0x00000000000000FFu  // RIP.
 };
 
-// TODO: Make universal.
+//
 static ASMJIT_INLINE uint32_t gpRegSizeByArchId(uint32_t archId) noexcept {
   static const uint8_t table[] = { 0, 4, 8, 4, 8 };
   return table[archId];

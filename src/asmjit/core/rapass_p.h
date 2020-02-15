@@ -93,7 +93,7 @@ public:
   //! Block successors.
   RABlocks _successors;
 
-  // TODO: Used?
+  //
   RABlocks _doms;
 
   enum LiveType : uint32_t {
@@ -465,7 +465,6 @@ public:
         if (ASMJIT_UNLIKELY(tiedReg->hasOutId()))
           return DebugUtils::errored(kErrorOverlappedRegs);
         tiedReg->setOutId(outId);
-        // TODO: ? _used[group] |= Support::bitMask(outId);
       }
 
       tiedReg->addRefCount();

@@ -15,10 +15,7 @@ void end_running(Thread &t){
 }
 
 void do_nothing(Thread &t){
-	__asm("nop\n\
-		   nop\n\
-		   nop\n\
-		   nop");
+	__asm("hlt");
 #ifndef _FAST_MODE
 	t.checkUseCode(2);
 #endif

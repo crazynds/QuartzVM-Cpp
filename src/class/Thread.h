@@ -138,6 +138,10 @@
 			void setPontCode(uint32);
 			void setPontCodeCtx(uint48);
 
+			uint8 operator==(const Thread &t){
+				return (vt==t.vt && ct==t.ct && stack==t.stack);
+			}
+
 			JitRuntime& getJitRuntime();
 	};
 

@@ -237,7 +237,7 @@ public:
   //! Returns the emitter options.
   inline uint32_t emitterOptions() const noexcept { return _emitterOptions; }
 
-  // TODO: Deprecate and remove, CodeHolder::addEmitterOptions() is the way.
+  //
   inline void addEmitterOptions(uint32_t options) noexcept {
     _emitterOptions |= options;
     onUpdateGlobalInstOptions();

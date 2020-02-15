@@ -94,7 +94,6 @@ FuncNode* BaseCompiler::newFunc(const FuncSignature& sign) noexcept {
 
   err = registerLabelNode(func);
   if (ASMJIT_UNLIKELY(err)) {
-    // TODO: Calls reportError, maybe rethink noexcept?
     reportError(err);
     return nullptr;
   }

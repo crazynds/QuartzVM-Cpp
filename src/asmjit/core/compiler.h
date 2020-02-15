@@ -301,7 +301,7 @@ public:
 
   //! \}
 
-  // TODO: These should be removed
+  //
   inline void alloc(BaseReg& reg) { ASMJIT_UNUSED(reg); }
   inline void spill(BaseReg& reg) { ASMJIT_UNUSED(reg); }
 

@@ -159,7 +159,8 @@
 	void laco_jit(Thread &t,CodeHolder *code){
 		JitContentsAuxiliar jcontent;
 		AssemblerJIT a(code);
-		//20 Clocks perdidos no inicio + 20 clocks no fim
+
+
 		a.push(rbx);
 		a.push(rdi);
 		a.push(rsi);
@@ -236,9 +237,20 @@
 				if(jmp_cmp(jcontent,t,a,end,v,startCode,reentrada))break;
 				if(cmov(jcontent,t,a,end,v))break;
 				t.error_flags|=INVALID_OPCODE_JIT_;
+				std::cout<< "[ERROR] - Opcode JIT não encontrado. (Erro interno do sistema) " << std::endl;
 				return;
 			}
 			jcontent.opcode=t.getNext16();
+		}
+
+		{
+			uint32 aux=t.getPontCode()-2;
+			for(uint32 x=0;x<v.size();x++){
+				if(v[x].getSecond()==aux){
+					a.bind(v[x].getFirst());
+					break;
+				}
+			}
 		}
 
 

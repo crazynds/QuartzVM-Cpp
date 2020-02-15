@@ -469,7 +469,7 @@ Error RALocalAllocator::allocInst(InstNode* node) noexcept {
     // ------------------------------------------------------------------------
 
     if (usePending) {
-      // TODO: Not sure `liveRegs` should be used, maybe willUse and willFree would be enough and much more clear.
+      //
 
       // All registers that are currently alive without registers that will be freed.
       uint32_t liveRegs = _curAssignment.assigned(group) & ~willFree;
@@ -919,14 +919,13 @@ uint32_t RALocalAllocator::decideOnAssignment(uint32_t group, uint32_t workId, u
   if (Support::isPowerOf2(allocableRegs))
     return Support::ctz(allocableRegs);
 
-  // TODO: This is not finished.
+  //
   return Support::ctz(allocableRegs);
 }
 
 uint32_t RALocalAllocator::decideOnUnassignment(uint32_t group, uint32_t workId, uint32_t physId, uint32_t allocableRegs) const noexcept {
   ASMJIT_ASSERT(allocableRegs != 0);
 
-  // TODO:
   ASMJIT_UNUSED(allocableRegs);
   ASMJIT_UNUSED(group);
   ASMJIT_UNUSED(workId);

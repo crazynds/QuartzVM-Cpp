@@ -73,7 +73,7 @@ struct CallConv {
     // [Universal]
     // ------------------------------------------------------------------------
 
-    // TODO: To make this possible we need to know target ARCH and ABI.
+    //
 
     /*
 

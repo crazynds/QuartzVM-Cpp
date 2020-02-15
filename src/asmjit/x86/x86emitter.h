@@ -5264,8 +5264,6 @@ struct EmitterImplicitT : public EmitterExplicitT<This> {
 
   //! \cond
   using EmitterExplicitT<This>::_emitter;
-
-  // TODO: xrstor and xsave don't have explicit variants yet.
   using EmitterExplicitT<This>::cbw;
   using EmitterExplicitT<This>::cdq;
   using EmitterExplicitT<This>::cdqe;

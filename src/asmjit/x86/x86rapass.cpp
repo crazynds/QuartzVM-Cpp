@@ -414,7 +414,6 @@ Error X86RACFGBuilder::onBeforeCall(FuncCallNode* call) noexcept {
           uint32_t argGroup = Reg::groupOf(arg.regType());
 
           if (regGroup != argGroup) {
-            // TODO:
             ASMJIT_ASSERT(false);
           }
         }
@@ -484,7 +483,6 @@ Error X86RACFGBuilder::onBeforeCall(FuncCallNode* call) noexcept {
           uint32_t retGroup = Reg::groupOf(ret.regType());
 
           if (regGroup != retGroup) {
-            // TODO:
             ASMJIT_ASSERT(false);
           }
         }
@@ -796,7 +794,7 @@ Error X86RACFGBuilder::moveRegToStackArg(FuncCallNode* call, const FuncValue& ar
       break;
 
     default:
-      // TODO: Vector types by stack.
+      //
       break;
   }
   return DebugUtils::errored(kErrorInvalidState);

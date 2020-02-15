@@ -170,7 +170,7 @@ Error RAPass::runOnFunction(Zone* zone, Logger* logger, FuncNode* func) noexcept
   // Must be called regardless of the allocation status.
   onDone();
 
-  // TODO: I don't like this...
+  //
   // Reset possible connections introduced by the register allocator.
   RAPass_resetVirtRegData(this);
 
@@ -1290,7 +1290,7 @@ Error RAPass::runLocalAllocator() noexcept {
             continue;
           }
           else if (successors.size() > 1) {
-            // TODO: Jump table.
+            //
             ASMJIT_ASSERT(false);
           }
           else {

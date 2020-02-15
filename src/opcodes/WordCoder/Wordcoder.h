@@ -30,6 +30,8 @@
 	#define WOX w_(14)
 	#define WPX w_(15)
 
+	class Label;
+
 	class Wordcoder{
 		private:
 			uint8 *bytecode;
@@ -311,6 +313,132 @@
 				set8(m1);
 				set8(m2);
 			}
+			void jmp_c(uint32 m1){
+				set16(JMP_C);
+				set32(m1);
+			}
+			void jmp_m(uint48 m1){
+				set16(JMP_M);
+				set48(m1);
+			}
+			void jmp_w(uint8 m1){
+				set16(JMP_W);
+				set8(m1);
+			}
+
+			void jmp_c_ma(uint32 m1){
+				set16(JMP_C_MA);
+				set32(m1);
+			}
+			void jmp_c_me(uint32 m1){
+				set16(JMP_C_ME);
+				set32(m1);
+			}
+			void jmp_c_ma_ig(uint32 m1){
+				set16(JMP_C_MA_IG);
+				set32(m1);
+			}
+			void jmp_c_me_ig(uint32 m1){
+				set16(JMP_C_ME_IG);
+				set32(m1);
+			}
+			void jmp_c_ig(uint32 m1){
+				set16(JMP_C_IG);
+				set32(m1);
+			}
+			void jmp_c_di(uint32 m1){
+				set16(JMP_C_DI);
+				set32(m1);
+			}
+			void jmp_w_ma(uint8 m1){
+				set16(JMP_W_MA);
+				set8(m1);
+			}
+			void jmp_w_me(uint8 m1){
+				set16(JMP_W_ME);
+				set8(m1);
+			}
+			void jmp_w_ma_ig(uint8 m1){
+				set16(JMP_W_MA_IG);
+				set8(m1);
+			}
+			void jmp_w_me_ig(uint8 m1){
+				set16(JMP_W_ME_IG);
+				set8(m1);
+			}
+			void jmp_w_ig(uint8 m1){
+				set16(JMP_W_IG);
+				set8(m1);
+			}
+			void jmp_w_di(uint8 m1){
+				set16(JMP_W_DI);
+				set8(m1);
+			}
+			void jmp_m_ma(uint48 m1){
+				set16(JMP_M_MA);
+				set48(m1);
+			}
+			void jmp_m_me(uint48 m1){
+				set16(JMP_M_ME);
+				set48(m1);
+			}
+			void jmp_m_ma_ig(uint48 m1){
+				set16(JMP_M_MA_IG);
+				set48(m1);
+			}
+			void jmp_m_me_ig(uint48 m1){
+				set16(JMP_M_ME_IG);
+				set48(m1);
+			}
+			void jmp_m_ig(uint48 m1){
+				set16(JMP_M_IG);
+				set48(m1);
+			}
+			void jmp_m_di(uint48 m1){
+				set16(JMP_M_DI);
+				set48(m1);
+			}
+			void mul_m_c(uint48 m1,uint64 m2){
+				set16(atual+MUL_M_C);
+				set48(m1);
+				setAtual(m2);
+			}
+			void mul_w_c(uint8 m1,uint64 m2){
+				set16(atual+MUL_W_C);
+				set8(m1);
+				setAtual(m2);
+			}
+			void mul_w_m(uint8 m1,uint48 m2){
+				set16(atual+MUL_W_M);
+				set8(m1);
+				set48(m2);
+			}
+			void mul_w_w(uint8 m1,uint8 m2){
+				set16(atual+MUL_W_W);
+				set8(m1);
+				set8(m2);
+			}
+
+			void div_m_c(uint48 m1,uint64 m2){
+				set16(atual+DIV_M_C);
+				set48(m1);
+				setAtual(m2);
+			}
+			void div_w_c(uint8 m1,uint64 m2){
+				set16(atual+DIV_W_C);
+				set8(m1);
+				setAtual(m2);
+			}
+			void div_w_m(uint8 m1,uint48 m2){
+				set16(atual+DIV_W_M);
+				set8(m1);
+				set48(m2);
+			}
+			void div_w_w(uint8 m1,uint8 m2){
+				set16(atual+DIV_W_W);
+				set8(m1);
+				set8(m2);
+			}
 		public:
 
 			Wordcoder(int x=0){
@@ -332,9 +460,14 @@
 				delete[] bytecode;
 			}
 
+			void bind(Label&);
+
+
 			void mov(GeralMemory*,GeralMemory*);
 			void add(GeralMemory*,GeralMemory*);
 			void sub(GeralMemory*,GeralMemory*);
+			void mul(GeralMemory*,GeralMemory*);
+			void div(GeralMemory*,GeralMemory*);
 			void inc(GeralMemory*);
 			void dec(GeralMemory*);
 			void call(GeralMemory*);
@@ -344,6 +477,10 @@
 			void printNum(GeralMemory*);
 			void printChar(GeralMemory*);
 			void printString(GeralMemory*);
+			void jmp(GeralMemory*);
+			void jmp(GeralMemory*,char);
+			void jmp(Label&);
+			void jmp(Label&,char);
 
 			void setDevVersion(uint64 x);
 			void setGeralName(const char*);
@@ -359,6 +496,10 @@
 			}
 			void finalize(){
 				set16(0);
+			}
+
+			uint32 getPos(){
+				return tam-localLastCab;
 			}
 
 			void copy_m_m_c(uint48 m1,uint48 m2,uint32 m3){
@@ -617,95 +758,6 @@
 				set8(m2);
 			}
 
-			void jmp_c(uint32 m1){
-				set16(JMP_C);
-				set32(m1);
-			}
-			void jmp_m(uint48 m1){
-				set16(JMP_M);
-				set48(m1);
-			}
-			void jmp_w(uint8 m1){
-				set16(JMP_W);
-				set8(m1);
-			}
-			uint32 getPos(){
-				return tam-localLastCab;
-			}
-
-			void jmp_c_ma(uint32 m1){
-				set16(JMP_C_MA);
-				set32(m1);
-			}
-			void jmp_c_me(uint32 m1){
-				set16(JMP_C_ME);
-				set32(m1);
-			}
-			void jmp_c_ma_ig(uint32 m1){
-				set16(JMP_C_MA_IG);
-				set32(m1);
-			}
-			void jmp_c_me_ig(uint32 m1){
-				set16(JMP_C_ME_IG);
-				set32(m1);
-			}
-			void jmp_c_ig(uint32 m1){
-				set16(JMP_C_IG);
-				set32(m1);
-			}
-			void jmp_c_di(uint32 m1){
-				set16(JMP_C_DI);
-				set32(m1);
-			}
-			void jmp_w_ma(uint8 m1){
-				set16(JMP_W_MA);
-				set8(m1);
-			}
-			void jmp_w_me(uint8 m1){
-				set16(JMP_W_ME);
-				set8(m1);
-			}
-			void jmp_w_ma_ig(uint8 m1){
-				set16(JMP_W_MA_IG);
-				set8(m1);
-			}
-			void jmp_w_me_ig(uint8 m1){
-				set16(JMP_W_ME_IG);
-				set8(m1);
-			}
-			void jmp_w_ig(uint8 m1){
-				set16(JMP_W_IG);
-				set8(m1);
-			}
-			void jmp_w_di(uint8 m1){
-				set16(JMP_W_DI);
-				set8(m1);
-			}
-			void jmp_m_ma(uint48 m1){
-				set16(JMP_M_MA);
-				set48(m1);
-			}
-			void jmp_m_me(uint48 m1){
-				set16(JMP_M_ME);
-				set48(m1);
-			}
-			void jmp_m_ma_ig(uint48 m1){
-				set16(JMP_M_MA_IG);
-				set48(m1);
-			}
-			void jmp_m_me_ig(uint48 m1){
-				set16(JMP_M_ME_IG);
-				set48(m1);
-			}
-			void jmp_m_ig(uint48 m1){
-				set16(JMP_M_IG);
-				set48(m1);
-			}
-			void jmp_m_di(uint48 m1){
-				set16(JMP_M_DI);
-				set48(m1);
-			}
-
 			void cmp_m_c(uint48 m1,uint64 m2){
 				set16(atual+CMP_M_C);
 				set48(m1);
@@ -798,49 +850,6 @@
 				set8(m1);
 				set8(m2);
 			}
-
-			void mul_m_c(uint48 m1,uint64 m2){
-				set16(atual+MUL_M_C);
-				set48(m1);
-				setAtual(m2);
-			}
-			void mul_w_c(uint8 m1,uint64 m2){
-				set16(atual+MUL_W_C);
-				set8(m1);
-				setAtual(m2);
-			}
-			void mul_w_m(uint8 m1,uint48 m2){
-				set16(atual+MUL_W_M);
-				set8(m1);
-				set48(m2);
-			}
-			void mul_w_w(uint8 m1,uint8 m2){
-				set16(atual+MUL_W_W);
-				set8(m1);
-				set8(m2);
-			}
-
-			void div_m_c(uint48 m1,uint64 m2){
-				set16(atual+DIV_M_C);
-				set48(m1);
-				setAtual(m2);
-			}
-			void div_w_c(uint8 m1,uint64 m2){
-				set16(atual+DIV_W_C);
-				set8(m1);
-				setAtual(m2);
-			}
-			void div_w_m(uint8 m1,uint48 m2){
-				set16(atual+DIV_W_M);
-				set8(m1);
-				set48(m2);
-			}
-			void div_w_w(uint8 m1,uint8 m2){
-				set16(atual+DIV_W_W);
-				set8(m1);
-				set8(m2);
-			}
-
 			void mod_m_c(uint48 m1,uint64 m2){
 				set16(atual+MOD_M_C);
 				set48(m1);
@@ -870,6 +879,62 @@
 				jit_pos=1;
 				set16(JIT_FLAG_END);
 			}
+	};
+
+	class Label{
+		private:
+			uint32 pos=0;
+			uint32 *locations;
+			uint16 tam=0,maxtam=4;
+			uint8 type;
+			Wordcoder *w;
+
+			void addToLocations(uint32 val){
+				if(tam>=maxtam){
+					maxtam+=4;
+					uint32 *aux=new uint32[maxtam];
+					for(int x=0;x<tam;x++){
+						aux[x]=locations[x];
+					}
+					delete[] locations;
+					locations=aux;
+				}else{
+					locations[tam++]=val;
+				}
+			}
+		public:
+
+			Label(Wordcoder &w){
+				this->w=&w;
+				type=0;
+				locations = new uint32[4];
+			}
+			~Label(){
+				delete[] locations;
+			}
+
+			void addLocation(uint32 val){
+				if(type==2){
+					w->setIn32(val,pos);
+				}else if(type==1 || type==0){
+					type=1;
+					addToLocations(val);
+				}
+			}
+			void setPosition(uint32 pos){
+				if(type==0){
+					type=2;
+					this->pos=pos;
+				}else if (type==1){
+					type=2;
+					this->pos=pos;
+					for(int x=0;x<tam;x++){
+						w->setIn32(locations[x],pos);
+					}
+				}
+
+			}
+
 	};
 
 

@@ -125,7 +125,7 @@ enum MemFlags : uint32_t {
 enum Flags : uint32_t {
   kFlagNone               = 0x00000000u, //!< No flags.
 
-  // TODO: Deprecated
+  //
   // ----------------
   //
   // These flags describe the use of 1st and/or 1st+2nd operands. This allows

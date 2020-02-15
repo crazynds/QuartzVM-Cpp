@@ -71,6 +71,14 @@
 	#define MOV_MMWW_MMW (MOVIMENTACAO+29)
 	#define MOV_MMW_MMWW (MOVIMENTACAO+30)
 
+	#define MOV_RRW_C (MOVIMENTACAO+31)
+	#define MOV_RRW_W (MOVIMENTACAO+32)
+	#define MOV_W_RRW (MOVIMENTACAO+33)
+	#define MOV_RRW_RRW (MOVIMENTACAO+34)
+
+	#define MOV_MMWW_RRW
+	#define MOV_RRW_MMWW
+
 
 
 #define ARITIMETICA (1<<OP_CAT)
@@ -223,7 +231,6 @@
 	#define CALL_CTX_W GERAL_TYPE+(STACK+8)//Chama uma função a partir de um local de memoria de codigo de acordo com um slot da workspace de outro contexto
 
 
-
 //System Call commands
 	#define PRINT_OUT_CHAR SYSTEM_CALL+1 //Printa o char da workspace
 	#define PRINT_OUT_NUM SYSTEM_CALL+2  //Printa o num da workspace
@@ -232,7 +239,11 @@
 	#define LOAD_CONTEXT SYSTEM_CALL+5 //Carrega contexto
 	#define GET_CONTEXT_ID SYSTEM_CALL+6 //Retorna o id do contexto
 	#define CHECK_CONTEXT_ID SYSTEM_CALL+7 //Confere o id do contexto, caso falso, zera a variavel passada como parametro
+	#define HLT_COMAND SYSTEM_CALL+8
 
+
+	#define ALLOC_RES SYSTEM_CALL+128
+	#define FREE_RES SYSTEM_CALL+129
 
 #endif /* OPCODES_OPCODE_H_ */
 

@@ -216,4 +216,24 @@
 	void mov_w_mmw48(Thread&);
 	void mov_w_mmw64(Thread&);
 
+
+////
+	#define createFuncOnlyNumber(B) B(8);\
+		B(16);\
+		B(32);\
+		B(48);\
+		B(64);
+
+	#define mov_rrw_w(B) void mov_rrw_w##B(Thread&);
+	createFuncOnlyNumber(mov_rrw_w);
+
+	#define mov_w_rrw(B) void mov_w_rrw##B(Thread&);
+	createFuncOnlyNumber(mov_w_rrw);
+
+	#define mov_rrw_rrw(B) void mov_rrw_rrw##B(Thread&);
+	createFuncOnlyNumber(mov_rrw_rrw);
+
+	#define mov_rrw_c(B) void mov_rrw_c##B(Thread&);
+	createFuncOnlyNumber(mov_rrw_c);
+
 #endif /* OPCODES_MOV_H_ */

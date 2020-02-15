@@ -24,5 +24,8 @@
 	void do_nothing(Thread &t);
 	void end_running(Thread &t);
 
+	void alloc_res(Thread &t);
+	void free_res(Thread &t);
+
 
 #endif /* SRC_OPCODES_SYSCALL_H_ */

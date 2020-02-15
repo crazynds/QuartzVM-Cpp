@@ -21,6 +21,7 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 			a.shr(al,cl);
 			a.mov(ptr(workspace,dst*8),al);
 		}
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 	}break;
 	case P_INT8+DD_W_C:
 	case P_UINT8+DD_W_C:{
@@ -45,6 +46,7 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 			a.shr(ax,cl);
 			a.mov(word_ptr(workspace,dst*8),ax);
 		}
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 	}break;
 	case P_INT16+DD_W_C:
 	case P_UINT16+DD_W_C:{
@@ -69,6 +71,7 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 			a.shr(eax,cl);
 			a.mov(dword_ptr(workspace,dst*8),eax);
 		}
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 	}break;
 	case P_INT32+DD_W_C:
 	case P_UINT32+DD_W_C:{
@@ -91,10 +94,11 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		else{
 			a.mov(rax,ptr(workspace,dst*8));
 			a.shr(rax,cl);
-			a.mov(ptr(workspace,dst*8),eax);
-			a.shr(rax,32);
-			a.mov(ptr(workspace,dst*8+4),ax);
+			a.mov(dx,ptr(workspace,dst*8+6));
+			a.mov(ptr(workspace,dst*8),rax);
+			a.mov(ptr(workspace,dst*8+6),dx);
 		}
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 	}break;
 	case P_INT48+DD_W_C:
 	case P_UINT48+DD_W_C:{
@@ -104,9 +108,9 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		else{
 			a.mov(rax,ptr(workspace,dst*8));
 			a.shr(rax,val);
-			a.mov(ptr(workspace,dst*8),eax);
-			a.shr(rax,32);
-			a.mov(ptr(workspace,dst*8+4),ax);
+			a.mov(dx,ptr(workspace,dst*8+6));
+			a.mov(ptr(workspace,dst*8),rax);
+			a.mov(ptr(workspace,dst*8+6),dx);
 		}
 	}break;
 	case P_UINT64+DD_W_W:
@@ -121,6 +125,7 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 			a.shr(rax,cl);
 			a.mov(qword_ptr(workspace,dst*8),rax);
 		}
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 	}break;
 	case P_INT64+DD_W_C:
 	case P_UINT64+DD_W_C:{
@@ -146,6 +151,7 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 			a.shr(al,cl);
 			a.mov(ptr(workspace,dst*8),al);
 		}
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 	}break;
 	case P_INT8+DE_W_C:
 	case P_UINT8+DE_W_C:{
@@ -170,6 +176,7 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 			a.shl(ax,cl);
 			a.mov(word_ptr(workspace,dst*8),ax);
 		}
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 	}break;
 	case P_INT16+DE_W_C:
 	case P_UINT16+DE_W_C:{
@@ -194,6 +201,7 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 			a.shl(eax,cl);
 			a.mov(dword_ptr(workspace,dst*8),eax);
 		}
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 	}break;
 	case P_INT32+DE_W_C:
 	case P_UINT32+DE_W_C:{
@@ -216,10 +224,11 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		else{
 			a.mov(rax,ptr(workspace,dst*8));
 			a.shl(rax,cl);
-			a.mov(ptr(workspace,dst*8),eax);
-			a.shr(rax,32);
-			a.mov(ptr(workspace,dst*8+4),ax);
+			a.mov(dx,ptr(workspace,dst*8+6));
+			a.mov(ptr(workspace,dst*8),rax);
+			a.mov(ptr(workspace,dst*8+6),dx);
 		}
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 	}break;
 	case P_INT48+DE_W_C:
 	case P_UINT48+DE_W_C:{
@@ -229,9 +238,9 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		else{
 			a.mov(rax,ptr(workspace,dst*8));
 			a.shl(rax,val);
-			a.mov(ptr(workspace,dst*8),eax);
-			a.shr(rax,32);
-			a.mov(ptr(workspace,dst*8+4),ax);
+			a.mov(dx,ptr(workspace,dst*8+6));
+			a.mov(ptr(workspace,dst*8),rax);
+			a.mov(ptr(workspace,dst*8+6),dx);
 		}
 	}break;
 	case P_UINT64+DE_W_W:
@@ -246,6 +255,7 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 			a.shl(rax,cl);
 			a.mov(qword_ptr(workspace,dst*8),rax);
 		}
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 	}break;
 	case P_INT64+DE_W_C:
 	case P_UINT64+DE_W_C:{
@@ -290,9 +300,9 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 
 		a.mov(rax,ptr(memory,dst));
 		a.add(rax,val);
-		a.mov(ptr(memory,dst),eax);
-		a.shr(rax,32);
-		a.mov(ptr(memory,dst+4),ax);
+		a.mov(dx,ptr(workspace,dst*8+6));
+		a.mov(ptr(workspace,dst*8),rax);
+		a.mov(ptr(workspace,dst*8+6),dx);
 	}break;
 	case P_INT64+SOMA_M_C:
 	case P_UINT64+SOMA_M_C:{
@@ -344,18 +354,20 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		uint64 val=t.getNext48().toInt();
 
 		if(dst<8){
-			a.mov(rbx,0x0000FFFFFFFFFFFF);
-			a.mov(rcx,qreg[dst]);
-			a.and_(rcx,rcx);
-			a.add(rcx,rbx);
-			a.andn(qreg[dst],rbx,qreg[dst]);
-			a.or_(qreg[dst],rcx);
+			a.mov(rax,qreg[dst]);
+			#ifndef _FAST_MODE
+				a.mov(rcx,0x0000FFFFFFFFFFFF);
+			#endif
+			a.add(rax,val);
+			a.andn(qreg[dst],rcx,qreg[dst]);
+			a.and_(rax,rcx);
+			a.or_(qreg[dst],rax);
 		}else{
 			a.mov(rax,ptr(workspace,dst*8));
 			a.add(rax,val);
-			a.mov(ptr(workspace,dst*8),eax);
-			a.shr(rax,32);
-			a.mov(ptr(workspace,(dst*8)+4),ax);
+			a.mov(dx,ptr(workspace,dst*8+6));
+			a.mov(ptr(workspace,dst*8),rax);
+			a.mov(ptr(workspace,dst*8+6),dx);
 		}
 	}break;
 	case P_INT64+SOMA_W_C:
@@ -376,11 +388,11 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		uint8 dst=t.getNext8();
 		uint64 val=t.getNext48().toInt();
 
-		a.mov(bl,ptr(memory,val));
 
 		if(dst<8){
-			a.add(breg[dst],bl);
+			a.add(breg[dst],ptr(memory,val));
 		}else{
+			a.mov(bl,ptr(memory,val));
 			a.add(ptr(workspace,dst*8),bl);
 		}
 	}break;
@@ -390,11 +402,11 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		uint8 dst=t.getNext8();
 		uint64 val=t.getNext48().toInt();
 
-		a.mov(bx,ptr(memory,val));
 
 		if(dst<8){
-			a.add(wreg[dst],bx);
+			a.add(wreg[dst],ptr(memory,val));
 		}else{
+			a.mov(bx,ptr(memory,val));
 			a.add(ptr(workspace,dst*8),bx);
 		}
 	}break;
@@ -404,11 +416,10 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		uint8 dst=t.getNext8();
 		uint64 val=t.getNext48().toInt();
 
-		a.mov(ebx,ptr(memory,val));
-
 		if(dst<8){
-			a.add(dreg[dst],ebx);
+			a.add(dreg[dst],ptr(memory,val));
 		}else{
+			a.mov(ebx,ptr(memory,val));
 			a.add(ptr(workspace,dst*8),ebx);
 		}
 	}break;
@@ -419,20 +430,22 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		uint64 val=t.getNext48().toInt();
 
 		a.mov(rbx,ptr(memory,val));
-		a.and_(rbx,0x0000FFFFFFFFFFFF);
 
+		#ifndef _FAST_MODE
+			a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#endif
 		if(dst<8){
-			a.mov(rcx,qreg[dst]);
-			a.and_(rcx,0x0000FFFFFFFFFFFF);
-			a.add(rcx,rbx);
-			a.and_(qreg[dst],0xFFFF000000000000);
-			a.or_(qreg[dst],rcx);
+			a.mov(rax,qreg[dst]);
+			a.add(rax,rbx);
+			a.and_(rax,rcx);
+			a.andn(qreg[dst],rcx,qreg[dst]);
+			a.or_(qreg[dst],rax);
 		}else{
 			a.mov(rax,ptr(workspace,dst*8));
 			a.add(rax,rbx);
-			a.mov(ptr(workspace,dst*8),eax);
-			a.shr(rax,32);
-			a.mov(ptr(workspace,(dst*8)+4),ax);
+			a.mov(dx,ptr(workspace,dst*8+6));
+			a.mov(ptr(workspace,dst*8),rax);
+			a.mov(ptr(workspace,dst*8+6),dx);
 		}
 	}break;
 	case P_INT64+SOMA_W_M:
@@ -441,11 +454,11 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		uint8 dst=t.getNext8();
 		uint64 val=t.getNext48().toInt();
 
-		a.mov(rbx,ptr(memory,val));
 
 		if(dst<8){
-			a.add(qreg[dst],rbx);
+			a.add(qreg[dst],ptr(memory,val));
 		}else{
+			a.mov(rbx,ptr(memory,val));
 			a.add(ptr(workspace,dst*8),rbx);
 		}
 	}break;
@@ -454,13 +467,19 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		uint8 dst=t.getNext8();
 		uint8 val=t.getNext8();
 
-		if(val<8)a.mov(bl,breg[val]);
-		else a.mov(bl,ptr(workspace,val*8));
-
-		if(dst<8){
-			a.add(breg[dst],bl);
+		if(val<8 ){
+			if(dst < 8){
+				a.add(breg[dst],breg[val]);
+			}else{
+				a.add(ptr(workspace,dst*8),breg[val]);
+			}
 		}else{
-			a.add(ptr(workspace,dst*8),bl);
+			a.mov(al,ptr(workspace,val*8));
+			if(dst < 8){
+				a.add(wreg[dst],al);
+			}else{
+				a.add(ptr(workspace,dst*8),al);
+			}
 		}
 	}break;
 	case P_INT16+SOMA_W_W:
@@ -468,13 +487,19 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		uint8 dst=t.getNext8();
 		uint8 val=t.getNext8();
 
-		if(val<8)a.mov(bx,wreg[val]);
-		else a.mov(bx,ptr(workspace,val*8));
-
-		if(dst<8){
-			a.add(wreg[dst],bx);
+		if(val<8 ){
+			if(dst < 8){
+				a.add(wreg[dst],wreg[val]);
+			}else{
+				a.add(ptr(workspace,dst*8),wreg[val]);
+			}
 		}else{
-			a.add(ptr(workspace,dst*8),bx);
+			a.mov(ax,ptr(workspace,val*8));
+			if(dst < 8){
+				a.add(wreg[dst],ax);
+			}else{
+				a.add(ptr(workspace,dst*8),ax);
+			}
 		}
 	}break;
 	case P_INT32+SOMA_W_W:
@@ -482,13 +507,19 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		uint8 dst=t.getNext8();
 		uint8 val=t.getNext8();
 
-		if(val<8)a.mov(ebx,dreg[val]);
-		else a.mov(ebx,ptr(workspace,val*8));
-
-		if(dst<8){
-			a.add(dreg[dst],ebx);
+		if(val<8 ){
+			if(dst < 8){
+				a.add(dreg[dst],dreg[val]);
+			}else{
+				a.add(ptr(workspace,dst*8),dreg[val]);
+			}
 		}else{
-			a.add(ptr(workspace,dst*8),ebx);
+			a.mov(eax,ptr(workspace,val*8));
+			if(dst < 8){
+				a.add(dreg[dst],eax);
+			}else{
+				a.add(ptr(workspace,dst*8),eax);
+			}
 		}
 	}break;
 	case P_INT48+SOMA_W_W:
@@ -496,24 +527,47 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		uint8 dst=t.getNext8();
 		uint8 val=t.getNext8();
 
-		if(val<8)a.mov(rbx,qreg[val]);
-		else a.mov(rbx,ptr(workspace,val*8));
-
 		if(dst<8){
 			#ifndef _FAST_MODE
-	a.mov(rcx,0x0000FFFFFFFFFFFF);
-#endif
-			a.mov(rax,qreg[dst]);
-			a.add(rax,rbx);
-			a.andn(qreg[dst],rcx,qreg[dst]);
-			a.and_(rax,rcx);
-			a.or_(qreg[dst],rax);
+				a.mov(rcx,0x0000FFFFFFFFFFFF);
+			#endif
+
+			if(val<8){
+				a.mov(rax,qreg[dst]);
+				a.add(rax,qreg[val]);
+				a.andn(qreg[dst],rcx,qreg[dst]);
+				a.and_(rax,rcx);
+				a.or_(qreg[dst],rax);
+			}else{
+				a.mov(rbx,ptr(workspace,val*8));
+				a.mov(rax,qreg[dst]);
+				a.add(rax,rbx);
+				a.andn(qreg[dst],rcx,qreg[dst]);
+				a.and_(rax,rcx);
+				a.or_(qreg[dst],rax);
+			}
 		}else{
-			a.mov(rax,ptr(workspace,dst*8));
-			a.add(rax,rbx);
-			a.mov(ptr(workspace,dst*8),eax);
-			a.shr(rax,32);
-			a.mov(ptr(workspace,(dst*8)+4),ax);
+			if(val<8){
+				a.mov(rax,ptr(workspace,dst*8));
+				a.mov(bx,ptr(workspace,dst*8+6));
+				a.add(rax,qreg[val]);
+				a.mov(ptr(workspace,dst*8),rax);
+				a.mov(ptr(workspace,dst*8+6),bx);
+			}else{
+				a.mov(rax,ptr(workspace,dst*8));
+				a.mov(rbx,ptr(workspace,val*8));
+				a.add(rax,rbx);
+				a.mov(dx,ptr(workspace,dst*8+6));
+				a.mov(ptr(workspace,dst*8),rax);
+				a.mov(ptr(workspace,dst*8+6),dx);
+
+				// 5% de ganho em desempenho
+				/*a.mov(ptr(workspace,dst*8),eax);
+				a.shr(rax,32);
+				a.mov(ptr(workspace,(dst*8)+4),ax);*/
+			}
+
+
 		}
 	}break;
 	case P_INT64+SOMA_W_W:
@@ -521,6 +575,22 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		uint8 dst=t.getNext8();
 		uint8 val=t.getNext8();
 
+		if(val<8 ){
+			if(dst < 8){
+				a.add(qreg[dst],qreg[val]);
+			}else{
+				a.add(ptr(workspace,dst*8),qreg[val]);
+			}
+		}else{
+			a.mov(rax,ptr(workspace,val*8));
+			if(dst < 8){
+				a.add(dreg[dst],rax);
+			}else{
+				a.add(ptr(workspace,dst*8),rax);
+			}
+		}
+		// 7% de ganho de desenpenho. Não foi muita coisa mas melhorou.
+		/*
 		if(val<8)a.mov(rbx,qreg[val]);
 		else a.mov(rbx,ptr(workspace,val*8));
 
@@ -528,7 +598,7 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 			a.add(qreg[dst],rbx);
 		}else{
 			a.add(ptr(workspace,dst*8),rbx);
-		}
+		}*/
 	}break;
 	case P_UINT8+SUB_M_C:
 	case P_INT8+SUB_M_C:{
@@ -562,9 +632,9 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 
 		a.mov(rax,ptr(memory,dst));
 		a.sub(rax,val);
-		a.mov(ptr(memory,dst),eax);
-		a.shr(rax,32);
-		a.mov(ptr(memory,dst+4),ax);
+		a.mov(dx,ptr(workspace,dst*8+6));
+		a.mov(ptr(workspace,dst*8),rax);
+		a.mov(ptr(workspace,dst*8+6),dx);
 	}break;
 	case P_INT64+SUB_M_C:
 	case P_UINT64+SUB_M_C:{
@@ -616,17 +686,20 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		uint64 val=t.getNext48().toInt();
 
 		if(dst<8){
-			a.mov(rcx,qreg[dst]);
-			a.and_(rcx,0x0000FFFFFFFFFFFF);
-			a.sub(rcx,val);
-			a.and_(qreg[dst],0xFFFF000000000000);
-			a.or_(qreg[dst],rcx);
+			a.mov(rax,qreg[dst]);
+			#ifndef _FAST_MODE
+				a.mov(rcx,0x0000FFFFFFFFFFFF);
+			#endif
+			a.sub(rax,val);
+			a.andn(qreg[dst],rcx,qreg[dst]);
+			a.and_(rax,rcx);
+			a.or_(qreg[dst],rax);
 		}else{
 			a.mov(rax,ptr(workspace,dst*8));
 			a.sub(rax,val);
-			a.mov(ptr(workspace,dst*8),eax);
-			a.shr(rax,32);
-			a.mov(ptr(workspace,(dst*8)+4),ax);
+			a.mov(dx,ptr(workspace,dst*8+6));
+			a.mov(ptr(workspace,dst*8),rax);
+			a.mov(ptr(workspace,dst*8+6),dx);
 		}
 	}break;
 	case P_INT64+SUB_W_C:
@@ -647,11 +720,11 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		uint8 dst=t.getNext8();
 		uint64 val=t.getNext48().toInt();
 
-		a.mov(bl,ptr(memory,val));
 
 		if(dst<8){
-			a.sub(breg[dst],bl);
+			a.sub(breg[dst],ptr(memory,val));
 		}else{
+			a.mov(bl,ptr(memory,val));
 			a.sub(ptr(workspace,dst*8),bl);
 		}
 	}break;
@@ -661,11 +734,10 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		uint8 dst=t.getNext8();
 		uint64 val=t.getNext48().toInt();
 
-		a.mov(bx,ptr(memory,val));
-
 		if(dst<8){
-			a.sub(wreg[dst],bx);
+			a.sub(wreg[dst],ptr(memory,val));
 		}else{
+			a.mov(bx,ptr(memory,val));
 			a.sub(ptr(workspace,dst*8),bx);
 		}
 	}break;
@@ -675,11 +747,11 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		uint8 dst=t.getNext8();
 		uint64 val=t.getNext48().toInt();
 
-		a.mov(ebx,ptr(memory,val));
 
 		if(dst<8){
-			a.sub(dreg[dst],ebx);
+			a.sub(dreg[dst],ptr(memory,val));
 		}else{
+			a.mov(ebx,ptr(memory,val));
 			a.sub(ptr(workspace,dst*8),ebx);
 		}
 	}break;
@@ -690,20 +762,24 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		uint64 val=t.getNext48().toInt();
 
 		a.mov(rbx,ptr(memory,val));
-		a.and_(rbx,0x0000FFFFFFFFFFFF);
+		#ifndef _FAST_MODE
+			a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#endif
 
 		if(dst<8){
-			a.mov(rcx,qreg[dst]);
-			a.and_(rcx,0x0000FFFFFFFFFFFF);
-			a.sub(rcx,rbx);
-			a.and_(qreg[dst],0xFFFF000000000000);
-			a.or_(qreg[dst],rcx);
+			a.mov(rax,qreg[dst]);
+			a.and_(rbx,rcx);
+			a.and_(rax,rcx);
+			a.sub(rax,rbx);
+			a.andn(qreg[dst],rcx,qreg[dst]);
+			a.or_(qreg[dst],rax);
 		}else{
 			a.mov(rax,ptr(workspace,dst*8));
+			a.and_(rbx,rcx);
 			a.sub(rax,rbx);
-			a.mov(ptr(workspace,dst*8),eax);
-			a.shr(rax,32);
-			a.mov(ptr(workspace,(dst*8)+4),ax);
+			a.mov(dx,ptr(workspace,dst*8+6));
+			a.mov(ptr(workspace,dst*8),rax);
+			a.mov(ptr(workspace,dst*8+6),dx);
 		}
 	}break;
 	case P_INT64+SUB_W_M:
@@ -712,11 +788,11 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		uint8 dst=t.getNext8();
 		uint64 val=t.getNext48().toInt();
 
-		a.mov(rbx,ptr(memory,val));
 
 		if(dst<8){
-			a.sub(qreg[dst],rbx);
+			a.sub(qreg[dst],ptr(memory,val));
 		}else{
+			a.mov(rbx,ptr(memory,val));
 			a.sub(ptr(workspace,dst*8),rbx);
 		}
 	}break;
@@ -769,20 +845,25 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 
 		if(val<8)a.mov(rbx,qreg[val]);
 		else a.mov(rbx,ptr(workspace,val*8));
-		a.and_(rbx,0x0000FFFFFFFFFFFF);
+
+		#ifndef _FAST_MODE
+			a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#endif
 
 		if(dst<8){
-			a.mov(rcx,qreg[dst]);
-			a.and_(rcx,0x0000FFFFFFFFFFFF);
-			a.sub(rcx,rbx);
-			a.and_(qreg[dst],0xFFFF000000000000);
-			a.or_(qreg[dst],rcx);
+			a.mov(rax,qreg[dst]);
+			a.and_(rbx,rcx);
+			a.and_(rax,rcx);
+			a.andn(qreg[dst],rcx,qreg[dst]);
+			a.sub(rax,rbx);
+			a.or_(qreg[dst],rax);
 		}else{
 			a.mov(rax,ptr(workspace,dst*8));
+			a.and_(rbx,rcx);
 			a.sub(rax,rbx);
-			a.mov(ptr(workspace,dst*8),eax);
-			a.shr(rax,32);
-			a.mov(ptr(workspace,(dst*8)+4),ax);
+			a.mov(dx,ptr(workspace,dst*8+6));
+			a.mov(ptr(workspace,dst*8),rax);
+			a.mov(ptr(workspace,dst*8+6),dx);
 		}
 	}break;
 	case P_INT64+SUB_W_W:
@@ -830,9 +911,9 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		a.mov(rbx,val);
 		a.and_(rax,0x0000FFFFFFFFFFFF);
 		a.mul(rbx);
-		a.mov(ptr(memory,dst),eax);
-		a.shr(rax,32);
-		a.mov(ptr(memory,dst+4),ax);
+		a.mov(dx,ptr(workspace,dst*8+6));
+		a.mov(ptr(workspace,dst*8),rax);
+		a.mov(ptr(workspace,dst*8+6),dx);
 	}break;
 	case P_UINT64+MUL_M_C:{
 		uint64 dst=t.getNext48().toInt();
@@ -899,20 +980,25 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 
 		if(dst<8){
 			a.mov(rax,qreg[dst]);
-			a.and_(rax,0x0000FFFFFFFFFFFF);
 			a.mov(rbx,val);
+			#ifndef _FAST_MODE
+				a.mov(rcx,0x0000FFFFFFFFFFFF);
+			#endif
 			a.mul(rbx);
-			a.and_(rax,0x0000FFFFFFFFFFFF);
-			a.and_(qreg[dst],0xFFFF000000000000);
+			a.andn(qreg[dst],rcx,qreg[dst]);
+			a.and_(rax,rcx);
 			a.or_(qreg[dst],rax);
 		}else{
 			a.mov(rax,ptr(workspace,dst*8));
-			a.and_(rax,0x0000FFFFFFFFFFFF);
+			#ifndef _FAST_MODE
+				a.mov(rcx,0x0000FFFFFFFFFFFF);
+			#endif
 			a.mov(rbx,val);
+			a.and_(rax,rcx);
 			a.mul(rbx);
-			a.mov(ptr(workspace,dst*8),eax);
-			a.shr(rax,32);
-			a.mov(ptr(workspace,dst*8+4),ax);
+			a.mov(dx,ptr(workspace,dst*8+6));
+			a.mov(ptr(workspace,dst*8),rax);
+			a.mov(ptr(workspace,dst*8+6),dx);
 		}
 	}break;
 	case P_UINT64+MUL_W_C:{
@@ -987,24 +1073,27 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		uint8 dst=t.getNext8();
 		uint64 val=t.getNext48().toInt();
 
+
 		if(dst<8){
 			a.mov(rax,qreg[dst]);
-			a.and_(rax,0x0000FFFFFFFFFFFF);
+			#ifndef _FAST_MODE
+				a.mov(rcx,0x0000FFFFFFFFFFFF);
+			#endif
 			a.mov(rbx,ptr(memory,val));
-			a.and_(rbx,0x0000FFFFFFFFFFFF);
 			a.mul(rbx);
-			a.and_(rax,0x0000FFFFFFFFFFFF);
-			a.and_(qreg[dst],0xFFFF000000000000);
+			a.and_(rax,rcx);
+			a.andn(qreg[dst],rcx,qreg[dst]);
 			a.or_(qreg[dst],rax);
 		}else{
-			a.mov(rax,ptr(memory,dst));
-			a.and_(rax,0x0000FFFFFFFFFFFF);
+			a.mov(rax,ptr(workspace,dst*8));
+			#ifndef _FAST_MODE
+				a.mov(rcx,0x0000FFFFFFFFFFFF);
+			#endif
 			a.mov(rbx,ptr(memory,val));
-			a.and_(rbx,0x0000FFFFFFFFFFFF);
 			a.mul(rbx);
-			a.mov(ptr(memory,dst),eax);
-			a.shr(rax,32);
-			a.mov(ptr(memory,dst+4),ax);
+			a.mov(dx,ptr(workspace,dst*8+6));
+			a.mov(ptr(workspace,dst*8),rax);
+			a.mov(ptr(workspace,dst*8+6),dx);
 		}
 	}break;
 	case P_UINT64+MUL_W_M:{
@@ -1088,30 +1177,27 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 	case P_UINT48+MUL_W_W:{
 		uint8 dst=t.getNext8();
 		uint8 val=t.getNext8();
-		#ifndef _FAST_MODE
-	a.mov(rcx,0x0000FFFFFFFFFFFF);
-#endif
+
 		if(val<8){
 			a.mov(rbx,qreg[val]);
 		}else{
 			a.mov(rbx,ptr(workspace,val*8));
 		}
-		a.and_(rbx,rcx);//0x0000ff..
+		#ifndef _FAST_MODE
+			a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#endif
 		if(dst<8){
 			a.mov(rax,qreg[dst]);
-			a.and_(rax,rcx);//0x0000ff..
 			a.mul(rbx);
-			a.and_(rax,rcx); //0x0000ff..
-			a.not_(rcx);
-			a.and_(qreg[dst],rcx); //0xffff00..
+			a.and_(rax,rcx);
+			a.andn(qreg[dst],rcx,qreg[dst]);
 			a.or_(qreg[dst],rax);
 		}else{
-			a.mov(rax,ptr(memory,dst));
-			a.and_(rax,rcx);//0x0000ff..
+			a.mov(rax,ptr(workspace,dst*8));
 			a.mul(rbx);
-			a.mov(ptr(memory,dst),eax);
-			a.shr(rax,32);
-			a.mov(ptr(memory,dst+4),ax);
+			a.mov(dx,ptr(workspace,dst*8+6));
+			a.mov(ptr(workspace,dst*8),rax);
+			a.mov(ptr(workspace,dst*8+6),dx);
 		}
 	}break;
 	case P_UINT64+MUL_W_W:{
@@ -1171,15 +1257,16 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		a.jnc(t);
 		a.not_(rcx);
 		a.or_(rax,rcx);//0xffff00..
+		a.not_(rcx);
 		a.bind(t);
 		if(val&(uint64(1)<<47)){
 			val|=0xFFFF000000000000;
 		}
 		a.mov(rbx,val);
 		a.imul(rbx);
-		a.mov(ptr(memory,dst),eax);
-		a.shr(rax,32);
-		a.mov(ptr(memory,dst+4),ax);
+		a.mov(dx,ptr(workspace,dst*8+6));
+		a.mov(ptr(workspace,dst*8),rax);
+		a.mov(ptr(workspace,dst*8+6),dx);
 	}break;
 	case P_INT64+MUL_M_C:{
 		uint64 dst=t.getNext48().toInt();
@@ -1238,27 +1325,31 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		uint8 dst=t.getNext8();
 		uint64 val=t.getNext48().toInt();
 		#ifndef _FAST_MODE
-	a.mov(rcx,0x0000FFFFFFFFFFFF);
-#endif
+			a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#endif
 		if(dst<8){
+
+			if(val&(uint64(1)<<47)){
+				val|=0xFFFF000000000000;
+			}
 			a.mov(rax,qreg[dst]);
-			a.and_(rax,rcx);//0x0000ff..
-			a.bt(rax,47);
+			a.mov(rbx,val);
+			#ifndef _FAST_MODE
+				a.mov(rcx,0x0000FFFFFFFFFFFF);
+			#endif
 			Label t=a.newLabel();
+			a.bt(rax,47);
 			a.jnc(t);
 			a.not_(rcx);
 			a.or_(rax,rcx);//0xffff00..
 			a.not_(rcx);
 			a.bind(t);
-			if(val&(uint64(1)<<47)){
-				val|=0xFFFF000000000000;
-			}
-			a.mov(rbx,val);
 			a.imul(rbx);
-			a.and_(rax,rcx);//0x0000ff..
-			a.not_(rcx);
-			a.and_(qreg[dst],rcx);//0xffff00..
+			a.andn(qreg[dst],rcx,qreg[dst]);
+			a.and_(rax,rcx);
 			a.or_(qreg[dst],rax);
+
+
 		}else{
 			a.mov(rax,ptr(workspace,dst*8));
 			a.and_(rax,rcx);//0x0000ff..
@@ -1267,15 +1358,16 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 			a.jnc(t);
 			a.not_(rcx);
 			a.or_(rax,rcx);//0xffff00..
+			a.not_(rcx);
 			a.bind(t);
 			if(val&(uint64(1)<<47)){
 				val|=0xFFFF000000000000;
 			}
 			a.mov(rbx,val);
 			a.imul(rbx);
-			a.mov(ptr(workspace,dst*8),eax);
-			a.shr(rax,32);
-			a.mov(ptr(workspace,dst*8+4),ax);
+			a.mov(dx,ptr(workspace,dst*8+6));
+			a.mov(ptr(workspace,dst*8),rax);
+			a.mov(ptr(workspace,dst*8+6),dx);
 		}
 	}break;
 	case P_INT64+MUL_W_C:{
@@ -1364,8 +1456,7 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 			a.not_(rcx);
 			a.imul(rbx);
 			a.and_(rax,rcx);//0x0000ff..
-			a.not_(rcx);
-			a.and_(qreg[dst],rcx);//0xffff00..
+			a.andn(qreg[dst],rcx,qreg[dst]);//0xffff00..
 			a.or_(qreg[dst],rax);
 		}else{
 			a.mov(rax,ptr(workspace,dst*8));
@@ -1385,9 +1476,9 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 			a.bind(t2);
 			a.not_(rcx);
 			a.imul(rbx);
-			a.mov(ptr(workspace,dst*8),eax);
-			a.shr(rax,32);
-			a.mov(ptr(workspace,(dst*8)+4),ax);
+			a.mov(dx,ptr(workspace,dst*8+6));
+			a.mov(ptr(workspace,dst*8),rax);
+			a.mov(ptr(workspace,dst*8+6),dx);
 		}
 	}break;
 	case P_INT64+MUL_W_M:{
@@ -1477,9 +1568,8 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 			a.bind(t2);
 			a.not_(rcx);
 			a.imul(rbx);
-			a.and_(rax,rcx);//0x0000ff..
-			a.not_(rcx);
-			a.and_(qreg[dst],rcx);//0xffff00..
+			a.and_(rax,rcx);//0x0000ff.
+			a.andn(qreg[dst],rcx,qreg[dst]);//0xffff00..
 			a.or_(qreg[dst],rax);
 		}else{
 			a.mov(rax,ptr(workspace,dst*8));
@@ -1495,10 +1585,11 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 			a.jnc(t2);
 			a.or_(rbx,rcx);//0xffff00..
 			a.bind(t2);
+			a.not_(rcx);
 			a.imul(rbx);
-			a.mov(ptr(workspace,dst*8),eax);
-			a.shr(rax,32);
-			a.mov(ptr(workspace,(dst*8)+4),ax);
+			a.mov(dx,ptr(workspace,dst*8+6));
+			a.mov(ptr(workspace,dst*8),rax);
+			a.mov(ptr(workspace,dst*8+6),dx);
 		}
 	}break;
 	case P_INT64+MUL_W_W:{
@@ -1565,21 +1656,24 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		uint64 val=t.getNext48().toInt();
 		a.mov(rbx,val);
 		a.xor_(rdx,rdx);
-		#ifndef _FAST_MODE
-	a.mov(rcx,0x0000FFFFFFFFFFFF);
-#endif
 		if(dst<8){
+			#ifndef _FAST_MODE
+				a.mov(rcx,0x0000FFFFFFFFFFFF);
+			#endif
 			a.mov(rax,qreg[dst]);
 			a.and_(rax,rcx);
 			a.div(rbx);
 			a.mov(qreg[dst],rax);
 		}else{
 			a.mov(rax,ptr(workspace,dst*8));
+			#ifndef _FAST_MODE
+				a.mov(rcx,0x0000FFFFFFFFFFFF);
+			#endif
 			a.and_(rax,rcx);
 			a.div(rbx);
-			a.mov(ptr(workspace,dst*8),eax);
-			a.shr(rax,32);
-			a.mov(ptr(workspace,dst*8),ax);
+			a.mov(dx,ptr(workspace,dst*8+6));
+			a.mov(ptr(workspace,dst*8),rax);
+			a.mov(ptr(workspace,dst*8+6),dx);
 		}
 	}break;
 	case P_UINT64+DIV_W_C:{
@@ -1601,13 +1695,13 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		uint64 dst=t.getNext48().toInt();
 		uint8 val=t.getNext8();
 		a.mov(bl,val);
-		a.xor_(edx,edx);
 		a.movzx(ax,byte_ptr(memory,dst));
+		a.xor_(edx,edx);
 		a.div(bl);
 		a.mov(byte_ptr(memory,dst),al);
 	}break;
 	case P_UINT16+DIV_M_C:{
-		uint8 dst=t.getNext8();
+		uint64 dst=t.getNext48().toInt();
 		uint16 val=t.getNext16();
 		a.mov(bx,val);
 		a.xor_(edx,edx);
@@ -1616,35 +1710,35 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		a.mov(ptr(memory,dst),ax);
 	}break;
 	case P_UINT32+DIV_M_C:{
-		uint8 dst=t.getNext8();
-		uint32 val=t.getNext16();
+		uint64 dst=t.getNext48().toInt();
+		uint32 val=t.getNext32();
 		a.mov(ebx,val);
-		a.xor_(edx,edx);
 		a.mov(eax,ptr(memory,dst));
+		a.xor_(edx,edx);
 		a.div(ebx);
 		a.mov(ptr(memory,dst),eax);
 	}break;
 	case P_UINT48+DIV_M_C:{
-		uint8 dst=t.getNext8();
+		uint64 dst=t.getNext48().toInt();
 		uint64 val=t.getNext48().toInt();
 		a.mov(rbx,val);
-		a.xor_(rdx,rdx);
 		#ifndef _FAST_MODE
-	a.mov(rcx,0x0000FFFFFFFFFFFF);
-#endif
+			a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#endif
 		a.mov(rax,ptr(memory,dst));
+		a.xor_(rdx,rdx);
 		a.and_(rax,rcx);
 		a.div(rbx);
-		a.mov(ptr(memory,dst),eax);
-		a.shr(rax,32);
-		a.mov(ptr(memory,dst+4),ax);
+		a.mov(dx,ptr(workspace,dst*8+6));
+		a.mov(ptr(workspace,dst*8),rax);
+		a.mov(ptr(workspace,dst*8+6),dx);
 	}break;
 	case P_UINT64+DIV_M_C:{
-		uint8 dst=t.getNext8();
+		uint64 dst=t.getNext48().toInt();
 		uint64 val=t.getNext64();
 		a.mov(rbx,val);
-		a.xor_(rdx,rdx);
 		a.mov(rax,ptr(memory,dst));
+		a.xor_(rdx,rdx);
 		a.div(rbx);
 		a.mov(ptr(memory,dst),rax);
 	}break;
@@ -1664,14 +1758,16 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 	case P_UINT16+DIV_W_M:{
 		uint8 dst=t.getNext8();
 		uint64 pos=t.getNext48().toInt();
-		a.xor_(edx,edx);
+		a.mov(bx,ptr(memory,pos));
 		if(dst<8){
 			a.mov(ax,wreg[dst]);
-			a.div(word_ptr(memory,pos));
+			a.xor_(edx,edx);
+			a.div(bx);
 			a.mov(wreg[dst],ax);
 		}else{
 			a.mov(ax,ptr(workspace,dst*8));
-			a.div(word_ptr(memory,pos));
+			a.xor_(edx,edx);
+			a.div(bx);
 			a.mov(ptr(workspace,dst*8),ax);
 		}
 	}break;
@@ -1679,14 +1775,15 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		uint8 dst=t.getNext8();
 		uint64 pos=t.getNext48().toInt();
 		a.mov(ebx,ptr(memory,pos));
-		a.xor_(edx,edx);
 		if(dst<8){
 			a.mov(eax,dreg[dst]);
-			a.div(dword_ptr(memory,pos));
+			a.xor_(edx,edx);
+			a.div(ebx);
 			a.mov(dreg[dst],eax);
 		}else{
 			a.mov(eax,ptr(workspace,dst*8));
-			a.div(dword_ptr(memory,pos));
+			a.xor_(edx,edx);
+			a.div(ebx);
 			a.mov(ptr(workspace,dst*8),eax);
 		}
 	}break;
@@ -1695,22 +1792,24 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		uint64 pos=t.getNext48().toInt();
 		a.mov(rbx,ptr(memory,pos));
 		#ifndef _FAST_MODE
-	a.mov(rcx,0x0000FFFFFFFFFFFF);
-#endif
-		a.xor_(rdx,rdx);
-		a.and_(rbx,rcx);
+			a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#endif
 		if(dst<8){
 			a.mov(rax,qreg[dst]);
+			a.and_(rbx,rcx);
 			a.and_(rax,rcx);
-			a.div(qword_ptr(memory,pos));
+			a.xor_(rdx,rdx);
+			a.div(rbx);
 			a.mov(qreg[dst],rax);
 		}else{
 			a.mov(rax,ptr(workspace,dst*8));
+			a.and_(rbx,rcx);
 			a.and_(rax,rcx);
-			a.div(qword_ptr(memory,pos));
-			a.mov(ptr(workspace,dst*8),eax);
-			a.shr(rax,32);
-			a.mov(ptr(workspace,dst*8),ax);
+			a.xor_(rdx,rdx);
+			a.div(rbx);
+			a.mov(dx,ptr(workspace,dst*8+6));
+			a.mov(ptr(workspace,dst*8),rax);
+			a.mov(ptr(workspace,dst*8+6),dx);
 		}
 	}break;
 	case P_UINT64+DIV_W_M:{
@@ -1720,11 +1819,11 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		a.xor_(rdx,rdx);
 		if(dst<8){
 			a.mov(rax,qreg[dst]);
-			a.div(qword_ptr(memory,pos));
+			a.div(rbx);
 			a.mov(qreg[dst],rax);
 		}else{
 			a.mov(rax,ptr(workspace,dst*8));
-			a.div(qword_ptr(memory,pos));
+			a.div(rbx);
 			a.mov(ptr(workspace,dst*8),rax);
 		}
 	}break;
@@ -1797,8 +1896,7 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 			a.cqo();
 			a.idiv(rbx);
 			a.and_(rax,rcx);//0x0000ff..
-			a.not_(rcx);
-			a.and_(qreg[dst],rcx);//0xffff00..
+			a.andn(qreg[dst],rcx,qreg[dst]);//0xffff00..
 			a.or_(qreg[dst],rax);
 		}else{
 			a.mov(rax,ptr(workspace,dst*8));
@@ -1808,6 +1906,7 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 			a.jnc(t);
 			a.not_(rcx);
 			a.or_(rax,rcx);//0xffff00..
+			a.not_(rcx);
 			a.bind(t);
 			if(val&(uint64(1)<<47)){
 				val|=0xFFFF000000000000;
@@ -1815,9 +1914,9 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 			a.mov(rbx,val);
 			a.cqo();
 			a.idiv(rbx);
-			a.mov(ptr(workspace,dst*8),eax);
-			a.shr(rax,32);
-			a.mov(ptr(workspace,dst*8+4),ax);
+			a.mov(dx,ptr(workspace,dst*8+6));
+			a.mov(ptr(workspace,dst*8),rax);
+			a.mov(ptr(workspace,dst*8+6),dx);
 		}
 	}break;
 	case P_INT64+DIV_W_C:{
@@ -1875,6 +1974,7 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		a.jnc(t);
 		a.not_(rcx);
 		a.or_(rax,rcx);//0xffff00..
+		a.not_(rcx);
 		a.bind(t);
 		if(val&(uint64(1)<<47)){
 			val|=0xFFFF000000000000;
@@ -1882,9 +1982,9 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 		a.mov(rbx,val);
 		a.cqo();
 		a.idiv(rbx);
-		a.mov(ptr(memory,dst),eax);
-		a.shr(rax,32);
-		a.mov(ptr(memory,dst+4),ax);
+		a.mov(dx,ptr(workspace,dst*8+6));
+		a.mov(ptr(workspace,dst*8),rax);
+		a.mov(ptr(workspace,dst*8+6),dx);
 	}break;
 	case P_INT64+DIV_M_C:{
 		uint8 dst=t.getNext8();
@@ -1965,8 +2065,7 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 			a.cqo();
 			a.idiv(rbx);
 			a.and_(rax,rcx); //0x0000ff..
-			a.not_(rcx);
-			a.and_(qreg[dst],rcx); // 0xffff00...
+			a.andn(qreg[dst],rcx,qreg[dst]); // 0xffff00...
 			a.or_(qreg[dst],rax);
 		}else{
 			a.mov(rax,ptr(workspace,dst*8));
@@ -1984,11 +2083,12 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 			a.jnc(t2);
 			a.or_(rbx,rcx);//0xffff00..
 			a.bind(t2);
+			a.not_(rcx);
 			a.cqo();
 			a.idiv(rbx);
-			a.mov(ptr(workspace,dst*8),eax);
-			a.shr(rax,32);
-			a.mov(ptr(workspace,(dst*8)+4),ax);
+			a.mov(dx,ptr(workspace,dst*8+6));
+			a.mov(ptr(workspace,dst*8),rax);
+			a.mov(ptr(workspace,dst*8+6),dx);
 		}
 	}break;
 	case P_INT64+DIV_W_M:{
@@ -2090,16 +2190,15 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 			a.and_(rax,rcx); //0x0000FF..
 			a.div(rbx);
 			a.and_(rax,rcx);//0x0000FF..
-			a.not_(rcx);
-			a.and_(qreg[dst],rcx);//0xffff00..
+			a.andn(qreg[dst],rcx,qreg[dst]);//0xffff00..
 			a.or_(qreg[dst],rax);
 		}else{
-			a.mov(rax,ptr(memory,dst));
+			a.mov(rax,ptr(workspace,dst*8));
 			a.and_(rax,rcx);//0x0000FF..
 			a.div(rbx);
-			a.mov(ptr(memory,dst),eax);
-			a.shr(rax,32);
-			a.mov(ptr(memory,dst+4),ax);
+			a.mov(dx,ptr(workspace,dst*8+6));
+			a.mov(ptr(workspace,dst*8),rax);
+			a.mov(ptr(workspace,dst*8+6),dx);
 		}
 	}break;
 	case P_UINT64+DIV_W_W:{
@@ -2218,8 +2317,7 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 			a.cqo();
 			a.idiv(rbx);
 			a.and_(rax,rcx);//0x0000ff..
-			a.not_(rcx);
-			a.and_(qreg[dst],rcx);//0xffff00..
+			a.andn(qreg[dst],rcx,qreg[dst]);//0xffff00..
 			a.or_(qreg[dst],rax);
 		}else{
 			a.mov(rax,ptr(workspace,dst*8));
@@ -2235,11 +2333,12 @@ uint8 aritimetic(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label 
 			a.jnc(t2);
 			a.or_(rbx,rcx);//0xffff00..
 			a.bind(t2);
+			a.not_(rcx);
 			a.cqo();
 			a.idiv(rbx);
-			a.mov(ptr(workspace,dst*8),eax);
-			a.shr(rax,32);
-			a.mov(ptr(workspace,(dst*8)+4),ax);
+			a.mov(dx,ptr(workspace,dst*8+6));
+			a.mov(ptr(workspace,dst*8),rax);
+			a.mov(ptr(workspace,dst*8+6),dx);
 		}
 	}break;
 	case P_INT64+DIV_W_W:{

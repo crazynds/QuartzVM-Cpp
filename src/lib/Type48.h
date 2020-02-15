@@ -29,6 +29,17 @@
     			//return ((uint64)ax<<32)+eax;
     		}
 
+    		explicit operator uint64() const
+    		{
+    			register int64 x=*(int64*)this;
+				if(ax>=0){
+					x&=(int64)0x0000FFFFFFFFFFFF;
+					return x;
+				}
+				x|=(int64)0xFFFF000000000000;
+				return x;
+    		}
+
     		void inline operator++(){
     			operator=(toInt()+1);
     		}
@@ -36,6 +47,10 @@
     			eax=x&0x0000FFFFFFFF;
     			ax=x>>32;
     		}
+    		void inline operator = (uint48 x){
+				eax=x.eax;
+				ax=x.ax;
+			}
     		void operator += (uint48 x){
     			eax+=x.eax;
     			if(eax<x.eax)ax++;
@@ -129,10 +144,27 @@
         			return x;
         		}
 
+
+        		explicit operator uint64() const
+        		{
+        			register int64 x=*(int64*)this;
+					if(ax>=0){
+						x&=(int64)0x0000FFFFFFFFFFFF;
+						return x;
+					}
+					x|=(int64)0xFFFF000000000000;
+					return x;
+        		}
+
+
         		void operator = (int64 x){
 					eax=x&0x0000FFFFFFFF;
 					ax=x>>32;
 				}
+        		void inline operator = (int48 x){
+    				eax=x.eax;
+    				ax=x.ax;
+    			}
 				void operator += (int48 x){
 					register int64 p=toInt();
 					p+=x.toInt();

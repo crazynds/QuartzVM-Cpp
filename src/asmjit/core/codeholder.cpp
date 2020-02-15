@@ -606,7 +606,7 @@ Error CodeHolder::newNamedLabelEntry(LabelEntry** entryOut, const char* name, si
 }
 
 uint32_t CodeHolder::labelIdByName(const char* name, size_t nameSize, uint32_t parentId) noexcept {
-  // TODO: Finalize - parent id is not used here?
+  //
   ASMJIT_UNUSED(parentId);
 
   uint32_t hashCode = CodeHolder_hashNameAndGetSize(name, nameSize);
@@ -887,7 +887,7 @@ size_t CodeHolder::codeSize() const noexcept {
     }
   }
 
-  // TODO: Not nice, maybe changing `codeSize()` to return `uint64_t` instead?
+  //
   if ((sizeof(uint64_t) > sizeof(size_t) && offset > SIZE_MAX) || of)
     return SIZE_MAX;
 
@@ -1096,8 +1096,6 @@ Error CodeHolder::copyFlattenedData(void* dst, size_t dstSize, uint32_t options)
 
     end = Support::max(end, offset + bufferSize + paddingSize);
   }
-
-  // TODO: `end` is not used atm, we need an option to also pad anything beyond
   // the code in case that the destination was much larger (for example page-size).
 
   return kErrorOk;

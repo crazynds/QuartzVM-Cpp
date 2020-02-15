@@ -18,9 +18,7 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &en
 		a.mov(rdx,aux);
 		a.call(uint64((void*)Thread::saveInStack));
 		popRegisters(a);
-		#ifndef _FAST_MODE
-			a.mov(rcx,0x0000FFFFFFFFFFFF);
-		#endif
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 
 	}break;
 	case PUSH_W:{
@@ -35,9 +33,7 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &en
 		}
 		a.call(uint64((void*)Thread::saveInStack));
 		popRegisters(a);
-		#ifndef _FAST_MODE
-			a.mov(rcx,0x0000FFFFFFFFFFFF);
-		#endif
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 
 	}break;
 	case POP_W:{
@@ -47,9 +43,8 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &en
 		pushRegisters(a);
 		a.call(uint64((void*)Thread::recoverInStack));
 		popRegisters(a);
-		#ifndef _FAST_MODE
-			a.mov(rcx,0x0000FFFFFFFFFFFF);
-		#endif
+
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 
 		if(aux<8){
 			a.mov(qreg[aux],rax);
@@ -70,13 +65,11 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &en
 		a.call(uint64((void*)Thread::saveInStack));
 		popRegisters(a);
 
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 		if(aux>=jcontent.maxCode|| aux<jcontent.minCode){
 			a.mov(rax,uint64(aux));
 			a.jmp(end);
 		}else for(uint32 x=0;x<v.size();x++){
-			#ifndef _FAST_MODE
-				a.mov(rcx,0x0000FFFFFFFFFFFF);
-			#endif
 			if(v[x].getSecond()==aux){
 				a.jmp(v[x].getFirst());
 				break;
@@ -98,9 +91,8 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &en
 		a.jb(end);
 		a.cmp(rax,jcontent.maxCode);
 		a.jae(end);
-		#ifndef _FAST_MODE
-			a.mov(rcx,0x0000FFFFFFFFFFFF);
-		#endif
+
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 		a.cdqe();
 		a.mov(rbx,1);
 		a.add(rax,6);
@@ -309,8 +301,8 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &en
 		#ifndef _FAST_MODE
 	a.mov(rcx,0x0000FFFFFFFFFFFF);
 #endif
-		a.and_(rax,rcx);
 		a.and_(rbx,rcx);
+		a.and_(rax,rcx);
 		a.cmp(rax,rbx);
 		jcontent.type='u';
 
@@ -320,12 +312,14 @@ uint8 jmp_cmp(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &en
 	case P_INT48+CMP_W_M:{
 		uint8 aux=t.getNext8();
 		uint64 val=t.getNext48().toInt();
-		a.mov(rcx,0xFFFF000000000000);
 		if(aux<8){
 			a.mov(rax,qreg[aux]);
 		}else{
 			a.mov(rax,ptr(workspace,aux*8));
 		}
+		#ifndef _FAST_MODE
+			a.mov(rcx,0x0000FFFFFFFFFFFF);
+		#endif
 		a.mov(rbx,ptr(memory,val));
 		a.andn(rax,rcx,rax);
 		a.andn(rbx,rcx,rax);

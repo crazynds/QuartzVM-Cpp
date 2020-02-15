@@ -314,7 +314,7 @@ Error BaseAssembler::embedLabel(const Label& label) {
   }
   #endif
 
-  // TODO: Does it make sense to calculate the address here if everything is known?
+  //
   /*
   if (_code->hasBaseAddress() && currentSection() == _code->textSection() && le->isBound()) {
     uint64_t addr = _code->baseAddress() + _code->textSection()->offset() + le->offset();

@@ -20,6 +20,8 @@ VirtualMachine::VirtualMachine(uint8 debug){
 		VET[x]=(void*)no_opcode;
 	}
 
+	qtd_res=0;
+
 
 	definesPositionsThread();
 
@@ -31,7 +33,7 @@ VirtualMachine::VirtualMachine(uint8 debug){
 	VET[0]=(void*)end_running;
 	VET[1]=(void*)test_func;
 	VET[2]=(void*)sleep;
-	VET[3]=(void*)do_nothing;
+	VET[HLT_COMAND]=(void*)do_nothing;
 
 	VET[JIT_FLAG_START]=(void*)init_jit;
 	VET[JIT_FLAG_END]=(void*)end_jit;
@@ -60,10 +62,17 @@ VirtualMachine::~VirtualMachine(){
 
 	for(uint16 x=0;x<funcs;x++){
 		if(func_pos[x]==0)continue;
-		if(getDebugLevel()>=3)std::cout << "[LOG] -" << 10+65*((x+1)/float(funcs+1)) << "%- Liberando Instrução N: " << func_pos[x] << std::endl;
+		if(getDebugLevel()>=3)std::cout << "[LOG] -" << 10+35*((x+1)/float(funcs+1)) << "%- Liberando Instrução N: " << func_pos[x] << std::endl;
 		rt.release(VET[func_pos[x]]);
 	}
 	free(func_pos);
+
+	if(getDebugLevel()>=2)std::cout << "[LOG] -50%- Liberado todas as alocações dinamicas!" << std::endl;
+	for(uint16 x=0;x<qtd_res;x++){
+		if(getDebugLevel()>=3)std::cout << "[LOG] -" << 50+20*((x+1)/float(qtd_res+1)) << "%- Liberando alocação N: " << x << std::endl;
+		free(recursos_alocados[x]);
+	}
+	free(recursos_alocados);
 	if(getDebugLevel()>=2)std::cout << "[LOG] -77%- Liberado todas as instruções!" << std::endl;
 	for(uint64 x=0;x<ct.size();x++){
 		if(getDebugLevel()>=3)std::cout << "[LOG] -" << (77+21*((x+1)/float(ct.size()+1))) << "%- Liberando Contexto N: " << ct[x].getSecond() << std::endl;
@@ -146,6 +155,32 @@ Contexto& VirtualMachine::getContexto(uint16 id) {
 		if(ct[x].getSecond()==id)return ct[x].getFirst();
 	}
 	return ct[0].getFirst();
+}
+
+void* VirtualMachine::alloc_resorce(uint32 tam){
+	void *res=alloca(tam);
+	qtd_res++;
+	recursos_alocados=(void**)realloc(recursos_alocados,sizeof(void*)*qtd_res);
+	recursos_alocados[qtd_res-1]=res;
+	return res;
+}
+void VirtualMachine::free_resorce(void* res){
+	if(!qtd_res)return;
+	uint8 bol=0;
+	for(uint32 x=0;x<qtd_res;x++){
+		if(bol){
+			recursos_alocados[x-1]=recursos_alocados[x];
+		}else
+			if(recursos_alocados[x]!=res)continue;
+			else{
+				bol=1;
+			}
+	}
+	if(bol){
+		qtd_res--;
+		recursos_alocados=(void**)realloc(recursos_alocados,sizeof(void*)*qtd_res);
+		free(res);
+	}
 }
 
 uint16 VirtualMachine::checkContexto(uint16 id){
@@ -242,8 +277,30 @@ void VirtualMachine::setGerais(){
 	VET[LOAD_CONTEXT]=(void*)load_context_w_mw;
 	VET[GET_CONTEXT_ID]=(void*)get_context_id_w;
 	VET[CHECK_CONTEXT_ID]=(void*)check_context_id_w;
+
+
+	VET[ALLOC_RES]=alloc_res;
+	VET[FREE_RES]=free_res;
 }
 void VirtualMachine::setMov(){
+
+	VET[P_UINT8+MOV_RRW_C]=(void*)mov_rrw_c8;
+	VET[P_UINT16+MOV_RRW_C]=(void*)mov_rrw_c16;
+	VET[P_UINT32+MOV_RRW_C]=(void*)mov_rrw_c32;
+	VET[P_UINT48+MOV_RRW_C]=(void*)mov_rrw_c48;
+	VET[P_UINT64+MOV_RRW_C]=(void*)mov_rrw_c64;
+
+	VET[P_UINT8+MOV_RRW_W]=(void*)mov_rrw_w8;
+	VET[P_UINT16+MOV_RRW_W]=(void*)mov_rrw_w16;
+	VET[P_UINT32+MOV_RRW_W]=(void*)mov_rrw_w32;
+	VET[P_UINT48+MOV_RRW_W]=(void*)mov_rrw_w48;
+	VET[P_UINT64+MOV_RRW_W]=(void*)mov_rrw_w64;
+
+	VET[P_UINT8+MOV_W_RRW]=(void*)mov_w_rrw8;
+	VET[P_UINT16+MOV_W_RRW]=(void*)mov_w_rrw16;
+	VET[P_UINT32+MOV_W_RRW]=(void*)mov_w_rrw32;
+	VET[P_UINT48+MOV_W_RRW]=(void*)mov_w_rrw48;
+	VET[P_UINT64+MOV_W_RRW]=(void*)mov_w_rrw64;
 
 	VET[P_UINT8+MOV_MMWW_MMWW]=(void*)mov_mmww_mmww8;
 	VET[P_INT8+MOV_MMWW_MMWW]=(void*)mov_mmww_mmww8;
@@ -413,6 +470,9 @@ void VirtualMachine::setMov(){
 	VET[P_UINT32+MOV_W_C]=(void*)mov_w_c32;
 	VET[P_UINT48+MOV_W_C]=(void*)mov_w_c48;
 	VET[P_UINT64+MOV_W_C]=(void*)mov_w_c64;
+
+
+	//TASK Fazer comandos interpretados em JIT
 
 
 	{

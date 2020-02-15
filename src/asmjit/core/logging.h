@@ -56,7 +56,7 @@ public:
     //!< Annotate nodes that are lowered by passes.
     kFlagAnnotations = 0x00000040u,
 
-    // TODO: These must go, keep this only for formatting.
+    //
     //!< Show an additional output from passes.
     kFlagDebugPasses = 0x00000080u,
     //!< Show an additional output from RA.

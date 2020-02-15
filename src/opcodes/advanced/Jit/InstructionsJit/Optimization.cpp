@@ -13,15 +13,19 @@ void test_func(Thread&);
 uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,std::vector<Dupla<Label,uint32>> &v){
 
 	switch(jcontent.opcode){
+	case HLT_COMAND:{
+
+		a.hlt();
+
+
+	}break;
 	case 1:{
-		a.pop(rcx);
-		a.push(rcx);
+
+		a.mov(rcx,ptr(rsp));
 		pushRegisters(a);
 		a.call(uint64((void*)test_func));
 		popRegisters(a);
-		#ifndef _FAST_MODE
-	a.mov(rcx,0x0000FFFFFFFFFFFF);
-#endif
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 	}break;
 	case P_UINT8+COPY_MW_MW_C:
 	case P_INT8+COPY_MW_MW_C:{
@@ -47,6 +51,7 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Labe
 		a.movsb();
 		a.pop(rsi);
 		a.pop(rdi);
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 
 
 	}break;
@@ -76,6 +81,7 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Labe
 		a.pop(rsi);
 		a.pop(rdi);
 
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 
 	}break;
 	case P_UINT16+COPY_MW_MW_C:
@@ -103,6 +109,7 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Labe
 		a.pop(rsi);
 		a.pop(rdi);
 
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 
 	}break;
 	case P_UINT16+COPY_MW_MW_W:
@@ -131,6 +138,7 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Labe
 		a.pop(rsi);
 		a.pop(rdi);
 
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 
 	}break;
 	case P_UINT32+COPY_MW_MW_C:
@@ -158,6 +166,7 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Labe
 		a.pop(rsi);
 		a.pop(rdi);
 
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 
 	}break;
 	case P_UINT32+COPY_MW_MW_W:
@@ -186,6 +195,7 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Labe
 		a.pop(rsi);
 		a.pop(rdi);
 
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 
 	}break;
 	case P_UINT48+COPY_MW_MW_C:
@@ -213,6 +223,7 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Labe
 		a.pop(rsi);
 		a.pop(rdi);
 
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 
 	}break;
 	case P_UINT48+COPY_MW_MW_W:
@@ -242,6 +253,7 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Labe
 		a.pop(rsi);
 		a.pop(rdi);
 
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 
 	}break;
 	case P_UINT64+COPY_MW_MW_C:
@@ -269,6 +281,7 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Labe
 		a.pop(rsi);
 		a.pop(rdi);
 
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 
 	}break;
 	case P_UINT64+COPY_MW_MW_W:
@@ -297,6 +310,7 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Labe
 		a.pop(rsi);
 		a.pop(rdi);
 
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 
 	}break;
 	case P_UINT8+COPY_M_M_C:
@@ -314,6 +328,7 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Labe
 		a.pop(rsi);
 		a.pop(rdi);
 
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 
 	}break;
 	case P_UINT8+COPY_M_M_W:
@@ -332,6 +347,7 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Labe
 		a.pop(rsi);
 		a.pop(rdi);
 
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 
 	}break;
 	case P_UINT16+COPY_M_M_C:
@@ -349,6 +365,7 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Labe
 		a.pop(rsi);
 		a.pop(rdi);
 
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 
 	}break;
 	case P_UINT16+COPY_M_M_W:
@@ -367,6 +384,7 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Labe
 		a.pop(rsi);
 		a.pop(rdi);
 
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 
 	}break;
 	case P_UINT32+COPY_M_M_C:
@@ -384,6 +402,7 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Labe
 		a.pop(rsi);
 		a.pop(rdi);
 
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 
 	}break;
 	case P_UINT32+COPY_M_M_W:
@@ -402,6 +421,7 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Labe
 		a.pop(rsi);
 		a.pop(rdi);
 
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 
 	}break;
 	case P_UINT48+COPY_M_M_C:
@@ -419,6 +439,7 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Labe
 		a.pop(rsi);
 		a.pop(rdi);
 
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 
 	}break;
 	case P_UINT48+COPY_M_M_W:
@@ -438,6 +459,7 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Labe
 		a.pop(rsi);
 		a.pop(rdi);
 
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 
 	}break;
 	case P_UINT64+COPY_M_M_C:
@@ -455,6 +477,7 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Labe
 		a.pop(rsi);
 		a.pop(rdi);
 
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 
 	}break;
 	case P_UINT64+COPY_M_M_W:
@@ -473,6 +496,7 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Labe
 		a.pop(rsi);
 		a.pop(rdi);
 
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 
 	}break;
 	case LOOP_C_W:{
@@ -564,6 +588,7 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Labe
 		}
 
 
+		a.mov(rcx,0x0000FFFFFFFFFFFF);
 
 
 	}break;
@@ -609,7 +634,9 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Labe
 
 				}
 			}
+			a.mov(rcx,0x0000FFFFFFFFFFFF);
 		}
+
 	}break;
 	case LEA_W__W_W_2:{
 
@@ -655,6 +682,7 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Labe
 
 				}
 			}
+			a.mov(rcx,0x0000FFFFFFFFFFFF);
 		}
 	}break;
 	case LEA_W__W_W_4:{
@@ -701,6 +729,7 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Labe
 
 				}
 			}
+			a.mov(rcx,0x0000FFFFFFFFFFFF);
 		}
 	}break;
 	case LEA_W__W_W_8:{
@@ -747,6 +776,7 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Labe
 
 				}
 			}
+			a.mov(rcx,0x0000FFFFFFFFFFFF);
 		}
 	}break;
 	case LEA_W__W_W_16:{
@@ -793,6 +823,7 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Labe
 
 				}
 			}
+			a.mov(rcx,0x0000FFFFFFFFFFFF);
 		}
 	}break;
 	case LEA_W__W_W_32:{
@@ -839,6 +870,7 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Labe
 
 				}
 			}
+			a.mov(rcx,0x0000FFFFFFFFFFFF);
 		}
 	}break;
 	case LEA_W__W_W_64:{
@@ -885,6 +917,7 @@ uint8 optimization(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Labe
 
 				}
 			}
+			a.mov(rcx,0x0000FFFFFFFFFFFF);
 		}
 	}break;
 	default:

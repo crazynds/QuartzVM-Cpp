@@ -4145,9 +4145,8 @@ EmitVexEvexR:
       }
     }
 
-    // Check if EVEX is required by checking bits in `x` :  [@.......|xx.x.xxx|x......x|.x.x....].
     if (x & 0x80D78150u) {
-      uint32_t y = ((x << 4) & 0x00080000u) |            // [@.......|...bV...|........|........].
+      uint32_t y = ((x << 4) & 0x00080000u) |
                    ((x >> 4) & 0x00000010u) ;            // [@.......|...bV...|........|...R....].
       x  = (x & 0x00FF78E3u) | y;                        // [........|zLLbVaaa|0vvvv000|RBBR00mm].
       x  = x << 8;                                       // [zLLbVaaa|0vvvv000|RBBR00mm|00000000].

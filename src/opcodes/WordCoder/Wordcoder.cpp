@@ -6,300 +6,250 @@
 */
 
 #include "Wordcoder.h"
+#include <string>
 
+using namespace std;
+
+constexpr unsigned int str2int(const char* str, int h = 0)
+{
+    return !str[h] ? 5381 : (str2int(str, h+1) * 33) ^ str[h];
+}
+
+
+string getPropriety(GeralMemory *g1, GeralMemory *g2){
+	string str = "";
+
+	switch(g1->getType()){
+		case 'I':{
+			str+= "i-";
+		}break;
+		case 'm':{
+			str+= "m-";
+		}break;
+		case 'M':{
+			str+= "mmww-";
+		}break;
+		case 'P':{
+			str+= "mmw-";
+		}break;
+		case 'W':{
+			str+= "w-";
+		}break;
+		case 'R':{
+			str+= "rrw-";
+		}break;
+		case 'r':{
+			str+= "r-";
+		}break;
+	}
+	switch(g2->getType()){
+		case 'I':{
+			str+= "i";
+		}break;
+		case 'm':{
+			str+= "m";
+		}break;
+		case 'M':{
+			str+= "mmww";
+		}break;
+		case 'P':{
+			str+= "mmw";
+		}break;
+		case 'W':{
+			str+= "w";
+		}break;
+		case 'R':{
+			str+= "rrw";
+		}break;
+		case 'r':{
+			str+= "r";
+		}break;
+	}
+	return str;
+}
 
 void Wordcoder::mov(GeralMemory *g1,GeralMemory *g2){
-	switch(g1->getType()){
-	case 'I':{
-		std::cout << "WordCoder: Não é possivel usar valor estatico como destino de comando!" << std::endl;
-	}break;
-	case 'm':{
+	string str=getPropriety(g1,g2);
+	if (str=="m-i"){
 		Memoria *m1=(Memoria*)g1;
-		switch(g2->getType()){
-			case 'I':{
-				ImediateData *im=(ImediateData*)g2;
-				mov_m_c(m1->getPos(),im->getValue());
-			}break;
-			case 'm':{
-				Memoria *m2=(Memoria*)g2;
-				mov_m_m(m1->getPos(),m2->getPos());
-			}break;
-			case 'M':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'mov m <- mmww'" << std::endl;
-			}break;
-			case 'P':{
-				MemoriaPtr *m2=(MemoriaPtr*)g2;
-				mov_m_mmw(m1->getPos(),m2->getPosBase(),m2->getIncrement());
-			}break;
-			case 'W':{
-				Workspace *w2=(Workspace*)g2;
-				mov_m_w(m1->getPos(),w2->getPos());
-			}break;
-		}
-	}break;
-	case 'M':{
-		MemoriaPtr*mp1=(MemoriaPtr*)g1;
-		switch(g2->getType()){
-			case 'I':{
-				ImediateData *im2=(ImediateData*)g2;
-				mov_mmww_c(mp1->getPosBase(),mp1->getPosIndex(),mp1->getShift(),mp1->getIncrement(),im2->getValue());
-			}break;
-			case 'm':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'mov mmww <- m'" << std::endl;
-			}break;
-			case 'M':{
-				MemoriaPtr *m2=(MemoriaPtr*)g2;
-				mov_mmww_mmww(mp1->getPosBase(),mp1->getPosIndex(),mp1->getShift(),mp1->getIncrement(),m2->getPosBase(),m2->getPosIndex(),m2->getShift(),m2->getIncrement());
-			}break;
-			case 'P':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'mov mmww <- mmw' (Nem vai estar)" << std::endl;
-			}break;
-			case 'W':{
-				Workspace *w2=(Workspace*)g2;
-				mov_mmww_w(mp1->getPosBase(),mp1->getPosIndex(),mp1->getShift(),mp1->getIncrement(),w2->getPos());
-			}break;
-		}
-	}break;
-	case 'P':{
-		MemoriaPtr*mp1=(MemoriaPtr*)g1;
-		switch(g2->getType()){
-			case 'I':{
-				ImediateData *im2=(ImediateData*)g2;
-				mov_mmw_c(mp1->getPosBase(),mp1->getIncrement(),im2->getValue());
-			}break;
-			case 'm':{
-				Memoria *m2=(Memoria*)g2;
-				mov_mmw_m(mp1->getPosBase(),mp1->getIncrement(),m2->getPos());
-			}break;
-			case 'M':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'mov mmw <- mmww' (Nem vai estar)" << std::endl;
-			}break;
-			case 'P':{
-				MemoriaPtr *m2=(MemoriaPtr*)g2;
-				mov_mmw_mmw(mp1->getPosBase(),mp1->getIncrement(),m2->getPosBase(),m2->getIncrement());
-			}break;
-			case 'W':{
-				Workspace *w2=(Workspace*)g2;
-				mov_mmw_w(mp1->getPosBase(),mp1->getIncrement(),w2->getPos());
-			}break;
-		}
-	}break;
-	case 'W':{
-		Workspace *w1=(Workspace*)g1;
-		switch(g2->getType()){
-			case 'I':{
-				ImediateData *im2=(ImediateData*)g2;
-				mov_w_c(w1->getPos(),im2->getValue());
-			}break;
-			case 'm':{
-				Memoria *m2=(Memoria*)g2;
-				mov_w_m(w1->getPos(),m2->getPos());
-			}break;
-			case 'M':{
-				MemoriaPtr *m2=(MemoriaPtr*)g2;
-				mov_w_mmww(w1->getPos(),m2->getPosBase(),m2->getPosIndex(),m2->getShift(),m2->getIncrement());
-			}break;
-			case 'P':{
-				MemoriaPtr *m2=(MemoriaPtr*)g2;
-				mov_w_mmw(w1->getPos(),m2->getPosBase(),m2->getIncrement());
-			}break;
-			case 'W':{
-				Workspace *w2=(Workspace*)g2;
-				mov_w_w(w1->getPos(),w2->getPos());
-			}break;
-		}
-	}break;
+		ImediateData *im=(ImediateData*)g2;
+		mov_m_c(m1->getPos(),im->getValue());
+	}else if(str=="m-m"){
+			Memoria *m1=(Memoria*)g1;
+			Memoria *m2=(Memoria*)g2;
+			mov_m_m(m1->getPos(),m2->getPos());
+	}else if(str=="m-mmw"){
+			Memoria *m1=(Memoria*)g1;
+			MemoriaPtr *m2=(MemoriaPtr*)g2;
+			mov_m_mmw(m1->getPos(),m2->getPosBase(),m2->getIncrement());
+	}else if(str=="m-w"){
+			Memoria *m1=(Memoria*)g1;
+			Workspace *w2=(Workspace*)g2;
+			mov_m_w(m1->getPos(),w2->getPos());
+	}else if(str=="mmww-i"){
+			MemoriaPtr*mp1=(MemoriaPtr*)g1;
+			ImediateData *im2=(ImediateData*)g2;
+			mov_mmww_c(mp1->getPosBase(),mp1->getPosIndex(),mp1->getShift(),mp1->getIncrement(),im2->getValue());
+	}else if(str=="mmww-mmww"){
+			MemoriaPtr*mp1=(MemoriaPtr*)g1;
+			MemoriaPtr *m2=(MemoriaPtr*)g2;
+			mov_mmww_mmww(mp1->getPosBase(),mp1->getPosIndex(),mp1->getShift(),mp1->getIncrement(),m2->getPosBase(),m2->getPosIndex(),m2->getShift(),m2->getIncrement());
+	}else if(str=="mmww-w"){
+			MemoriaPtr*mp1=(MemoriaPtr*)g1;
+			Workspace *w2=(Workspace*)g2;
+			mov_mmww_w(mp1->getPosBase(),mp1->getPosIndex(),mp1->getShift(),mp1->getIncrement(),w2->getPos());
+	}else if(str=="mmw-i"){
+			MemoriaPtr*mp1=(MemoriaPtr*)g1;
+			ImediateData *im2=(ImediateData*)g2;
+			mov_mmw_c(mp1->getPosBase(),mp1->getIncrement(),im2->getValue());
+	}else if(str=="mmw-m"){
+			MemoriaPtr*mp1=(MemoriaPtr*)g1;
+			Memoria *m2=(Memoria*)g2;
+			mov_mmw_m(mp1->getPosBase(),mp1->getIncrement(),m2->getPos());
+	}else if(str=="mmw-mmw"){
+			MemoriaPtr*mp1=(MemoriaPtr*)g1;
+			MemoriaPtr *m2=(MemoriaPtr*)g2;
+			mov_mmw_mmw(mp1->getPosBase(),mp1->getIncrement(),m2->getPosBase(),m2->getIncrement());
+	}else if(str=="mmw-w"){
+			MemoriaPtr*mp1=(MemoriaPtr*)g1;
+			Workspace *w2=(Workspace*)g2;
+			mov_mmw_w(mp1->getPosBase(),mp1->getIncrement(),w2->getPos());
+	}else if(str=="w-i"){
+			Workspace *w1=(Workspace*)g1;
+			ImediateData *im2=(ImediateData*)g2;
+			mov_w_c(w1->getPos(),im2->getValue());
+	}else if(str=="w-m"){
+			Workspace *w1=(Workspace*)g1;
+			Memoria *m2=(Memoria*)g2;
+			mov_w_m(w1->getPos(),m2->getPos());
+	}else if(str=="w-mmww"){
+			Workspace *w1=(Workspace*)g1;
+			MemoriaPtr *m2=(MemoriaPtr*)g2;
+			mov_w_mmww(w1->getPos(),m2->getPosBase(),m2->getPosIndex(),m2->getShift(),m2->getIncrement());
+	}else if(str=="w-mmw"){
+			Workspace *w1=(Workspace*)g1;
+			MemoriaPtr *m2=(MemoriaPtr*)g2;
+			mov_w_mmw(w1->getPos(),m2->getPosBase(),m2->getIncrement());
+	}else if(str=="w-w"){
+			Workspace *w1=(Workspace*)g1;
+			Workspace *w2=(Workspace*)g2;
+			mov_w_w(w1->getPos(),w2->getPos());
+	}else{
+			std::cout << "WordCoder: Ainda não disponivel o uso do comando  mov " << str << std::endl;
 	}
 	delete g1;
 	delete g2;
 }
+void Wordcoder::mul(GeralMemory *g1,GeralMemory *g2){
 
-void Wordcoder::add(GeralMemory *g1,GeralMemory *g2){
-	switch(g1->getType()){
-	case 'I':{
-		std::cout << "WordCoder: Não é possivel usar valor estatico como destino de comando!" << std::endl;
-	}break;
-	case 'm':{
+	string str=getPropriety(g1,g2);
+	if(str=="m-i"){
 		Memoria *m1=(Memoria*)g1;
-		switch(g2->getType()){
-			case 'I':{
-				ImediateData *im=(ImediateData*)g2;
-				soma_m_c(m1->getPos(),im->getValue());
-			}break;
-			case 'm':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'soma m <- m + m'" << std::endl;
-			}break;
-			case 'M':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'soma m <- m + mmww'" << std::endl;
-			}break;
-			case 'P':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'soma m <- m + mmw'" << std::endl;
-			}break;
-			case 'W':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'soma m <- m + w'" << std::endl;
-			}break;
-		}
-	}break;
-	case 'M':{
-		//MemoriaPtr*mp1=(MemoriaPtr*)g1;
-		switch(g2->getType()){
-			case 'I':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'soma m <- mmww + c'" << std::endl;
-			}break;
-			case 'm':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'soma m <- mmww + m'" << std::endl;
-			}break;
-			case 'M':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'soma m <- mmww + mmww'" << std::endl;
-			}break;
-			case 'P':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'soma m <- mmww + mmw'" << std::endl;
-			}break;
-			case 'W':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'soma m <- mmww + w'" << std::endl;
-			}break;
-		}
-	}break;
-	case 'P':{
-		//MemoriaPtr*mp1=(MemoriaPtr*)g1;
-		switch(g2->getType()){
-			case 'I':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'soma m <- mmw + c'" << std::endl;
-			}break;
-			case 'm':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'soma m <- mmw + m'" << std::endl;
-			}break;
-			case 'M':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'soma m <- mmw + mmww'" << std::endl;
-			}break;
-			case 'P':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'soma m <- mmw + mmw'" << std::endl;
-			}break;
-			case 'W':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'soma m <- mmw + w'" << std::endl;
-			}break;
-		}
-	}break;
-	case 'W':{
+		ImediateData *im=(ImediateData*)g2;
+		mul_m_c(m1->getPos(),im->getValue());
+	}else if(str=="w-i"){
 		Workspace *w1=(Workspace*)g1;
-		switch(g2->getType()){
-			case 'I':{
-				ImediateData *im2=(ImediateData*)g2;
-				soma_w_c(w1->getPos(),im2->getValue());
-			}break;
-			case 'm':{
-				Memoria *m2=(Memoria*)g2;
-				soma_w_m(w1->getPos(),m2->getPos());
-			}break;
-			case 'M':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'soma m <- w + mmww'" << std::endl;
-			}break;
-			case 'P':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'soma m <- w + mmw'" << std::endl;
-			}break;
-			case 'W':{
-				Workspace *w2=(Workspace*)g2;
-				soma_w_w(w1->getPos(),w2->getPos());
-			}break;
-		}
-	}break;
+		ImediateData *im2=(ImediateData*)g2;
+		mul_w_c(w1->getPos(),im2->getValue());
+
+	}else if(str=="w-m"){
+		Workspace *w1=(Workspace*)g1;
+		Memoria *m2=(Memoria*)g2;
+		mul_w_m(w1->getPos(),m2->getPos());
+
+	}else if(str=="w-w"){
+		Workspace *w1=(Workspace*)g1;
+		Workspace *w2=(Workspace*)g2;
+		mul_w_w(w1->getPos(),w2->getPos());
+	}else{
+		std::cout << "WordCoder: Ainda não disponivel o uso do comando  mul " << str << std::endl;
+	}
+	delete g1;
+	delete g2;
+}
+void Wordcoder::div(GeralMemory *g1,GeralMemory *g2){
+
+	string str=getPropriety(g1,g2);
+	if(str=="m-i"){
+		Memoria *m1=(Memoria*)g1;
+		ImediateData *im=(ImediateData*)g2;
+		div_m_c(m1->getPos(),im->getValue());
+	}else if(str=="w-i"){
+		Workspace *w1=(Workspace*)g1;
+		ImediateData *im2=(ImediateData*)g2;
+		div_w_c(w1->getPos(),im2->getValue());
+
+	}else if(str=="w-m"){
+		Workspace *w1=(Workspace*)g1;
+		Memoria *m2=(Memoria*)g2;
+		div_w_m(w1->getPos(),m2->getPos());
+
+	}else if(str=="w-w"){
+		Workspace *w1=(Workspace*)g1;
+		Workspace *w2=(Workspace*)g2;
+		div_w_w(w1->getPos(),w2->getPos());
+	}else{
+		std::cout << "WordCoder: Ainda não disponivel o uso do comando  mul " << str << std::endl;
+	}
+	delete g1;
+	delete g2;
+}
+void Wordcoder::add(GeralMemory *g1,GeralMemory *g2){
+
+	string str=getPropriety(g1,g2);
+	if(str=="m-i"){
+		Memoria *m1=(Memoria*)g1;
+		ImediateData *im=(ImediateData*)g2;
+		soma_m_c(m1->getPos(),im->getValue());
+	}else if(str=="w-i"){
+		Workspace *w1=(Workspace*)g1;
+		ImediateData *im2=(ImediateData*)g2;
+		soma_w_c(w1->getPos(),im2->getValue());
+
+	}else if(str=="w-m"){
+		Workspace *w1=(Workspace*)g1;
+		Memoria *m2=(Memoria*)g2;
+		soma_w_m(w1->getPos(),m2->getPos());
+
+	}else if(str=="w-w"){
+		Workspace *w1=(Workspace*)g1;
+		Workspace *w2=(Workspace*)g2;
+		soma_w_w(w1->getPos(),w2->getPos());
+	}else{
+		std::cout << "WordCoder: Ainda não disponivel o uso do comando  mul " << str << std::endl;
 	}
 	delete g1;
 	delete g2;
 }
 void Wordcoder::sub(GeralMemory *g1,GeralMemory *g2){
-	switch(g1->getType()){
-	case 'I':{
-		std::cout << "WordCoder: Não é possivel usar valor estatico como destino de comando!" << std::endl;
-	}break;
-	case 'm':{
+
+	string str=getPropriety(g1,g2);
+	if(str=="m-i"){
 		Memoria *m1=(Memoria*)g1;
-		switch(g2->getType()){
-			case 'I':{
-				ImediateData *im=(ImediateData*)g2;
-				sub_m_c(m1->getPos(),im->getValue());
-			}break;
-			case 'm':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'sub m <- m + m'" << std::endl;
-			}break;
-			case 'M':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'sub m <- m + mmww'" << std::endl;
-			}break;
-			case 'P':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'sub m <- m + mmw'" << std::endl;
-			}break;
-			case 'W':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'sub m <- m + w'" << std::endl;
-			}break;
-		}
-	}break;
-	case 'M':{
-		//MemoriaPtr*mp1=(MemoriaPtr*)g1;
-		switch(g2->getType()){
-			case 'I':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'sub m <- mmww + c'" << std::endl;
-			}break;
-			case 'm':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'sub m <- mmww + m'" << std::endl;
-			}break;
-			case 'M':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'sub m <- mmww + mmww'" << std::endl;
-			}break;
-			case 'P':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'sub m <- mmww + mmw'" << std::endl;
-			}break;
-			case 'W':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'sub m <- mmww + w'" << std::endl;
-			}break;
-		}
-	}break;
-	case 'P':{
-		//MemoriaPtr*mp1=(MemoriaPtr*)g1;
-		switch(g2->getType()){
-			case 'I':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'sub m <- mmw + c'" << std::endl;
-			}break;
-			case 'm':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'sub m <- mmw + m'" << std::endl;
-			}break;
-			case 'M':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'sub m <- mmw + mmww'" << std::endl;
-			}break;
-			case 'P':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'sub m <- mmw + mmw'" << std::endl;
-			}break;
-			case 'W':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'sub m <- mmw + w'" << std::endl;
-			}break;
-		}
-	}break;
-	case 'W':{
+		ImediateData *im=(ImediateData*)g2;
+		sub_m_c(m1->getPos(),im->getValue());
+	}else if(str=="w-i"){
 		Workspace *w1=(Workspace*)g1;
-		switch(g2->getType()){
-			case 'I':{
-				ImediateData *im2=(ImediateData*)g2;
-				sub_w_c(w1->getPos(),im2->getValue());
-			}break;
-			case 'm':{
-				Memoria *m2=(Memoria*)g2;
-				sub_w_m(w1->getPos(),m2->getPos());
-			}break;
-			case 'M':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'sub m <- w + mmww'" << std::endl;
-			}break;
-			case 'P':{
-				std::cout << "WordCoder: Ainda não disponivel o uso do comando  'sub m <- w + mmw'" << std::endl;
-			}break;
-			case 'W':{
-				Workspace *w2=(Workspace*)g2;
-				sub_w_w(w1->getPos(),w2->getPos());
-			}break;
-		}
-	}break;
+		ImediateData *im2=(ImediateData*)g2;
+		sub_w_c(w1->getPos(),im2->getValue());
+
+	}else if(str=="w-m"){
+		Workspace *w1=(Workspace*)g1;
+		Memoria *m2=(Memoria*)g2;
+		sub_w_m(w1->getPos(),m2->getPos());
+
+	}else if(str=="w-w"){
+		Workspace *w1=(Workspace*)g1;
+		Workspace *w2=(Workspace*)g2;
+		sub_w_w(w1->getPos(),w2->getPos());
+	}else{
+		std::cout << "WordCoder: Ainda não disponivel o uso do comando  mul " << str << std::endl;
 	}
 	delete g1;
 	delete g2;
 }
+
+
 void Wordcoder::inc(GeralMemory *g1){
 	switch(g1->getType()){
 	case 'I':{
@@ -499,6 +449,121 @@ void Wordcoder::printString(GeralMemory *g1){
 		break;
 	}
 	delete g1;
+}
+
+void Wordcoder::jmp(GeralMemory *g1){
+	switch(g1->getType()){
+	case 'I':{
+		ImediateData *id=(ImediateData*)g1;
+		jmp_c(id->getValue());
+	}break;
+	case 'P':{
+		std::cout << "WordCoder: Não é possivel executar chamada de função de acordo com o valor em ponteiros!" << std::endl;
+	}break;
+	case 'm':{
+		Memoria *m=(Memoria*)g1;
+		jmp_m(m->getPos());
+	}break;
+	case 'M':
+		std::cout << "WordCoder: Não é possivel executar chamada de função de acordo com o valor em ponteiros!" << std::endl;
+		break;
+	case 'W':
+		Workspace *m=(Workspace*)g1;
+		jmp_w(m->getPos());
+		break;
+	}
+	delete g1;
+}
+void Wordcoder::jmp(GeralMemory *g1,char cmp){
+	switch(g1->getType()){
+	case 'I':{
+		ImediateData *id=(ImediateData*)g1;
+		switch(cmp){
+		case '!':
+			jmp_c_di(id->getValue());
+			break;
+		case '=':
+			jmp_c_ig(id->getValue());
+			break;
+		case '>':
+			jmp_c_ma(id->getValue());
+			break;
+		case '<':
+			jmp_c_me(id->getValue());
+			break;
+		case '+':
+			jmp_c_ma_ig(id->getValue());
+			break;
+		case '-':
+			jmp_c_me_ig(id->getValue());
+			break;
+		}
+	}break;
+	case 'P':{
+		std::cout << "WordCoder: Não é possivel executar chamada de função de acordo com o valor em ponteiros!" << std::endl;
+	}break;
+	case 'm':{
+		Memoria *m=(Memoria*)g1;
+		switch(cmp){
+		case '!':
+			jmp_m_di(m->getPos());
+			break;
+		case '=':
+			jmp_m_ig(m->getPos());
+			break;
+		case '>':
+			jmp_m_ma(m->getPos());
+			break;
+		case '<':
+			jmp_m_me(m->getPos());
+			break;
+		case '+':
+			jmp_m_ma_ig(m->getPos());
+			break;
+		case '-':
+			jmp_m_me_ig(m->getPos());
+			break;
+		}
+	}break;
+	case 'M':
+		std::cout << "WordCoder: Não é possivel executar chamada de função de acordo com o valor em ponteiros!" << std::endl;
+		break;
+	case 'W':
+		Workspace *m=(Workspace*)g1;
+		switch(cmp){
+		case '!':
+			jmp_w_di(m->getPos());
+			break;
+		case '=':
+			jmp_w_ig(m->getPos());
+			break;
+		case '>':
+			jmp_w_ma(m->getPos());
+			break;
+		case '<':
+			jmp_w_me(m->getPos());
+			break;
+		case '+':
+			jmp_w_ma_ig(m->getPos());
+			break;
+		case '-':
+			jmp_w_me_ig(m->getPos());
+			break;
+		}
+		break;
+	}
+	delete g1;
+}
+void Wordcoder::jmp(Label &l,char cmp){
+	l.addLocation(getTam()+2);
+	jmp(c_(0),cmp);
+}
+void Wordcoder::jmp(Label &l){
+	l.addLocation(getTam()+2);
+	jmp(c_(0));
+}
+void Wordcoder::bind(Label &l){
+	l.setPosition(getPos());
 }
 GeralMemory* w_(uint8 pos){
 	Workspace *w=new Workspace(pos);

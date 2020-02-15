@@ -117,6 +117,7 @@ std::vector<Dupla<Label,uint32>>* pre_check_jig(Thread &t,Assembler &a){
 			}break;
 		case RETURN:
 		case 1:
+		case HLT_COMAND:
 			{}break;
 		case INC_W:
 		case DEC_W:

@@ -150,7 +150,6 @@ struct Operand_ {
   // \cond INTERNAL
   enum SignatureBits : uint32_t {
     // Operand type (3 least significant bits).
-    // |........|........|........|.....XXX|
     kSignatureOpShift = 0,
     kSignatureOpMask = 0x07u << kSignatureOpShift,
 
@@ -501,7 +500,7 @@ public:
     kTypeCount = 3
   };
 
-  // TODO: Find a better place, find a better name.
+  //
   enum {
     //! Label tag is used as a sub-type, forming a unique signature across all
     //! operand types as 0x1 is never associated with any register (reg-type).

@@ -623,7 +623,7 @@ ASMJIT_FAVOR_SIZE Error X86FuncArgsContext::markScratchRegs(FuncFrame& frame) no
 }
 
 ASMJIT_FAVOR_SIZE Error X86FuncArgsContext::markStackArgsReg(FuncFrame& frame) noexcept {
-  // TODO: Validate, improve...
+  //
   if (_saVarId != kVarIdNone) {
     const Var& var = _vars[_saVarId];
     frame.setSARegId(var.cur.regId());
@@ -689,7 +689,7 @@ ASMJIT_FAVOR_SIZE Error X86Internal::finalizeFuncFrame(FuncFrame& frame) noexcep
                                                frame._callStackAlignment,
                                                frame._localStackAlignment));
 
-  // TODO: Must be configurable.
+  //
   uint32_t vecSize = 16;
 
   bool hasFP = frame.hasPreservedFP();
@@ -1460,11 +1460,9 @@ ASMJIT_FAVOR_SIZE Error X86Internal::emitArgsAssignment(Emitter* emitter, const 
 
         // Requires a conversion between two register groups.
         if (workData[outGroup]._numSwaps) {
-          // TODO: Postponed
           workFlags |= kWorkPending;
         }
         else {
-          // TODO:
           workFlags |= kWorkPending;
         }
       }
