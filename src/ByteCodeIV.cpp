@@ -6,22 +6,22 @@
 // Description :
 //============================================================================
 
-#include "class/VirtualMachine.h"
 #include "lib/Types.h"
 #include "class/Contexto.h"
 #include "class/CodeLoader.h"
 #include <ctime>
 #include <iostream>
 #include <algorithm>
+#include "class/VirtualMachine/VirtualMachine.h"
 
-#define DEBUG 0
+#define DEBUG 3
 
 using namespace std;
 
 
 int main(int argc, char **argv) {
 	VirtualMachine *vm;
-	uint8 debug=0;
+	uint8 debug=3;
 	FileLoader *c;
 	cout << "$$$$$ INICIANDO $$$$$" << endl;
 	{
@@ -48,15 +48,16 @@ int main(int argc, char **argv) {
 	delete c;
 	{
 		clock_t max=clock();
-		uint8 flag;
+		uint64 flag=0;
 		if(debug){
-			while(!flag)flag=vm->runCommand();
+			while(!flag){
+				flag=vm->runCommand();
+			}
 		}else flag=vm->run();
 		cout<<"[INFO] - Duração total: "<< ( clock() - max )/(double)CLOCKS_PER_SEC << endl;
 	}
 
 
 	delete vm;
-	getchar();
 	return 0;
 }

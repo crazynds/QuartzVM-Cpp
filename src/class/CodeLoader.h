@@ -18,11 +18,7 @@ class FileLoader {
 	public:
 		FileLoader(char *a,uint8 debug){
 			FILE *arq;
-			uint8 *vet;
 			if(debug>1)printf("[INFO] - Iniciando a busca do arquivo!\n");
-			vet=new uint8[TAM_READ];
-			uint32 max=0;
-			uint32 res;
 			arq = fopen(a, "rb");
 			if (arq == NULL){
 				printf("[ERROR] - Arquivo '%s' não encontrado!\n",a);
@@ -30,23 +26,13 @@ class FileLoader {
 				code=NULL;
 				return;
 			}
-			if(debug>0)printf("[SUCESS] - Arquivo '%s' encontrado!\n",a);
-			res = fread (vet, sizeof(uint8), TAM_READ, arq);
-			max+=res;
-			while(res==TAM_READ){
-				uint8 *p=new uint8[max+TAM_READ];
-				for(uint32 x=0;x<max;x++){
-					p[x]=vet[x];
-				}
-				delete[] vet;
-				vet=p;
-				res = fread (&vet[max], sizeof(uint8), TAM_READ, arq);
-				max+=res;
-			}
-			fclose(arq);
-
-			tam=max;
-			code=vet;
+			fseek(arq, 0, 2);
+			tam = ftell(arq);
+			code = new uint8[tam];
+			fseek(arq,0,SEEK_END);
+			fseek(arq,0,SEEK_SET);
+			fread(code,1,tam,arq);
+			if(debug>1)printf("[INFO] - Arquivo carregado com sucesso!\n");
 		}
 
 

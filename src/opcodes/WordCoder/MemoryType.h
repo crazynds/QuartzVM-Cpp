@@ -85,6 +85,44 @@
 		}
 	};
 
+	class RecursoPtr: GeralMemory{
+	private:
+		uint8 regBase,regIndex;
+		uint8 shift;
+		uint32 inc;
+	public:
+		RecursoPtr(Workspace *reg1,Workspace *reg2,uint8 s=0,uint32 i=0){
+			inc=i;
+			shift=s;
+			regBase=reg1->getPos();
+			regIndex=reg2->getPos();
+			type='R';
+			delete reg1;
+			delete reg2;
+		}
+		RecursoPtr(Workspace *reg1,uint32 i=0){
+			inc=i;
+			shift=0;
+			regBase=reg1->getPos();
+			regIndex=0;
+			type='r';
+			delete reg1;
+		}
+
+		uint8 getPosBase(){
+			return regBase;
+		}
+		uint8 getPosIndex(){
+			return regIndex;
+		}
+		uint8 getShift(){
+			return shift;
+		}
+		uint32 getIncrement(){
+			return inc;
+		}
+	};
+
 	class ImediateData: GeralMemory{
 	private:
 		uint64 value;
@@ -103,6 +141,8 @@
 	GeralMemory* c_(uint64 dado);
 	GeralMemory* ptr_(GeralMemory *r,uint32 inc);
 	GeralMemory* ptr_(GeralMemory *reg,GeralMemory *regIndex,uint8 shift,uint32 inc);
+	GeralMemory* ptr_R(GeralMemory *reg,GeralMemory *regIndex,uint8 shift,uint32 inc);
+	GeralMemory* ptr_R(GeralMemory *r,uint32 inc);
 	/*
 	 * Tipos diferentes de gerais:
 	 * m - memoria estática

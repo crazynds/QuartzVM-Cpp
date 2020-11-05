@@ -1,6 +1,8 @@
 #ifndef VAR_H
     #define VAR_H
 
+	#include <string>
+
     #define true 1
     #define false 0
 
@@ -17,7 +19,12 @@
     typedef short int16;
     typedef char int8;
 
+    typedef std::string String;
+
 	#include "Type48.h"
+
+
+	#include "Memory.h"
 
 	#ifndef NULL
     	#define NULL 0

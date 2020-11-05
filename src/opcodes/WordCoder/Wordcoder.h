@@ -313,6 +313,67 @@
 				set8(m1);
 				set8(m2);
 			}
+			void mov_r_c(uint8 base, uint32 inc, uint64 m2){
+				set16(atual+MOV_R_C);
+				set32(inc);
+				set8(base);
+				setAtual(m2);
+			}
+			void mov_r_w(uint8 base, uint32 inc, uint8 m2){
+				set16(atual+MOV_R_W);
+				set32(inc);
+				set8(base);
+				set8(m2);
+			}
+			void mov_w_r(uint8 m2,uint8 base, uint32 inc){
+				set16(atual+MOV_W_R);
+				set8(m2);
+				set32(inc);
+				set8(base);
+			}
+			void mov_r_r(uint8 base, uint32 inc,uint8 base2, uint32 inc2){
+				set16(atual+MOV_R_R);
+				set32(inc);
+				set8(base);
+				set32(inc2);
+				set8(base2);
+			}
+			void mov_rrw_c(uint8 base, uint8 index, uint8 shift, uint32 inc,uint64 m2){
+				set16(atual+MOV_RRW_C);
+				set32(inc);
+				set8(base);
+				set8(index);
+				set8(shift);
+				setAtual(m2);
+			}
+			void mov_rrw_w(uint8 base, uint8 index, uint8 shift, uint32 inc,uint8 m2){
+				set16(atual+MOV_RRW_W);
+				set32(inc);
+				set8(base);
+				set8(index);
+				set8(shift);
+				set8(m2);
+			}
+			void mov_w_rrw(uint8 m2,uint8 base, uint8 index, uint8 shift, uint32 inc){
+				set16(atual+MOV_W_RRW);
+				set8(m2);
+				set32(inc);
+				set8(base);
+				set8(index);
+				set8(shift);
+			}
+			void mov_rrw_rrw(uint8 base, uint8 index, uint8 shift, uint32 inc,uint8 base2, uint8 index2, uint8 shift2, uint32 inc2){
+				set16(atual+MOV_RRW_RRW);
+				set32(inc);
+				set8(base);
+				set8(index);
+				set8(shift);
+				set32(inc2);
+				set8(base2);
+				set8(index2);
+				set8(shift2);
+			}
+
 			void jmp_c(uint32 m1){
 				set16(JMP_C);
 				set32(m1);
@@ -471,6 +532,7 @@
 			void inc(GeralMemory*);
 			void dec(GeralMemory*);
 			void call(GeralMemory*);
+			void call(Label&);
 			void pop(GeralMemory*);
 			void push(GeralMemory*);
 			void setString(GeralMemory*,char*);
@@ -500,6 +562,33 @@
 
 			uint32 getPos(){
 				return tam-localLastCab;
+			}
+
+			void alloc_w(uint8 val,uint32 tam){
+				set16(ALLOC_RES);
+				set8(val);
+				set32(tam);
+			}
+			void realloc_w(uint8 val,uint32 tam){
+				set16(REALLOC_RES);
+				set8(val);
+				set32(tam);
+			}
+
+			void free_w(uint8 val){
+				set16(FREE_RES);
+				set8(val);
+			}
+
+			void alloc_w_w(uint8 dst, uint8 tam){
+				set16(ALLOC_DIN_RES);
+				set8(dst);
+				set8(tam);
+			}
+			void realloc_w_w(uint8 dst, uint8 tam){
+				set16(REALLOC_DIN_RES);
+				set8(dst);
+				set8(tam);
 			}
 
 			void copy_m_m_c(uint48 m1,uint48 m2,uint32 m3){
@@ -633,6 +722,14 @@
 			void print_out_char_w(uint8 m1){
 				set16(PRINT_OUT_CHAR);
 				set8(m1);
+			}
+			void debug_print_out_resorce_w(uint8 r1,uint32 tam){
+				set16(DEBUG_PRINT_OUT_RESORCE);
+				set8(r1);
+				set32(tam);
+			}
+			void debug_print_out_mem(){
+				set16(DEBUG_PRINT_OUT_MEM);
 			}
 			void print_out_num_w(uint8 m1){
 				set16(PRINT_OUT_NUM);

@@ -1,14 +1,29 @@
-// [AsmJit]
-// Machine Code Generation for C++.
+// AsmJit - Machine code generation for C++
 //
-// [License]
-// Zlib - See LICENSE.md file in the package.
+//  * Official AsmJit Home Page: https://asmjit.com
+//  * Official Github Repository: https://github.com/asmjit/asmjit
+//
+// Copyright (c) 2008-2020 The AsmJit Authors
+//
+// This software is provided 'as-is', without any express or implied
+// warranty. In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not be
+//    misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source distribution.
 
-#ifndef _ASMJIT_X86_X86OPCODE_P_H
-#define _ASMJIT_X86_X86OPCODE_P_H
+#ifndef ASMJIT_X86_X86OPCODE_P_H_INCLUDED
+#define ASMJIT_X86_X86OPCODE_P_H_INCLUDED
 
-#include "../core/logging.h"
-#include "../core/string.h"
 #include "../x86/x86globals.h"
 
 ASMJIT_BEGIN_SUB_NAMESPACE(x86)
@@ -144,7 +159,7 @@ struct Opcode {
     // cases (similar to forcing REX prefix). Force EVEX will force emitting
     // EVEX prefix instead of VEX2|VEX3. EVEX-only instructions will have
     // ForceEvex always set, however. instructions that can be encoded by
-    // either VEX or EVEX prefix shall not have ForceEvex set.
+    // either VEX or EVEX prefix should not have ForceEvex set.
 
     kMM_ForceVex3  = 0x04u << kMM_Shift,   // Force 3-BYTE VEX prefix.
     kMM_ForceEvex  = 0x10u << kMM_Shift,   // Force 4-BYTE EVEX prefix.
@@ -432,4 +447,4 @@ struct Opcode {
 
 ASMJIT_END_SUB_NAMESPACE
 
-#endif // _ASMJIT_X86_X86OPCODE_P_H
+#endif // ASMJIT_X86_X86OPCODE_P_H_INCLUDED

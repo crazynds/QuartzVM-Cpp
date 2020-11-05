@@ -74,7 +74,9 @@ void call_w(Thread &t){
 
 void ret(Thread &t){
 	t.recoverPoint();
-	t.checkUseCode(2);
+#ifndef _FAST_MODE
+	if(t.checkUseCode(2))return;
+#endif
 }
 
 

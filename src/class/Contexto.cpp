@@ -121,12 +121,7 @@ void Contexto::prepare(uint16 codi,uint8 *rep,uint32 len){
 			cod_len++;
 		}
 	}else{
-		std::cout << "[INFO] -" << printVisibleName() << "- Contexto sem cabeçalho." << std::endl;
-		cod=new uint8[len];
-		while(cod_len<len){
-			cod[cod_len]=rep[cod_len];
-			cod_len++;
-		}
+		throw VMException(_LOAD_CONTEXT_NOT_VALID_STR);
 	}
 }
 void Contexto::incrementMemory(){

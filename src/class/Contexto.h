@@ -9,12 +9,12 @@
 #define CONTEXTO_H_
 	#include "../lib/Types.h"
 	#include "../lib/Dupla.h"
-	#include "VirtualMachine.h"
 	#include <vector>
+	#include "VirtualMachine/VirtualMachine.h"
 
 
 
-	#define MEMORY_BASE_CONTEXT 16384
+	#define MEMORY_BASE_CONTEXT 16*KB
 	//#define _FAST_MODE
 
 

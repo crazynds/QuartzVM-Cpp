@@ -1,11 +1,28 @@
-// [AsmJit]
-// Machine Code Generation for C++.
+// AsmJit - Machine code generation for C++
 //
-// [License]
-// Zlib - See LICENSE.md file in the package.
+//  * Official AsmJit Home Page: https://asmjit.com
+//  * Official Github Repository: https://github.com/asmjit/asmjit
+//
+// Copyright (c) 2008-2020 The AsmJit Authors
+//
+// This software is provided 'as-is', without any express or implied
+// warranty. In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not be
+//    misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source distribution.
 
-#ifndef _ASMJIT_X86_X86FEATURES_H
-#define _ASMJIT_X86_X86FEATURES_H
+#ifndef ASMJIT_X86_X86FEATURES_H_INCLUDED
+#define ASMJIT_X86_X86FEATURES_H_INCLUDED
 
 #include "../core/features.h"
 
@@ -23,6 +40,8 @@ class Features : public BaseFeatures {
 public:
   //! CPU feature ID.
   enum Id : uint32_t {
+    // @EnumValuesBegin{"enum": "x86::Features::Id"}@
+
     kNone = 0,                 //!< No feature (never set, used internally).
 
     kMT,                       //!< CPU has multi-threading capabilities.
@@ -127,6 +146,8 @@ public:
     kXSAVEC,                   //!< CPU has XSAVEC.
     kXSAVEOPT,                 //!< CPU has XSAVEOPT.
     kXSAVES,                   //!< CPU has XSAVES.
+
+    // @EnumValuesEnd@
 
     kCount                     //!< Count of X86 CPU features.
   };
@@ -266,4 +287,4 @@ public:
 
 ASMJIT_END_SUB_NAMESPACE
 
-#endif // _ASMJIT_X86_X86FEATURES_H
+#endif // ASMJIT_X86_X86FEATURES_H_INCLUDED

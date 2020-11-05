@@ -1,13 +1,29 @@
-// [AsmJit]
-// Machine Code Generation for C++.
+// AsmJit - Machine code generation for C++
 //
-// [License]
-// Zlib - See LICENSE.md file in the package.
+//  * Official AsmJit Home Page: https://asmjit.com
+//  * Official Github Repository: https://github.com/asmjit/asmjit
+//
+// Copyright (c) 2008-2020 The AsmJit Authors
+//
+// This software is provided 'as-is', without any express or implied
+// warranty. In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not be
+//    misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source distribution.
 
-#define ASMJIT_EXPORTS
-
+#include "../core/api-build_p.h"
 #include "../core/assembler.h"
-#include "../core/logging.h"
+#include "../core/logger.h"
 #include "../core/support.h"
 
 ASMJIT_BEGIN_NAMESPACE
@@ -62,13 +78,6 @@ public:
 };
 
 // ============================================================================
-// [asmjit::ErrorHandler]
-// ============================================================================
-
-ErrorHandler::ErrorHandler() noexcept {}
-ErrorHandler::~ErrorHandler() noexcept {}
-
-// ============================================================================
 // [asmjit::CodeHolder - Utilities]
 // ============================================================================
 
@@ -81,8 +90,8 @@ static void CodeHolder_resetInternal(CodeHolder* self, uint32_t resetPolicy) noe
     self->detach(emitters[--i]);
 
   // Reset everything into its construction state.
-  self->_codeInfo.reset();
-  self->_emitterOptions = 0;
+  self->_environment.reset();
+  self->_baseAddress = Globals::kNoBaseAddress;
   self->_logger = nullptr;
   self->_errorHandler = nullptr;
 
@@ -113,20 +122,10 @@ static void CodeHolder_resetInternal(CodeHolder* self, uint32_t resetPolicy) noe
   self->_zone.reset(resetPolicy);
 }
 
-static void CodeHolder_modifyEmitterOptions(CodeHolder* self, uint32_t clear, uint32_t add) noexcept {
-  uint32_t oldOpt = self->_emitterOptions;
-  uint32_t newOpt = (oldOpt & ~clear) | add;
-
-  if (oldOpt == newOpt)
-    return;
-
-  // Modify emitter options of `CodeHolder` itself.
-  self->_emitterOptions = newOpt;
-
-  // Modify emitter options of all attached emitters.
+static void CodeHolder_onSettingsUpdated(CodeHolder* self) noexcept {
+  // Notify all attached emitters about a settings update.
   for (BaseEmitter* emitter : self->emitters()) {
-    emitter->_emitterOptions = (emitter->_emitterOptions & ~clear) | add;
-    emitter->onUpdateGlobalInstOptions();
+    emitter->onSettingsUpdated();
   }
 }
 
@@ -135,8 +134,8 @@ static void CodeHolder_modifyEmitterOptions(CodeHolder* self, uint32_t clear, ui
 // ============================================================================
 
 CodeHolder::CodeHolder() noexcept
-  : _codeInfo(),
-    _emitterOptions(0),
+  : _environment(),
+    _baseAddress(Globals::kNoBaseAddress),
     _logger(nullptr),
     _errorHandler(nullptr),
     _zone(16384 - Zone::kBlockOverhead),
@@ -161,7 +160,7 @@ inline void CodeHolder_setSectionDefaultName(
   section->_name.u32[1] = Support::bytepack32_4x8(uint8_t(c4), uint8_t(c5), uint8_t(c6), uint8_t(c7));
 }
 
-Error CodeHolder::init(const CodeInfo& info) noexcept {
+Error CodeHolder::init(const Environment& environment, uint64_t baseAddress) noexcept {
   // Cannot reinitialize if it's locked or there is one or more emitter attached.
   if (isInitialized())
     return DebugUtils::errored(kErrorAlreadyInitialized);
@@ -169,7 +168,7 @@ Error CodeHolder::init(const CodeInfo& info) noexcept {
   // If we are just initializing there should be no emitters attached.
   ASMJIT_ASSERT(_emitters.empty());
 
-  // Create the default section and insert it to the `_sections` array.
+  // Create a default section and insert it to the `_sections` array.
   Error err = _sections.willGrow(&_allocator);
   if (err == kErrorOk) {
     Section* section = _allocator.allocZeroedT<Section>();
@@ -188,7 +187,8 @@ Error CodeHolder::init(const CodeInfo& info) noexcept {
     return err;
   }
   else {
-    _codeInfo = info;
+    _environment = environment;
+    _baseAddress = baseAddress;
     return kErrorOk;
   }
 }
@@ -255,31 +255,25 @@ Error CodeHolder::detach(BaseEmitter* emitter) noexcept {
 }
 
 // ============================================================================
-// [asmjit::CodeHolder - Emitter Options]
-// ============================================================================
-
-static constexpr uint32_t kEmitterOptionsFilter = ~uint32_t(BaseEmitter::kOptionLoggingEnabled);
-
-void CodeHolder::addEmitterOptions(uint32_t options) noexcept {
-  CodeHolder_modifyEmitterOptions(this, 0, options & kEmitterOptionsFilter);
-}
-
-void CodeHolder::clearEmitterOptions(uint32_t options) noexcept {
-  CodeHolder_modifyEmitterOptions(this, options & kEmitterOptionsFilter, 0);
-}
-
-// ============================================================================
-// [asmjit::CodeHolder - Logging & Error Handling]
+// [asmjit::CodeHolder - Logging]
 // ============================================================================
 
 void CodeHolder::setLogger(Logger* logger) noexcept {
-  #ifndef ASMJIT_DISABLE_LOGGING
+#ifndef ASMJIT_NO_LOGGING
   _logger = logger;
-  uint32_t option = !logger ? uint32_t(0) : uint32_t(BaseEmitter::kOptionLoggingEnabled);
-  CodeHolder_modifyEmitterOptions(this, BaseEmitter::kOptionLoggingEnabled, option);
-  #else
-  ASMJIT_UNUSED(logger);
-  #endif
+  CodeHolder_onSettingsUpdated(this);
+#else
+  DebugUtils::unused(logger);
+#endif
+}
+
+// ============================================================================
+// [asmjit::CodeHolder - Error Handling]
+// ============================================================================
+
+void CodeHolder::setErrorHandler(ErrorHandler* errorHandler) noexcept {
+  _errorHandler = errorHandler;
+  CodeHolder_onSettingsUpdated(this);
 }
 
 // ============================================================================
@@ -424,7 +418,7 @@ Section* CodeHolder::ensureAddressTableSection() noexcept {
   if (_addressTableSection)
     return _addressTableSection;
 
-  newSection(&_addressTableSection, CodeHolder_addrTabName, sizeof(CodeHolder_addrTabName) - 1, 0, _codeInfo.gpSize());
+  newSection(&_addressTableSection, CodeHolder_addrTabName, sizeof(CodeHolder_addrTabName) - 1, 0, _environment.registerSize());
   return _addressTableSection;
 }
 
@@ -442,7 +436,7 @@ Error CodeHolder::addAddressToAddressTable(uint64_t address) noexcept {
     return DebugUtils::errored(kErrorOutOfMemory);
 
   _addressTableEntries.insert(entry);
-  section->_virtualSize += _codeInfo.gpSize();
+  section->_virtualSize += _environment.registerSize();
 
   return kErrorOk;
 }
@@ -454,20 +448,24 @@ Error CodeHolder::addAddressToAddressTable(uint64_t address) noexcept {
 //! Only used to lookup a label from `_namedLabels`.
 class LabelByName {
 public:
-  inline LabelByName(const char* key, size_t keySize, uint32_t hashCode) noexcept
+  inline LabelByName(const char* key, size_t keySize, uint32_t hashCode, uint32_t parentId) noexcept
     : _key(key),
       _keySize(uint32_t(keySize)),
-      _hashCode(hashCode) {}
+      _hashCode(hashCode),
+      _parentId(parentId) {}
 
   inline uint32_t hashCode() const noexcept { return _hashCode; }
 
   inline bool matches(const LabelEntry* entry) const noexcept {
-    return entry->nameSize() == _keySize && ::memcmp(entry->name(), _key, _keySize) == 0;
+    return entry->nameSize() == _keySize &&
+           entry->parentId() == _parentId &&
+           ::memcmp(entry->name(), _key, _keySize) == 0;
   }
 
   const char* _key;
   uint32_t _keySize;
   uint32_t _hashCode;
+  uint32_t _parentId;
 };
 
 // Returns a hash of `name` and fixes `nameSize` if it's `SIZE_MAX`.
@@ -523,7 +521,7 @@ LabelLink* CodeHolder::newLabelLink(LabelEntry* le, uint32_t sectionId, size_t o
 }
 
 Error CodeHolder::newLabelEntry(LabelEntry** entryOut) noexcept {
-  *entryOut = 0;
+  *entryOut = nullptr;
 
   uint32_t labelId = _labelEntries.size();
   if (ASMJIT_UNLIKELY(labelId == Globals::kInvalidId))
@@ -545,7 +543,7 @@ Error CodeHolder::newLabelEntry(LabelEntry** entryOut) noexcept {
 }
 
 Error CodeHolder::newNamedLabelEntry(LabelEntry** entryOut, const char* name, size_t nameSize, uint32_t type, uint32_t parentId) noexcept {
-  *entryOut = 0;
+  *entryOut = nullptr;
   uint32_t hashCode = CodeHolder_hashNameAndGetSize(name, nameSize);
 
   if (ASMJIT_UNLIKELY(nameSize == 0))
@@ -564,7 +562,7 @@ Error CodeHolder::newNamedLabelEntry(LabelEntry** entryOut, const char* name, si
 
     case Label::kTypeGlobal:
       if (ASMJIT_UNLIKELY(parentId != Globals::kInvalidId))
-        return DebugUtils::errored(kErrorNonLocalLabelCantHaveParent);
+        return DebugUtils::errored(kErrorNonLocalLabelCannotHaveParent);
 
       break;
 
@@ -575,7 +573,7 @@ Error CodeHolder::newNamedLabelEntry(LabelEntry** entryOut, const char* name, si
   // Don't allow to insert duplicates. Local labels allow duplicates that have
   // different id, this is already accomplished by having a different hashes
   // between the same label names having different parent labels.
-  LabelEntry* le = _namedLabels.get(LabelByName(name, nameSize, hashCode));
+  LabelEntry* le = _namedLabels.get(LabelByName(name, nameSize, hashCode, parentId));
   if (ASMJIT_UNLIKELY(le))
     return DebugUtils::errored(kErrorLabelAlreadyDefined);
 
@@ -594,7 +592,7 @@ Error CodeHolder::newNamedLabelEntry(LabelEntry** entryOut, const char* name, si
   le->_hashCode = hashCode;
   le->_setId(labelId);
   le->_type = uint8_t(type);
-  le->_parentId = Globals::kInvalidId;
+  le->_parentId = parentId;
   le->_offset = 0;
   ASMJIT_PROPAGATE(le->_name.setData(&_zone, name, nameSize));
 
@@ -606,13 +604,14 @@ Error CodeHolder::newNamedLabelEntry(LabelEntry** entryOut, const char* name, si
 }
 
 uint32_t CodeHolder::labelIdByName(const char* name, size_t nameSize, uint32_t parentId) noexcept {
-  //
-  ASMJIT_UNUSED(parentId);
-
   uint32_t hashCode = CodeHolder_hashNameAndGetSize(name, nameSize);
-  if (ASMJIT_UNLIKELY(!nameSize)) return 0;
+  if (ASMJIT_UNLIKELY(!nameSize))
+    return 0;
 
-  LabelEntry* le = _namedLabels.get(LabelByName(name, nameSize, hashCode));
+  if (parentId != Globals::kInvalidId)
+    hashCode ^= parentId;
+
+  LabelEntry* le = _namedLabels.get(LabelByName(name, nameSize, hashCode, parentId));
   return le ? le->id() : uint32_t(Globals::kInvalidId);
 }
 
@@ -826,6 +825,9 @@ static Error CodeHolder_evaluateExpression(CodeHolder* self, Expression* exp, ui
     case Expression::kOpSra:
       result = Support::sar(a, Support::min<uint64_t>(b, 63));
       break;
+
+    default:
+      return DebugUtils::errored(kErrorInvalidState);
   }
 
   *out = result;
@@ -887,7 +889,6 @@ size_t CodeHolder::codeSize() const noexcept {
     }
   }
 
-  //
   if ((sizeof(uint64_t) > sizeof(size_t) && offset > SIZE_MAX) || of)
     return SIZE_MAX;
 
@@ -899,8 +900,8 @@ Error CodeHolder::relocateToBase(uint64_t baseAddress) noexcept {
   if (ASMJIT_UNLIKELY(baseAddress == Globals::kNoBaseAddress))
     return DebugUtils::errored(kErrorInvalidArgument);
 
-  _codeInfo.setBaseAddress(baseAddress);
-  uint32_t gpSize = _codeInfo.gpSize();
+  _baseAddress = baseAddress;
+  uint32_t addressSize = _environment.registerSize();
 
   Section* addressTableSection = _addressTableSection;
   uint32_t addressTableEntryCount = 0;
@@ -961,7 +962,7 @@ Error CodeHolder::relocateToBase(uint64_t baseAddress) noexcept {
 
       case RelocEntry::kTypeAbsToRel: {
         value -= baseAddress + sectionOffset + sourceOffset + regionSize;
-        if (gpSize > 4 && !Support::isInt32(int64_t(value)))
+        if (addressSize > 4 && !Support::isInt32(int64_t(value)))
           return DebugUtils::errored(kErrorRelocOffsetOutOfRange);
         break;
       }
@@ -984,7 +985,7 @@ Error CodeHolder::relocateToBase(uint64_t baseAddress) noexcept {
           if (!atEntry->hasAssignedSlot())
             atEntry->_slot = addressTableEntryCount++;
 
-          size_t atEntryIndex = size_t(atEntry->slot()) * gpSize;
+          size_t atEntryIndex = size_t(atEntry->slot()) * addressSize;
           uint64_t addrSrc = sectionOffset + sourceOffset + regionSize;
           uint64_t addrDst = addressTableSection->offset() + uint64_t(atEntryIndex);
 
@@ -1045,7 +1046,7 @@ Error CodeHolder::relocateToBase(uint64_t baseAddress) noexcept {
 
   // Fixup the virtual size of the address table if it's the last section.
   if (_sections.last() == addressTableSection) {
-    size_t addressTableSize = addressTableEntryCount * gpSize;
+    size_t addressTableSize = addressTableEntryCount * addressSize;
     addressTableSection->_buffer._size = addressTableSize;
     addressTableSection->_virtualSize = addressTableSize;
   }
@@ -1053,7 +1054,7 @@ Error CodeHolder::relocateToBase(uint64_t baseAddress) noexcept {
   return kErrorOk;
 }
 
-Error CodeHolder::copySectionData(void* dst, size_t dstSize, uint32_t sectionId, uint32_t options) noexcept {
+Error CodeHolder::copySectionData(void* dst, size_t dstSize, uint32_t sectionId, uint32_t copyOptions) noexcept {
   if (ASMJIT_UNLIKELY(!isSectionValid(sectionId)))
     return DebugUtils::errored(kErrorInvalidSection);
 
@@ -1065,7 +1066,7 @@ Error CodeHolder::copySectionData(void* dst, size_t dstSize, uint32_t sectionId,
 
   memcpy(dst, section->data(), bufferSize);
 
-  if (bufferSize < dstSize && (options & kCopyWithPadding)) {
+  if (bufferSize < dstSize && (copyOptions & kCopyPadSectionBuffer)) {
     size_t paddingSize = dstSize - bufferSize;
     memset(static_cast<uint8_t*>(dst) + bufferSize, 0, paddingSize);
   }
@@ -1073,7 +1074,7 @@ Error CodeHolder::copySectionData(void* dst, size_t dstSize, uint32_t sectionId,
   return kErrorOk;
 }
 
-Error CodeHolder::copyFlattenedData(void* dst, size_t dstSize, uint32_t options) noexcept {
+Error CodeHolder::copyFlattenedData(void* dst, size_t dstSize, uint32_t copyOptions) noexcept {
   size_t end = 0;
   for (Section* section : _sections) {
     if (section->offset() > dstSize)
@@ -1089,14 +1090,17 @@ Error CodeHolder::copyFlattenedData(void* dst, size_t dstSize, uint32_t options)
     size_t paddingSize = 0;
     memcpy(dstTarget, section->data(), bufferSize);
 
-    if ((options & kCopyWithPadding) && bufferSize < section->virtualSize()) {
+    if ((copyOptions & kCopyPadSectionBuffer) && bufferSize < section->virtualSize()) {
       paddingSize = Support::min<size_t>(dstSize - offset, size_t(section->virtualSize())) - bufferSize;
       memset(dstTarget + bufferSize, 0, paddingSize);
     }
 
     end = Support::max(end, offset + bufferSize + paddingSize);
   }
-  // the code in case that the destination was much larger (for example page-size).
+
+  if (end < dstSize && (copyOptions & kCopyPadTargetBuffer)) {
+    memset(static_cast<uint8_t*>(dst) + end, 0, dstSize - end);
+  }
 
   return kErrorOk;
 }

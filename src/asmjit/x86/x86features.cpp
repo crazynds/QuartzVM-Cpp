@@ -1,12 +1,27 @@
-// [AsmJit]
-// Machine Code Generation for C++.
+// AsmJit - Machine code generation for C++
 //
-// [License]
-// Zlib - See LICENSE.md file in the package.
+//  * Official AsmJit Home Page: https://asmjit.com
+//  * Official Github Repository: https://github.com/asmjit/asmjit
+//
+// Copyright (c) 2008-2020 The AsmJit Authors
+//
+// This software is provided 'as-is', without any express or implied
+// warranty. In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not be
+//    misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source distribution.
 
-#define ASMJIT_EXPORTS
-
-#include "../core/build.h"
+#include "../core/api-build_p.h"
 #if defined(ASMJIT_BUILD_X86) && ASMJIT_ARCH_X86
 
 #include "../core/cpuinfo.h"
@@ -91,22 +106,25 @@ static inline void simplifyCpuVendor(CpuInfo& cpu, uint32_t d0, uint32_t d1, uin
 }
 
 static inline void simplifyCpuBrand(char* s) noexcept {
-  // Used to always clear the current character to ensure that the result
-  // doesn't contain garbage after the new zero terminator.
   char* d = s;
 
+  char c = s[0];
   char prev = 0;
-  char curr = s[0];
+
+  // Used to always clear the current character to ensure that the result
+  // doesn't contain garbage after a new null terminator is placed at the end.
   s[0] = '\0';
 
   for (;;) {
-    if (curr == 0)
+    if (!c)
       break;
 
-    if (!(curr == ' ' && (prev == '@' || s[1] == ' ' || s[1] == '@')))
-      *d++ = prev = curr;
+    if (!(c == ' ' && (prev == '@' || s[1] == ' ' || s[1] == '@'))) {
+      *d++ = c;
+      prev = c;
+    }
 
-    curr = *++s;
+    c = *++s;
     s[0] = '\0';
   }
 
@@ -121,7 +139,9 @@ ASMJIT_FAVOR_SIZE void detectCpu(CpuInfo& cpu) noexcept {
   Features& features = cpu._features.as<Features>();
 
   cpu.reset();
-  cpu._archInfo.init(ArchInfo::kIdHost);
+  cpu._arch = Environment::kArchHost;
+  cpu._subArch = Environment::kSubArchUnknown;
+  cpu._reserved = 0;
   cpu._maxLogicalProcessors = 1;
   features.add(Features::kI486);
 

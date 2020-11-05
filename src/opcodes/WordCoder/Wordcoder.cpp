@@ -78,6 +78,38 @@ void Wordcoder::mov(GeralMemory *g1,GeralMemory *g2){
 			Memoria *m1=(Memoria*)g1;
 			Memoria *m2=(Memoria*)g2;
 			mov_m_m(m1->getPos(),m2->getPos());
+	}else if(str=="r-i"){
+			RecursoPtr *m1=(RecursoPtr*)g1;
+			ImediateData *m2=(ImediateData*)g2;
+			mov_r_c(m1->getPosBase(),m1->getIncrement(),m2->getValue());
+	}else if(str=="w-r"){
+			Workspace *m1=(Workspace*)g1;
+			RecursoPtr *m2=(RecursoPtr*)g2;
+			mov_w_r(m1->getPos(),m2->getPosBase(),m2->getIncrement());
+	}else if(str=="r-w"){
+			RecursoPtr *m1=(RecursoPtr*)g1;
+			Workspace *m2=(Workspace*)g2;
+			mov_r_w(m1->getPosBase(),m1->getIncrement(),m2->getPos());
+	}else if(str=="r-r"){
+			RecursoPtr *m1=(RecursoPtr*)g1;
+			RecursoPtr *m2=(RecursoPtr*)g2;
+			mov_r_r(m1->getPosBase(),m1->getIncrement(),m2->getPosBase(),m2->getIncrement());
+	}else if(str=="rrw-i"){
+			RecursoPtr *m1=(RecursoPtr*)g1;
+			ImediateData *m2=(ImediateData*)g2;
+			mov_rrw_c(m1->getPosBase(),m1->getPosIndex(),m1->getShift(),m1->getIncrement(),m2->getValue());
+	}else if(str=="w-rrw"){
+			Workspace *m2=(Workspace*)g1;
+			RecursoPtr *m1=(RecursoPtr*)g2;
+			mov_w_rrw(m2->getPos(),m1->getPosBase(),m1->getPosIndex(),m1->getShift(),m1->getIncrement());
+	}else if(str=="rrw-w"){
+			RecursoPtr *m1=(RecursoPtr*)g1;
+			Workspace *m2=(Workspace*)g2;
+			mov_rrw_w(m1->getPosBase(),m1->getPosIndex(),m1->getShift(),m1->getIncrement(),m2->getPos());
+	}else if(str=="rrw-rrw"){
+			RecursoPtr *m1=(RecursoPtr*)g1;
+			RecursoPtr *m2=(RecursoPtr*)g2;
+			mov_rrw_rrw(m1->getPosBase(),m1->getPosIndex(),m1->getShift(),m1->getIncrement(),m2->getPosBase(),m2->getPosIndex(),m2->getShift(),m2->getIncrement());
 	}else if(str=="m-mmw"){
 			Memoria *m1=(Memoria*)g1;
 			MemoriaPtr *m2=(MemoriaPtr*)g2;
@@ -312,6 +344,10 @@ void Wordcoder::call(GeralMemory *g1){
 	}break;
 	}
 	delete g1;
+}
+void Wordcoder::call(Label &l){
+	call_c(0);
+	l.addLocation(getTam()-4);
 }
 
 void Wordcoder::push(GeralMemory *g1){
@@ -555,12 +591,12 @@ void Wordcoder::jmp(GeralMemory *g1,char cmp){
 	delete g1;
 }
 void Wordcoder::jmp(Label &l,char cmp){
-	l.addLocation(getTam()+2);
 	jmp(c_(0),cmp);
+	l.addLocation(getTam()-4);
 }
 void Wordcoder::jmp(Label &l){
-	l.addLocation(getTam()+2);
 	jmp(c_(0));
+	l.addLocation(getTam()-4);
 }
 void Wordcoder::bind(Label &l){
 	l.setPosition(getPos());
@@ -585,6 +621,25 @@ GeralMemory* ptr_(GeralMemory *r,uint32 inc=0){
 GeralMemory* ptr_(GeralMemory *reg,GeralMemory *regIndex,uint8 shift=0,uint32 inc=0){
 	if(reg->getType()=='W' && regIndex->getType()=='W'){
 		MemoriaPtr *w=new MemoriaPtr((Workspace*)reg,(Workspace*)regIndex,shift,inc);
+		return (GeralMemory*)w;
+	}else{
+		std::cout << "Wordcoder: Esperado um registrador onde foi recebido outro tipo de variavel";
+		return NULL;
+	}
+}
+
+GeralMemory* ptr_R(GeralMemory *r,uint32 inc=0){
+	if(r->getType()=='W'){
+		RecursoPtr *w=new RecursoPtr((Workspace*)r,inc);
+		return (GeralMemory*)w;
+	}else{
+		std::cout << "Wordcoder: Esperado um registrador onde foi recebido outro tipo de variavel";
+		return NULL;
+	}
+}
+GeralMemory* ptr_R(GeralMemory *reg,GeralMemory *regIndex,uint8 shift=0,uint32 inc=0){
+	if(reg->getType()=='W' && regIndex->getType()=='W'){
+		RecursoPtr *w=new RecursoPtr((Workspace*)reg,(Workspace*)regIndex,shift,inc);
 		return (GeralMemory*)w;
 	}else{
 		std::cout << "Wordcoder: Esperado um registrador onde foi recebido outro tipo de variavel";

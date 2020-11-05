@@ -15,9 +15,13 @@ Thread::Thread(){
 	ct=0;
 	cod=0;
 	compare_flags=0;
+#ifdef THREAD_CUSTOM_STACK
 	stack_pointer=0;
 	stack=new uint64[THREAD_STACK_SIZE];
 	stack_max=THREAD_STACK_SIZE;
+#else
+
+#endif
 	for(int x=0;x<256;x++)workspace[x]=0;
 	vt=0;
 }
@@ -27,16 +31,11 @@ Thread::~Thread(){
 }
 
 void Thread::savePoint(){
-	if(stack_pointer>=stack_max){
-		incrementStack();
-		if(error_flags&MAX_LIMIT_STACK_){
-			return;
-		}
-	}
-	stack[stack_pointer++]=((uint64)ct->getCodContext()<<32)+cod_pointer;
+	saveInStack(((uint64)ct->getCodContext()<<32)+cod_pointer);
 }
 
 void Thread::saveInStack(uint64 p){
+#ifdef THREAD_CUSTOM_STACK
 	if(stack_pointer>=stack_max){
 		incrementStack();
 		if(error_flags&MAX_LIMIT_STACK_){
@@ -44,33 +43,44 @@ void Thread::saveInStack(uint64 p){
 		}
 	}
 	stack[stack_pointer++]=p;
+#else
+	stack.push(p);
+#endif
 }
 uint64 Thread::recoverInStack(){
-	if(stack_pointer!=0){
-		if(stack_max>THREAD_STACK_SIZE)if(stack_pointer<(stack_max>>4)-64)decrementStack();
+#ifdef THREAD_CUSTOM_STACK
+	if(stack_pointer>100){
+		if(stack_pointer&0x300!=0)if(stack_max>THREAD_STACK_SIZE)if(stack_pointer<(stack_max>>4)-64)decrementStack();
 		return stack[--stack_pointer];
 	}
+	error_flags|=MIN_LIMIT_STACK_;
 	return 0;
+#else
+	if(stack.empty()){
+		error_flags|=MIN_LIMIT_STACK_;
+		return 0;
+	}
+	uint64 ret=stack.top();
+	stack.pop();
+	return ret;
+#endif
 }
 
 void Thread::recoverPoint(){
-	if(stack_pointer!=0){
-		if(stack_max>THREAD_STACK_SIZE)if(stack_pointer<(stack_max>>4)-64)decrementStack();
-		register uint64 p=stack[--stack_pointer];
-		register uint16 k=uint16(p>>32);
-		if(ct->getCodContext()!=k){
-			if(vt->checkContexto(k)==0){
-				error_flags|=INVALID_CHANGE_CONTEXT_;
-				std::cout << "[ERROR] - Erro ao retornar para um contexto que não existe mais. (ID= " << k << ")" << std::endl;
-				return;
-			}
-			Contexto &c=vt->getContexto(k);
-			changeContexto(c);
+	register uint64 p=recoverInStack();
+	if(isFinalized())return;
+	register uint16 k=uint16(p>>32);
+	if(ct->getCodContext()!=k){
+		if(vt->checkContexto(k)==0){
+			error_flags|=INVALID_CHANGE_CONTEXT_;
+			std::cout << "[ERROR] - Erro ao retornar para um contexto que não existe mais. (ID= " << k << ")" << std::endl;
+			return;
 		}
-		cod_pointer=uint32(p);
-		return;
+		Contexto &c=vt->getContexto(k);
+		changeContexto(c);
 	}
-	error_flags|=MAX_LIMIT_STACK_;
+	cod_pointer=uint32(p);
+	return;
 }
 
 void Thread::setPontCodeCtx(uint48 val){
@@ -109,9 +119,7 @@ VirtualMachine& Thread::getVirtualMachine(){
 
 uint16 Thread::runInstruction(void **funcs){
 	uint16 opcode=getNext16();
-
 	((Func)funcs[opcode])(*this);
-
 	return opcode;
 }
 
@@ -171,7 +179,8 @@ uint64 Thread::getNext64(){
 
 uint8 Thread::checkUseCode(uint32 tam){
 	if(cod_pointer+tam>ct->cod_len){
-		error_flags|=OVERLOAD_COD_ERROR_;
+		//error_flags|=OVERLOAD_COD_ERROR_;
+		throw CodeException(cod_pointer,"CHECK_CODE_THREAD",_OVERLOAD_CODE);
 	}
 	return error_flags;
 }
@@ -189,5 +198,5 @@ Contexto& Thread::getContexto(){
 
 
 JitRuntime& Thread::getJitRuntime(){
-	return vt->getJitRuntime();
+	return vt->getManagerOpcodes().getJitRuntime();
 }

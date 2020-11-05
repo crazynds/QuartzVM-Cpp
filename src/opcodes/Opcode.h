@@ -10,13 +10,14 @@
 
 #define OP_TYPE 11 // Opcode tipo | Referente a como está sendo manipulado as variaveis (float,int,etc...)
 
+	#define P_BINARY_DATA (0<<OP_TYPE)
+
 	#define P_UINT8 (1<<OP_TYPE)
 	#define P_UINT16 (2<<OP_TYPE)
 	#define P_UINT32 (3<<OP_TYPE)
 	#define P_UINT48 (4<<OP_TYPE)
 	#define P_UINT64 (5<<OP_TYPE)
 	#define P_UINT128 (6<<OP_TYPE)
-
 
 	#define P_INT8 (7<<OP_TYPE)
 	#define P_INT16 (8<<OP_TYPE)
@@ -25,8 +26,15 @@
 	#define P_INT64 (11<<OP_TYPE)
 	#define P_INT128 (12<<OP_TYPE)
 
+	#define P_FLOAT32 (13<<OP_TYPE)
+	#define P_FLOAT64 (14<<OP_TYPE)
+	//#define P_FLOAT80 (15<<OP_TYPE)
+	//#define P_FLOAT128 (16<<OP_TYPE)
+	#define P_STRING (17<<OP_TYPE)
+	#define P_FILE (18<<OP_TYPE)
+
 	#define GERAL_TYPE (20<<OP_TYPE) // Tipo geral | Para comandos que não necessitam necessáriamente um tipo da variavel para manipular
-	#define SYSTEM_CALL (21<<OP_TYPE)
+	#define SYSTEM_CALL (31<<OP_TYPE)
 
 
 
@@ -75,6 +83,10 @@
 	#define MOV_RRW_W (MOVIMENTACAO+32)
 	#define MOV_W_RRW (MOVIMENTACAO+33)
 	#define MOV_RRW_RRW (MOVIMENTACAO+34)
+	#define MOV_R_W (MOVIMENTACAO+35)
+	#define MOV_W_R (MOVIMENTACAO+36)
+	#define MOV_R_R (MOVIMENTACAO+37)
+	#define MOV_R_C (MOVIMENTACAO+38)
 
 	#define MOV_MMWW_RRW
 	#define MOV_RRW_MMWW
@@ -240,10 +252,16 @@
 	#define GET_CONTEXT_ID SYSTEM_CALL+6 //Retorna o id do contexto
 	#define CHECK_CONTEXT_ID SYSTEM_CALL+7 //Confere o id do contexto, caso falso, zera a variavel passada como parametro
 	#define HLT_COMAND SYSTEM_CALL+8
+	#define SLEEP_COMAND SYSTEM_CALL+9
+	#define DEBUG_PRINT_OUT_RESORCE SYSTEM_CALL+10 //Printa um recurso
+	#define DEBUG_PRINT_OUT_MEM SYSTEM_CALL+11 //Printa um recurso
 
 
 	#define ALLOC_RES SYSTEM_CALL+128
 	#define FREE_RES SYSTEM_CALL+129
+	#define REALLOC_RES SYSTEM_CALL+130
+	#define ALLOC_DIN_RES SYSTEM_CALL+131
+	#define REALLOC_DIN_RES SYSTEM_CALL+132
 
 #endif /* OPCODES_OPCODE_H_ */
 
