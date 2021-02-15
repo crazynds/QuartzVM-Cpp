@@ -54,7 +54,7 @@
 		if(t.checkUseCode(4))return;
 		uint32 pos=t.getNext32();
 		uint32 enter=t.getPontCode();
-		FuncJit fn=t.getContexto().getFunction(pos);
+		FuncJit fn=t.getContext().getFunction(pos);
 		uint64 result;
 
 		try{
@@ -97,7 +97,7 @@
 		if(t.checkUseCode(2))return 0;
 		uint32 posInit=t.getPontCode();
 		{
-			uint16 *pt=(uint16*)&t.getContexto().cod[posInit-2];
+			uint16 *pt=(uint16*)&t.getContext().cod[posInit-2];
 			*pt=JIT_FLAG_EXECUTE;
 		}
 
@@ -116,7 +116,7 @@
 
 		if(t.isFinalized())return 0;
 		//Save code
-		FuncJit& fn=t.getContexto().createFunction(posInit);
+		FuncJit& fn=t.getContext().createFunction(posInit);
 		//Generate executable code
 		Error err = rt.add(&fn, &code);
 		if (err){
@@ -126,7 +126,7 @@
 	}
 
 	void execute_jit(Thread &t){
-		FuncJit fn=t.getContexto().getFunction(t.getPontCode());
+		FuncJit fn=t.getContext().getFunction(t.getPontCode());
 		if(fn==0){
 			throw CodeException(t.getPontCode(),"JIT_EXECUTE","Não foi possivel encontrar a função JIT já criada anteriormente.");
 		}

@@ -9,7 +9,7 @@
 #define SRC_CLASS_THREAD_H_
 
 	#include "../lib/Types.h"
-	#include "Contexto.h"
+	#include "Context.h"
 
 	#define RUNNING_ 1<<0
 	//#define OVERLOAD_COD_ERROR_ 1<<1
@@ -30,7 +30,7 @@
 			uint64 *maxMem;
 			uint32 *erro_flags;
 		public:
-			void prepare(Contexto *c,uint32 *err){
+			void prepare(Context *c,uint32 *err){
 				mem=&c->mem;
 				maxMem=&c->max_mem;
 				erro_flags=err;
@@ -59,7 +59,7 @@
 	class Thread{
 		private:
 			VirtualMachine *vt;
-			Contexto *ct;
+			Context *ct;
 			//Memorias de acesso;
 			uint8 *cod;
 
@@ -121,8 +121,8 @@
 			void saveInStack(uint64);
 			uint64 recoverInStack();
 			void recoverPoint();
-			void prepare(VirtualMachine&,Contexto&,uint16,uint32);
-			void changeContexto(Contexto&);
+			void prepare(VirtualMachine&,Context&,uint16,uint32);
+			void changeContext(Context&);
 			uint16 runInstruction(void**);
 
 			uint8 getNext8();
@@ -139,7 +139,7 @@
 			uint16 isFinalized();
 			uint32 getPontCode();
 			VirtualMachine& getVirtualMachine();
-			Contexto& getContexto();
+			Context& getContext();
 
 
 			void setPontCode(uint32);

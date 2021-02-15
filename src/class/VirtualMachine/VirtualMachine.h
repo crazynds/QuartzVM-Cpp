@@ -31,7 +31,7 @@
      */
 
 
-	class Contexto;
+	class Context;
 	class Thread;
 
 
@@ -41,10 +41,10 @@
 	class VirtualMachine{
 		private:
 
-			//Contextos e Threads
+			//Contexts e Threads
 			uint16 tamContex;
 			uint16 tamThreads;
-			std::vector<Dupla<Contexto,uint16>> ct;
+			std::vector<Dupla<Context,uint16>> ct;
 			std::vector<Dupla<Thread,uint16>> th;
 
 
@@ -78,8 +78,8 @@
 
 			//Cria uma thread de execução passando como param o código do ctx e a posição de entrada.
 			void createThread(uint16,uint32);
-			//Carrega um contexto passando como param o bytecode e o tamanho
-			uint16 loadContexto(uint8*,uint32);
+			//Carrega um Context passando como param o bytecode e o tamanho
+			uint16 loadContext(uint8*,uint32);
 
 
 
@@ -87,9 +87,9 @@
 			void free_resorce(void*);
 			void* realloc_resorce(void*,uint32);
 
-			uint16 checkContexto(uint16);
+			uint16 checkContext(uint16);
 			uint8 getDebugLevel();
-			Contexto& getContexto(uint16);
+			Context& getContext(uint16);
 			bool isRunning();
 			bool isExceptionCatched();
 

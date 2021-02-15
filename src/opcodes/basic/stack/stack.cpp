@@ -11,14 +11,14 @@ void call_ctx_c(Thread &t){
 	uint32 pon=t.getNext32();
 	t.savePoint();
 #ifndef _FAST_MODE
-	if(t.getVirtualMachine().checkContexto(ctx)==0){
+	if(t.getVirtualMachine().checkContext(ctx)==0){
 		t.error_flags|=INVALID_CHANGE_CONTEXT_;
-		std::cout << "[ERROR] - Erro ao entrar em um contexto inexistente. (ID= " << ctx << ")" << std::endl;
+		std::cout << "[ERROR] - Erro ao entrar em um Context inexistente. (ID= " << ctx << ")" << std::endl;
 		return;
 	}
 #endif
-	Contexto &ct=t.getVirtualMachine().getContexto(ctx);
-	t.changeContexto(ct);
+	Context &ct=t.getVirtualMachine().getContext(ctx);
+	t.changeContext(ct);
 	t.setPontCode(pon);
 	t.checkUseCode(2);
 }
@@ -31,14 +31,14 @@ void call_ctx_w(Thread &t){
 	uint32 pon=uint32(t.workspace[t.getNext8()]);
 	t.savePoint();
 #ifndef _FAST_MODE
-	if(t.getVirtualMachine().checkContexto(ctx)==0){
+	if(t.getVirtualMachine().checkContext(ctx)==0){
 		t.error_flags|=INVALID_CHANGE_CONTEXT_;
-		std::cout << "[ERROR] - Erro ao entrar em um contexto inexistente. (ID= " << ctx << ")" << std::endl;
+		std::cout << "[ERROR] - Erro ao entrar em um Context inexistente. (ID= " << ctx << ")" << std::endl;
 		return;
 	}
 #endif
-	Contexto &ct=t.getVirtualMachine().getContexto(ctx);
-	t.changeContexto(ct);
+	Context &ct=t.getVirtualMachine().getContext(ctx);
+	t.changeContext(ct);
 	t.setPontCode(pon);
 	t.checkUseCode(2);
 }

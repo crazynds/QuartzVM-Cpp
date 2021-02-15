@@ -1,5 +1,5 @@
 /*
- * Contexto.cpp
+ * Context.cpp
  *
  * Created on: 10 de abr de 2019
  *   Author: lhlag
@@ -71,13 +71,13 @@ void Thread::recoverPoint(){
 	if(isFinalized())return;
 	register uint16 k=uint16(p>>32);
 	if(ct->getCodContext()!=k){
-		if(vt->checkContexto(k)==0){
+		if(vt->checkContext(k)==0){
 			error_flags|=INVALID_CHANGE_CONTEXT_;
-			std::cout << "[ERROR] - Erro ao retornar para um contexto que não existe mais. (ID= " << k << ")" << std::endl;
+			std::cout << "[ERROR] - Erro ao retornar para um Context que não existe mais. (ID= " << k << ")" << std::endl;
 			return;
 		}
-		Contexto &c=vt->getContexto(k);
-		changeContexto(c);
+		Context &c=vt->getContext(k);
+		changeContext(c);
 	}
 	cod_pointer=uint32(p);
 	return;
@@ -87,18 +87,18 @@ void Thread::setPontCodeCtx(uint48 val){
 	uint64 p=val.toInt();
 	register uint16 k=uint16(p>>32);
 	if(ct->getCodContext()!=k){
-		if(vt->checkContexto(k)==0){
+		if(vt->checkContext(k)==0){
 			error_flags|=INVALID_CHANGE_CONTEXT_;
-			std::cout << "[ERROR] - Erro ao retornar para um contexto que não existe mais. (ID= " << k << ")" << std::endl;
+			std::cout << "[ERROR] - Erro ao retornar para um Context que não existe mais. (ID= " << k << ")" << std::endl;
 			return;
 		}
-		Contexto &c=vt->getContexto(k);
-		changeContexto(c);
+		Context &c=vt->getContext(k);
+		changeContext(c);
 	}
 	cod_pointer=uint32(p);
 }
 
-void Thread::prepare(VirtualMachine &v,Contexto &ct,uint16 cntx,uint32 pos){
+void Thread::prepare(VirtualMachine &v,Context &ct,uint16 cntx,uint32 pos){
 	this->ct=&ct;
 	vt=&v;
 	cod=ct.cod;
@@ -106,7 +106,7 @@ void Thread::prepare(VirtualMachine &v,Contexto &ct,uint16 cntx,uint32 pos){
 	error_flags&=~((uint16)1);
 	cod_pointer=pos;
 }
-void Thread::changeContexto(Contexto &c){
+void Thread::changeContext(Context &c){
 	mem.prepare(&c,&error_flags);
 	cod=c.cod;
 	cod_pointer=0;
@@ -192,7 +192,7 @@ uint32 Thread::getPontCode(){
 	return cod_pointer;
 }
 
-Contexto& Thread::getContexto(){
+Context& Thread::getContext(){
 	return *ct;
 }
 

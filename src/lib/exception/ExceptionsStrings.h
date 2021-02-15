@@ -14,7 +14,7 @@
 
 	static const std::string _OVERLOAD_CODE = "Fim do código encontrado em local invalido!";
 
-	static const std::string _LOAD_CONTEXT_NOT_VALID_STR = "Erro ao tentar criar um contexto inválido!";
+	static const std::string _LOAD_CONTEXT_NOT_VALID_STR = "Erro ao tentar criar um Context inválido!";
 
 	static const std::string _CREATE_FUNCTION_JIT_STR = "Erro ao criar função jit!";
 	static const std::string _ERROR_JIT_CREATE_NOT_FOUND_REGISTER_TYPE = "Erro ao criar um jit em tempo de execução, tipo ou tamanho de registrador não encontrado!";

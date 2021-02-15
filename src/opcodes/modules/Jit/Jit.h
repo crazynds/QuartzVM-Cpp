@@ -11,16 +11,14 @@
 	#include <vector>
 	#include <stdio.h>
 
-	#define ASMJIT_STATIC
-	#define ASMJIT_NO_LOGGING
-	#include "../../../asmjit/asmjit.h"
-	using namespace asmjit;
-	using namespace asmjit::x86;
-
+	#include "../../../lib/asmjit.h"
 	#include "../../../lib/Types.h"
 	#include "../../../class/Thread.h"
 	#include "../../../class/VirtualMachine/VirtualMachine.h"
 	#include "../../Opcode.h"
+
+	using namespace asmjit;
+	using namespace asmjit::x86;
 
 	#define OK_JIT_STATE 0x00
 	#define ERROR_JMP_ENTER_JIT_STATE 0x20

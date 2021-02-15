@@ -23,14 +23,14 @@ void jmp_ctx_c(Thread &t){
 	uint16 ctx=uint16(t.workspace[t.getNext8()]);
 	uint32 pon=t.getNext32();
 #ifndef _FAST_MODE
-	if(t.getVirtualMachine().checkContexto(ctx)==0){
+	if(t.getVirtualMachine().checkContext(ctx)==0){
 		t.error_flags|=INVALID_CHANGE_CONTEXT_;
-		std::cout << "[ERROR] - Erro ao entrar em um contexto inexistente. (ID= " << ctx << ")" << std::endl;
+		std::cout << "[ERROR] - Erro ao entrar em um Context inexistente. (ID= " << ctx << ")" << std::endl;
 		return;
 	}
 #endif
-	Contexto &ct=t.getVirtualMachine().getContexto(ctx);
-	t.changeContexto(ct);
+	Context &ct=t.getVirtualMachine().getContext(ctx);
+	t.changeContext(ct);
 	t.setPontCode(pon);
 	t.checkUseCode(2);
 }
@@ -41,14 +41,14 @@ void jmp_ctx_w(Thread &t){
 	uint16 ctx=uint16(t.workspace[t.getNext8()]);
 	uint32 pon=uint32(t.workspace[t.getNext8()]);
 #ifndef _FAST_MODE
-	if(t.getVirtualMachine().checkContexto(ctx)==0){
+	if(t.getVirtualMachine().checkContext(ctx)==0){
 		t.error_flags|=INVALID_CHANGE_CONTEXT_;
-		std::cout << "[ERROR] - Erro ao entrar em um contexto inexistente. (ID= " << ctx << ")" << std::endl;
+		std::cout << "[ERROR] - Erro ao entrar em um Context inexistente. (ID= " << ctx << ")" << std::endl;
 		return;
 	}
 #endif
-	Contexto &ct=t.getVirtualMachine().getContexto(ctx);
-	t.changeContexto(ct);
+	Context &ct=t.getVirtualMachine().getContext(ctx);
+	t.changeContext(ct);
 	t.setPontCode(pon);
 	t.checkUseCode(2);
 }

@@ -185,21 +185,21 @@ void load_context_w_mw(Thread &t){
 	if(cl.getTam()==0)t.workspace[pos]=0;
 	else{
 		VirtualMachine &vm=t.getVirtualMachine();
-		t.workspace[pos]=vm.loadContexto(cl.getCode(),cl.getTam());
+		t.workspace[pos]=vm.loadContext(cl.getCode(),cl.getTam());
 	}
 }
 void get_context_id_w(Thread &t){
 #ifndef _FAST_MODE
 	if(t.checkUseCode(3))return;
 #endif
-	t.workspace[t.getNext8()]=t.getContexto().getCodContext();
+	t.workspace[t.getNext8()]=t.getContext().getCodContext();
 }
 void check_context_id_w(Thread &t){
 #ifndef _FAST_MODE
 	if(t.checkUseCode(3))return;
 #endif
 	uint8 pos=t.getNext8();
-	t.workspace[pos]=t.getVirtualMachine().checkContexto(uint16(t.workspace[pos]));
+	t.workspace[pos]=t.getVirtualMachine().checkContext(uint16(t.workspace[pos]));
 }
 
 

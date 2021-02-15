@@ -7,7 +7,7 @@
 #include "VirtualMachine.h"
 
 #include "../Thread.h"
-#include "../Contexto.h"
+#include "../Context.h"
 #include <stdlib.h>
 
 
@@ -16,9 +16,10 @@ VirtualMachine::VirtualMachine(uint8 debug):
 	start();
 	tamContex=0;
 	tamThreads=0;
+
 	if(debug>3)debug=3;
 	vm_flags=(debug<<VM_FLAG_DEBUG_LV)|(1<<VM_FLAG_RUNNING);
-	recursos_alocados = mmalloc(0);
+	recursos_alocados = (void**)mmalloc(0);
 	qtd_res=0;
 
 	if(getDebugLevel()>=2)std::cout << "[LOG] - Definidas as variaveis hambientes!"<< std::endl;
@@ -64,11 +65,11 @@ VirtualMachine::~VirtualMachine(){
 		ct[x].getFirst().clearFunctions(manJit.getJitRuntime());
 		delete &ct[x].getFirst();
 		percentage+=passo*2;
-		if(getDebugLevel()>=3)std::cout << "[LOG] -" << percentage << "%- Liberando Contexto N: " << ct[x].getSecond() << std::endl;
+		if(getDebugLevel()>=3)std::cout << "[LOG] -" << percentage << "%- Liberando Context N: " << ct[x].getSecond() << std::endl;
 	}
 	ct.clear();
 	percentage+=passo;
-	if(getDebugLevel()>=2)std::cout << "[LOG] -" << percentage << "%- Liberado os Contextos!" << std::endl;
+	if(getDebugLevel()>=2)std::cout << "[LOG] -" << percentage << "%- Liberado os Contexts!" << std::endl;
 
 	if(getDebugLevel()>=1)std::cout << "[LOG] -100%- Maquina virtual liberada completamente" << std::endl;
 	if(getDebugLevel()>=1)std::cout << "[LOG] - Maquina virtual desligada!" << std::endl;
@@ -83,7 +84,7 @@ void finalizeThread(uint16 flag){
 	//if(flag&INVALID_OPCODE_JIT_)std::cout << "[ERROR] - Erro, opcode para transformação JIT invalido!" << std::endl;
 	if(flag&INTERNAL_ERROR_)std::cout << "[ERROR] - Erro interno do programa, mantenha as bibliotecas atualizadas para evitar esse erro novamente." << std::endl;
 	if(flag&INVALID_JMP_JIT_)std::cout << "[ERROR] - Erro ao tentar entrar dentro de código JIT sem flag de entrada." << std::endl;
-	if(flag&INVALID_CHANGE_CONTEXT_)std::cout << "[ERROR] - Acesso a um contexto inesistente ou que não existe mais." << std::endl;
+	if(flag&INVALID_CHANGE_CONTEXT_)std::cout << "[ERROR] - Acesso a um Context inesistente ou que não existe mais." << std::endl;
 	if(flag&MIN_LIMIT_STACK_)std::cout << "[ERROR] - Erro na tentativa de leitura de valor na stack vazia!" << std::endl;
 }
 
@@ -158,21 +159,21 @@ ManagerOpcodes& VirtualMachine::getManagerOpcodes(){
 	return manJit;
 }
 
-uint16 VirtualMachine::loadContexto(uint8 *bytecode,uint32 tam){
+uint16 VirtualMachine::loadContext(uint8 *bytecode,uint32 tam){
 	try{
 		ct.resize(ct.size()+1);
-		ct[ct.size()-1].setFirst(new Contexto());
+		ct[ct.size()-1].setFirst(new Context());
 		ct[ct.size()-1].getFirst().prepare(++tamContex,bytecode,tam);
 		ct[ct.size()-1].setSecond(tamContex);
 	}catch(VMException &e){
 		e.printError();
 		vm_flags|=1<<VM_FLAG_EXCEPTION;
 	}
-	if(getDebugLevel()>=2)std::cout << "[LOG] -" << ct[ct.size()-1].getFirst().printVisibleName() << "- Contexto carregado completamente." << std::endl;
+	if(getDebugLevel()>=2)std::cout << "[LOG] -" << ct[ct.size()-1].getFirst().printVisibleName() << "- Context carregado completamente." << std::endl;
 	return tamContex;
 }
 
-Contexto& VirtualMachine::getContexto(uint16 id) {
+Context& VirtualMachine::getContext(uint16 id) {
 	for(uint16 x=0;x<ct.size();x++){
 		if(ct[x].getSecond()==id)return ct[x].getFirst();
 	}
@@ -215,7 +216,7 @@ void VirtualMachine::free_resorce(void* res){
 	}
 }
 
-uint16 VirtualMachine::checkContexto(uint16 id){
+uint16 VirtualMachine::checkContext(uint16 id){
 	for(uint16 x=0;x<ct.size();x++){
 		if(ct[x].getSecond()==id)return id;
 	}
@@ -231,7 +232,7 @@ void VirtualMachine::createThread(uint16 context,uint32 pos){
 		}
 	}
 	if(c==(uint64)~0){
-		std::cout << "[ERROR] - Não foi encontrado o contexto de ID= " << tamThreads << " para a criação da thread." << std::endl;
+		std::cout << "[ERROR] - Não foi encontrado o Context de ID= " << tamThreads << " para a criação da thread." << std::endl;
 		return;
 	}
 	th.resize(th.size()+1);

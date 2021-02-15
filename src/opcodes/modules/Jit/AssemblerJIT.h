@@ -178,7 +178,7 @@
 			push(r15);
 			for(uint16 x=0;x<16;x++)prefetcht0(ptr(workspace,8*x));	//Move a workspace para perto do processador nos caches.
 			mov(workspace,rdx); 									// RSI - WORKSPACE THREAD
-			mov(memory,qword_ptr(rcx)); 							// RDI - MEMORIA CONTEXTO
+			mov(memory,qword_ptr(rcx)); 							// RDI - MEMORIA Context
 			push(r8);												// THREAD - ARMAZENADA
 			mov(rax,r9); 											// PRAMETRO goTo
 			for(uint16 x=0;x<8;x++)mov(qreg[x],qword_ptr(workspace,x*8));

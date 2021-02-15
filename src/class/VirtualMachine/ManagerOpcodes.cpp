@@ -5,10 +5,9 @@
  *      Author: lhlag
  */
 
-#include <iostream>
 #include "ManagerOpcodes.h"
+#include <iostream>
 #include "../../opcodes/GeralComand.h"
-
 #include "../../opcodes/modules/GeneralModules.h"
 #include "../../opcodes/modules/LibraryModuleOpcode.h"
 
@@ -36,7 +35,6 @@ void no_opcode(Thread &t){
 }
 
 ManagerOpcodes::ManagerOpcodes(void **VET,uint8 debugLevel) {
-	// TODO Auto-generated constructor stub
 	this->debugLevel=debugLevel;
 	this->VET=VET;
 	funcs=0;
@@ -98,8 +96,11 @@ uint16 ManagerOpcodes::sizeModules(){
 }
 
 void ManagerOpcodes::createOpcodeJit(uint16 pos, CodeHolder &code){
+	void *aux= VET[pos];
+
 	Error err = rt.add(&VET[pos], &code);
 	if (err){
+		VET[pos]=aux;
 		if(debugLevel>=1)std::cout << "[ERROR] - Error ao compilar comando da Virtual Machine! Comando:  "+pos << err <<  std::endl;
 		return;
 	}else if(debugLevel>=3) std::cout << "[SUCESS] - Criado comando jit optimizado N: " << pos << std::endl;

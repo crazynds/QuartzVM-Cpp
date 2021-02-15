@@ -10,9 +10,7 @@
 
 
 	#include "../../lib/Types.h"
-
-	#define ASMJIT_STATIC
-	#include "../../asmjit/asmjit.h"
+	#include "../../lib/asmjit.h"
 
 	using namespace asmjit;
 

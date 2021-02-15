@@ -239,8 +239,8 @@
 	#define PUSH_C GERAL_TYPE+(STACK+5)//Envia um valor de acordo com uma constante para a stack
 	#define POP_W GERAL_TYPE+(STACK+6)//Pega o valor no topo da stack e armazena na workspace
 
-	#define CALL_CTX_C GERAL_TYPE+(STACK+7)//Chama uma função a partir de um local de memoria de codigo constante de outro contexto
-	#define CALL_CTX_W GERAL_TYPE+(STACK+8)//Chama uma função a partir de um local de memoria de codigo de acordo com um slot da workspace de outro contexto
+	#define CALL_CTX_C GERAL_TYPE+(STACK+7)//Chama uma função a partir de um local de memoria de codigo constante de outro Context
+	#define CALL_CTX_W GERAL_TYPE+(STACK+8)//Chama uma função a partir de um local de memoria de codigo de acordo com um slot da workspace de outro Context
 
 
 //System Call commands
@@ -248,9 +248,9 @@
 	#define PRINT_OUT_NUM SYSTEM_CALL+2  //Printa o num da workspace
 	#define PRINT_OUT_STRING_MMW SYSTEM_CALL+3 //Printa a string do ponteiro da workspace
 	#define PRINT_OUT_STRING_M SYSTEM_CALL+4 //Printa a string do ponteiro da workspace
-	#define LOAD_CONTEXT SYSTEM_CALL+5 //Carrega contexto
-	#define GET_CONTEXT_ID SYSTEM_CALL+6 //Retorna o id do contexto
-	#define CHECK_CONTEXT_ID SYSTEM_CALL+7 //Confere o id do contexto, caso falso, zera a variavel passada como parametro
+	#define LOAD_CONTEXT SYSTEM_CALL+5 //Carrega Context
+	#define GET_CONTEXT_ID SYSTEM_CALL+6 //Retorna o id do Context
+	#define CHECK_CONTEXT_ID SYSTEM_CALL+7 //Confere o id do Context, caso falso, zera a variavel passada como parametro
 	#define HLT_COMAND SYSTEM_CALL+8
 	#define SLEEP_COMAND SYSTEM_CALL+9
 	#define DEBUG_PRINT_OUT_RESORCE SYSTEM_CALL+10 //Printa um recurso
