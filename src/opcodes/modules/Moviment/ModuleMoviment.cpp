@@ -132,7 +132,7 @@ uint16* ModuleMoviment::getListOpcodes(){
 	return arr;
 }
 
-bool ModuleMoviment::check_jit(Thread &t,Assembler &a,std::vector<Dupla<Label,uint32>> &vector,uint16 opcode){
+bool ModuleMoviment::check_jit(Thread &t,Assembler &a,std::map<uint32,Label> &vector,uint16 opcode){
 	switch(opcode){
 		case P_INT8+MOV_W_C:
 		case P_UINT8+MOV_W_C:
@@ -188,8 +188,65 @@ bool ModuleMoviment::check_jit(Thread &t,Assembler &a,std::vector<Dupla<Label,ui
 	}
 	return true;
 }
-bool ModuleMoviment::set_opcode_jit(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,std::vector<Dupla<Label,uint32>> &v){
+bool ModuleMoviment::set_opcode_jit(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,std::map<uint32,Label> &v){
 	switch(jcontent.opcode){
+	case P_INT8+MOV_M_M:
+	case P_UINT8+MOV_M_M:{
+		uint64 mem1=t.getNext48().toInt();
+		uint64 mem2=t.getNext48().toInt();
+		uint8 size=8;
+
+		Gp reg = a.getRegister(size);
+
+		a.mov(reg,ptr(memory,mem2));
+		a.mov(ptr(memory,mem1),reg);
+	}break;
+	case P_INT16+MOV_M_M:
+	case P_UINT16+MOV_M_M:{
+		uint64 mem1=t.getNext48().toInt();
+		uint64 mem2=t.getNext48().toInt();
+		uint8 size=16;
+
+		Gp reg = a.getRegister(size);
+
+		a.mov(reg,ptr(memory,mem2));
+		a.mov(ptr(memory,mem1),reg);
+	}break;
+	case P_INT32+MOV_M_M:
+	case P_UINT32+MOV_M_M:{
+		uint64 mem1=t.getNext48().toInt();
+		uint64 mem2=t.getNext48().toInt();
+		uint8 size=32;
+
+		Gp reg = a.getRegister(size);
+
+		a.mov(reg,ptr(memory,mem2));
+		a.mov(ptr(memory,mem1),reg);
+	}break;
+	case P_INT48+MOV_M_M:
+	case P_UINT48+MOV_M_M:{
+		uint64 mem1=t.getNext48().toInt();
+		uint64 mem2=t.getNext48().toInt();
+
+		Gp reg1 = a.getRegister(32);
+		Gp reg2 = a.getRegister(16);
+
+		a.mov(reg1,ptr(memory,mem2));
+		a.mov(reg2,ptr(memory,mem2+4));
+		a.mov(ptr(memory,mem1),reg1);
+		a.mov(ptr(memory,mem1+4),reg2);
+	}break;
+	case P_INT64+MOV_M_M:
+	case P_UINT64+MOV_M_M:{
+		uint64 mem1=t.getNext48().toInt();
+		uint64 mem2=t.getNext48().toInt();
+		uint8 size=64;
+
+		Gp reg = a.getRegister(size);
+
+		a.mov(reg,ptr(memory,mem2));
+		a.mov(ptr(memory,mem1),reg);
+	}break;
 	case P_INT8+MOV_M_W:
 	case P_UINT8+MOV_M_W:{
 		uint64 mem=t.getNext48().toInt();

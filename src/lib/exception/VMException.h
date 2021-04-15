@@ -67,7 +67,7 @@ public:
 		std::cout << std::endl
 		<< "--------------------------------------------------" << std::endl
 		<< "Location: " << local << std::endl
-		<< "PosCode: " << posCode << std::endl
+		<< "PosCode: 0x" << posCode << std::endl
 		<< "Path: " << getPath() << std::endl
 		<< "CodeException: " << getMensage() << std::endl
 		<< "--------------------------------------------------" << std::endl;

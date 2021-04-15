@@ -8,8 +8,8 @@
 #ifndef VIRTUALMACHINE_H_
 #define VIRTUALMACHINE_H_
 	#include "../../lib/Types.h"
-	#include "../../lib/Dupla.h"
-	#include <vector>
+	//#include <vector>
+	#include <map>
 	#include "ManagerOpcodes.h"
 	#include "ManagerResources.h"
 
@@ -31,6 +31,20 @@
      */
 
 
+	#define OUT_LOG 1
+	#define OUT_ERROR 2
+	#define OUT_INFO 3
+	//Debug definido em 1
+	#define OUT_SUCESS 4
+	#define OUT_WARNING 5
+	//Debug definido em 2
+	#define OUT_INFO_EXTRA 6
+	#define OUT_LOG_EXTRA 7
+	//Debug definido em 3
+	#define OUT_DEBUG 8
+
+
+
 	class Context;
 	class Thread;
 
@@ -41,11 +55,10 @@
 	class VirtualMachine{
 		private:
 
-			//Contexts e Threads
-			uint16 tamContex;
-			uint16 tamThreads;
-			std::vector<Dupla<Context,uint16>> ct;
-			std::vector<Dupla<Thread,uint16>> th;
+			uint16 nextIdContext;
+			uint16 nextIdThread;
+			std::map<uint16,Context> contexts;
+			std::map<uint16,Thread> threads;
 
 
 			//Flags da VM
@@ -77,7 +90,8 @@
 
 
 			//Cria uma thread de execução passando como param o código do ctx e a posição de entrada.
-			void createThread(uint16,uint32);
+			uint16 createThread(uint16,uint32);
+			void deleteThread(uint16);
 			//Carrega um Context passando como param o bytecode e o tamanho
 			uint16 loadContext(uint8*,uint32);
 
@@ -86,6 +100,9 @@
 			void* alloc_resorce(uint32);
 			void free_resorce(void*);
 			void* realloc_resorce(void*,uint32);
+
+			void printMessage(uint8,char *);
+			void printMessage(uint8,std::stringstream&);
 
 			uint16 checkContext(uint16);
 			uint8 getDebugLevel();

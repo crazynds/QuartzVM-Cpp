@@ -8,7 +8,7 @@
 #ifndef JIT_H_
 #define JIT_H_
 
-	#include <vector>
+	#include <map>
 	#include <stdio.h>
 
 	#include "../../../lib/asmjit.h"

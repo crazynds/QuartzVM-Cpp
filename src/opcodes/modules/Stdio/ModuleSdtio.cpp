@@ -59,24 +59,26 @@ uint16* ModuleSdtio::getListOpcodes(){
 }
 
 void ModuleSdtio::setInterpretedOpcodes(ManagerOpcodes& man){
-	man.createOpcode(DEBUG_PRINT_OUT_MEM,test_func);
-	man.createOpcode(DEBUG_PRINT_OUT_RESORCE,print_alloc);
-	man.createOpcode(SLEEP_COMAND,sleep);
-	man.createOpcode(HLT_COMAND,do_nothing);
+	printf("\n|%d|",DEBUG_PRINT_OUT_MEM);
+	man.createOpcode(DEBUG_PRINT_OUT_MEM,(void*)test_func);
+	man.createOpcode(DEBUG_PRINT_OUT_RESORCE,(void*)print_alloc);
+	man.createOpcode(SLEEP_COMAND,(void*)sleep);
+	man.createOpcode(HLT_COMAND,(void*)do_nothing);
 
-	man.createOpcode(PRINT_OUT_CHAR,print_out_char_w);
-	man.createOpcode(PRINT_OUT_NUM,print_out_num_w);
-	man.createOpcode(PRINT_OUT_STRING_MMW,print_out_string_mmw);
-	man.createOpcode(PRINT_OUT_STRING_M,print_out_string_m);
-	man.createOpcode(LOAD_CONTEXT,load_context_w_mw);
-	man.createOpcode(GET_CONTEXT_ID,get_context_id_w);
-	man.createOpcode(CHECK_CONTEXT_ID,check_context_id_w);
+	man.createOpcode(PRINT_OUT_CHAR,(void*)print_out_char_w);
+	man.createOpcode(PRINT_OUT_NUM,(void*)print_out_num_w);
+	man.createOpcode(PRINT_OUT_STRING_MMW,(void*)print_out_string_mmw);
+	man.createOpcode(PRINT_OUT_STRING_M,(void*)print_out_string_m);
+	man.createOpcode(LOAD_CONTEXT,(void*)load_context_w_mw);
+	man.createOpcode(GET_CONTEXT_ID,(void*)get_context_id_w);
+	man.createOpcode(CHECK_CONTEXT_ID,(void*)check_context_id_w);
 
 }
-bool ModuleSdtio::check_jit(Thread &t,Assembler &a,std::vector<Dupla<Label,uint32>> &vector,uint16 comand){
+
+bool ModuleSdtio::check_jit(Thread &t,Assembler &a,std::map<uint32,Label> &vector,uint16 comand){
 	return false;
 }
-bool ModuleSdtio::set_opcode_jit(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,std::vector<Dupla<Label,uint32>> &v){
+bool ModuleSdtio::set_opcode_jit(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,std::map<uint32,Label> &v){
 	return false;
 }
 

@@ -26,25 +26,30 @@
 
 	class MemoryAcess{
 		private:
-			uint8 **mem;
-			uint64 *maxMem;
+			uint8 *mem;
+			uint64 maxMem;
 			uint32 *erro_flags;
 		public:
-			void prepare(Context *c,uint32 *err){
-				mem=&c->mem;
-				maxMem=&c->max_mem;
+			MemoryAcess(){
+				mem= NULL;
+				maxMem = 0;
+				erro_flags = NULL;
+			}
+			MemoryAcess(Context *c,uint32 *err){
+				mem=c->getMemoryDataDataPointer();
+				maxMem=c->getMemoryDataSize().toInt();
 				erro_flags=err;
 			}
 			uint8& operator[](uint64 p){
 			#ifdef _FAST_MODE
 				return (*mem)[p];
 			#else
-				if(p<*maxMem)return (*mem)[p];
+				if(p<maxMem)return mem[p];
 				*erro_flags|=OVERLOAD_MEM_ERROR_;
-				return (*mem)[0];
+				return mem[0];
 			#endif
 			}
-			uint8** getPointerMem(){
+			uint8* getPointerMem(){
 				return mem;
 			}
 	};
@@ -58,10 +63,13 @@
 
 	class Thread{
 		private:
+			uint16 id;
+
 			VirtualMachine *vt;
 			Context *ct;
 			//Memorias de acesso;
-			uint8 *cod;
+			const uint8 *cod;
+			uint32 code_len;
 
 			// stack
 		#ifdef THREAD_CUSTOM_STACK
@@ -112,18 +120,16 @@
 			uint8 compare_flags;
 
 
+			Thread(VirtualMachine*,Context*,uint32,uint16);
 			Thread();
 			~Thread();
 
-			void set16InCode(uint32,uint16);
-			void set32InCode(uint32,uint32);
+
 			void savePoint();
 			void saveInStack(uint64);
 			uint64 recoverInStack();
 			void recoverPoint();
-			void prepare(VirtualMachine&,Context&,uint16,uint32);
-			void changeContext(Context&);
-			uint16 runInstruction(void**);
+			void changeContext(Context*,uint32 pos = 0);
 
 			uint8 getNext8();
 			uint16 getNext16();

@@ -8,7 +8,7 @@
 #include "../opcodes/WordCoder/VERSION.h"
 
 
-Context::Context(){
+Context::Context(VirtualMachine* vm,uint16 codi,uint8* binaryCode,uint32 len){
 	mem=new uint8[MEMORY_BASE_CONTEXT*2];
 	max_mem=MEMORY_BASE_CONTEXT*2;
 	for(uint64 x=0;x<max_mem;x++){
@@ -16,8 +16,7 @@ Context::Context(){
 	}
 	cod=NULL;
 	cod_len=0;
-	cod_ctx=0;
-	funcs.resize(0);
+	id=0;
 	versao=0;
 	correcao=0;
 	devVersion=0;
@@ -26,52 +25,47 @@ Context::Context(){
 }
 
 uint16 Context::getCodContext(){
-	return cod_ctx;
+	return id;
+}
+
+FuncJit& Context::createFunction(uint32 posMem){
+	functions[posMem] = FuncJit();
+	return functions[posMem];
 }
 
 FuncJit Context::getFunction(uint32 mem){
-	uint64 index=(uint64)~0;
-	for(uint64 x=0;x<funcs.size();x++){
-		if(funcs[x].getSecond()==mem)index=x;
-	}
-	if(index==(uint64)~0)return (FuncJit)0;
-	return funcs[index].getFirst();
-}
-FuncJit& Context::createFunction(uint32 posMem){
-	funcs.resize(funcs.size()+1);
-	uint64 val=funcs.size()-1;
-
-	funcs[val].setSecond(posMem);
-	funcs[val].setFirst(new FuncJit());
-	return funcs[val].getFirst();
+	std::map<uint32,FuncJit>::iterator it = functions.find(mem);
+	if(it!=functions.end())
+		return it->second;
+	else return 0;
 }
 
 void Context::clearFunctions(JitRuntime& rm){
-	for(uint64 y=0;y<funcs.size();y++){
-		rm.release(funcs[y].getFirst());
-		delete &funcs[y].getFirst();
+	for (auto it=functions.begin(); it!=functions.end(); ++it){
+		rm.release(it->second);
 	}
-	funcs.clear();
+	functions.clear();
+
 }
 char Context::printVisibleName(){
 	if(nome_visivel!=NULL)std::cout << "[" << nome_visivel;
 	else if(nome_geral!=NULL)std::cout << "[" << nome_geral;
-	else std::cout << "[CTX:"<< cod_ctx;
+	else std::cout << "[CTX:"<< id;
 	return ']';
 }
 
-void Context::prepare(uint16 codi,uint8 *rep,uint32 len){
-	cod_ctx=codi;
-	if(*((uint16*)rep)==0){
-		uint8 *bck=rep;
+void Context::prepare(uint16 codi,uint8 *binaryCode,uint32 len){
+	id=codi;
+	if(*((uint16*)binaryCode)==0){
+		uint8 *bck=binaryCode;
 		uint32 tam_header;
-		rep+=2;
-		versao=*((uint16*)rep);
-		rep+=2;
-		correcao=*((uint8*)rep);
-		rep++;
-		tam_header=*((uint32*)rep);
-		rep+=4;
+		binaryCode+=2;
+		versao=*((uint16*)binaryCode);
+		binaryCode+=2;
+		correcao=*((uint8*)binaryCode);
+		binaryCode++;
+		tam_header=*((uint32*)binaryCode);
+		binaryCode+=4;
 		if(tam_header>=len-9){
 			std::cout << "[ERROR] -" << printVisibleName()<< "- Tamanho de cabeçalho invalido para o que foi passado no Context;" <<  std::endl;
 		}else if(versao>VERSION_VM){
@@ -80,29 +74,29 @@ void Context::prepare(uint16 codi,uint8 *rep,uint32 len){
 			len-=tam_header+9;
 		}else{
 			std::cout << "[INFO] -" << printVisibleName()<< "- Compatibilidade: " << versao << "V(" << uint32(correcao) << ")" << std::endl;
-			uint16 dados=*((uint16*)rep);
-			rep+=2;
+			uint16 dados=*((uint16*)binaryCode);
+			binaryCode+=2;
 			while(dados-->0){
-				uint16 l=*((uint16*)rep);
-				rep+=2;
+				uint16 l=*((uint16*)binaryCode);
+				binaryCode+=2;
 				switch(l){
 				case COD_DEV_VERSION:
-					devVersion=*((uint64*)rep);
-					rep+=8;
+					devVersion=*((uint64*)binaryCode);
+					binaryCode+=8;
 					std::cout << "[INFO] -" << printVisibleName() << "- Versão Software: " << devVersion << std::endl;
 					break;
 				case COD_NOME_GERAL:{
-					char *c=(char*)rep;
+					char *c=(char*)binaryCode;
 					uint32 auxt=strlen(c);
-					rep+=auxt+1;
+					binaryCode+=auxt+1;
 					std::cout << "[INFO] -" << printVisibleName() << "- Nome completo: " << c << std::endl;
 					nome_geral=new char[auxt+1];
 					strcpy(nome_geral,c);
 					}break;
 				case COD_NOME_VISIVEL:{
-					char *c=(char*)rep;
+					char *c=(char*)binaryCode;
 					uint32 auxt=strlen(c);
-					rep+=auxt+1;
+					binaryCode+=auxt+1;
 					std::cout << "[INFO] -" << printVisibleName() << "- Nome visivel: " << c << std::endl;
 					nome_visivel=new char[auxt+1];
 					strcpy(nome_visivel,c);
@@ -112,39 +106,48 @@ void Context::prepare(uint16 codi,uint8 *rep,uint32 len){
 				}
 
 			};
-			len-=uint32(uint64(rep)-uint64(bck));
+			len-=uint32(uint64(binaryCode)-uint64(bck));
 		}
-		rep=bck;
+		binaryCode=bck;
 		cod=new uint8[len];
 		while(cod_len<len){
-			cod[cod_len]=rep[9+tam_header+cod_len];
+			cod[cod_len]=binaryCode[9+tam_header+cod_len];
 			cod_len++;
 		}
 	}else{
 		throw VMException(_LOAD_CONTEXT_NOT_VALID_STR);
 	}
 }
-void Context::incrementMemory(){
-	uint8 *aux=new uint8[max_mem+MEMORY_BASE_CONTEXT];
-	for(uint64 x=0;x<max_mem;x++)aux[x]=mem[x];
-	delete[] mem;
-	mem=aux;
-	max_mem+=MEMORY_BASE_CONTEXT;
+
+
+inline void Context::set16InCode(uint32 pont,uint16 val){
+	if(pont>=cod_len)return;
+	register uint16* x=((uint16*)(&cod[pont]));
+	*x=val;
 }
-void Context::freeMemory(uint48 i){
-	uint64 a=i.toInt();
-	if(a>=max_mem)return;
-	uint64 y=(a/MEMORY_BASE_CONTEXT)+1;
-	if(y>=max_mem/MEMORY_BASE_CONTEXT)return;
-	uint8 *aux=new uint8[y*MEMORY_BASE_CONTEXT];
-	max_mem=y*MEMORY_BASE_CONTEXT;
-	for(uint64 x=0;x<max_mem;x++)aux[x]=mem[x];
-	delete[] mem;
-	mem=aux;
+
+inline void Context::set32InCode(uint32 pont,uint32 val){
+	if(pont>=cod_len)return;
+	register uint32* x=((uint32*)(&cod[pont]));
+	*x=val;
+}
+
+uint8* Context::getMemoryDataDataPointer(){
+	return mem;
+}
+uint48 Context::getMemoryDataSize(){
+	return max_mem;
+}
+
+const uint8* Context::getCodeDataPointer(){
+	return cod;
+}
+uint32 Context::getCodeDataSize(){
+	return cod_len;
 }
 
 Context::~Context(){
-	funcs.clear();
+	functions.clear();
 	delete[] cod;
 	delete[] mem;
 	if(nome_visivel!=NULL)delete[] nome_visivel;

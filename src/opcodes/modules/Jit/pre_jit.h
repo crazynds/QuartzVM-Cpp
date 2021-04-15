@@ -1,10 +1,10 @@
 #include "../LibraryModuleOpcode.h"
 #include "Jit.h"
 
-std::vector<Dupla<Label,uint32>>* pre_check_jig(Thread &t,Assembler &a){
+inline std::map<uint32,Label>* pre_check_jit(Thread &t,Assembler &a,uint32* maxCode){
 	uint32 save_point=t.getPontCode();
-	std::vector<Dupla<Label,uint32>> *vt=new std::vector<Dupla<Label,uint32>>;
-	std::vector<Dupla<Label,uint32>> &v=*vt;
+	std::map<uint32,Label> *vt=new std::map<uint32,Label>;
+	std::map<uint32,Label> &v=*vt;
 	register uint16 p=t.getNext16();
 	uint32 auxi=t.getPontCode();
 	try{
@@ -27,34 +27,25 @@ std::vector<Dupla<Label,uint32>>* pre_check_jig(Thread &t,Assembler &a){
 			auxi=t.getPontCode();
 		}
 	}catch(VMException &e){
-		for(uint32 x=0;x<v.size();x++){
-			delete &v[x].getFirst();
-		}
 		delete vt;
 		e.addToPath("JIT_PRE_CHECK_LOOP");
 		throw;
 	}
 	if(t.isFinalized()){
-		for(uint32 x=0;x<v.size();x++){
-			delete &v[x].getFirst();
-		}
 		delete vt;
 		return 0;
 	}
 	{
 		uint32 x=0;
-		while(x<v.size()){
-			if(v[x].getSecond()>=t.getPontCode() || v[x].getSecond()<save_point){
-				delete &v[x].getFirst();
-				v.erase(v.begin()+x);
-			}else x++;
+		auto it = v.begin();
+		while(it != v.end()){
+			if(it->first >=t.getPontCode() || it->first<save_point)
+				it = v.erase(it);
+			else it++;
 		}
 
 	}
-
-	uint32 aux=v.size();
-	v.resize(aux+1);
-	v[aux].setSecond(t.getPontCode());
+	*maxCode = t.getPontCode();
 	t.setPontCode(save_point);
 	return vt;
 }

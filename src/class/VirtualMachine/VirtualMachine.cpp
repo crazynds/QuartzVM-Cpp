@@ -9,13 +9,16 @@
 #include "../Thread.h"
 #include "../Context.h"
 #include <stdlib.h>
+#include <sstream>
+
 
 
 VirtualMachine::VirtualMachine(uint8 debug):
 	manJit(VET,debug){
 	start();
-	tamContex=0;
-	tamThreads=0;
+	nextIdContext = 1;
+	nextIdThread = 1;
+
 
 	if(debug>3)debug=3;
 	vm_flags=(debug<<VM_FLAG_DEBUG_LV)|(1<<VM_FLAG_RUNNING);
@@ -34,17 +37,13 @@ VirtualMachine::~VirtualMachine(){
 	double percentage=0;
 	if(getDebugLevel()>=1)std::cout << "[LOG] -" << percentage << "%- Desligando virtual machine!" << std::endl;
 
-	double unclear = th.size()+1+4+qtd_res+1+ct.size()*2+1;
+	double unclear = threads.size()+1+4+qtd_res+1+contexts.size();
 	double passo = 94/unclear;
 	percentage+=5;
 	if(getDebugLevel()>=1)std::cout << "[LOG] -" << percentage << "%- Calculado todas as porcentagem!" << std::endl;
 
-	for(uint64 x=0;x<th.size();x++){
-		delete &th[x].getFirst();
-		percentage+=passo;
-		if(getDebugLevel()>=3)std::cout << "[LOG] -" << percentage << "%- Liberando Thread N: " << th[x].getSecond() << std::endl;
-	}
-	th.clear();
+	percentage+=passo*threads.size();
+	threads.clear();
 	percentage+=passo;
 	if(getDebugLevel()>=2)std::cout << "[LOG] -" << percentage << "%- Liberado todas as threads!" << std::endl;
 
@@ -61,13 +60,8 @@ VirtualMachine::~VirtualMachine(){
 	percentage+=passo;
 	if(getDebugLevel()>=2)std::cout << "[LOG] -" << percentage << "%- Liberado todas as alocações dinamicas!" << std::endl;
 
-	for(uint64 x=0;x<ct.size();x++){
-		ct[x].getFirst().clearFunctions(manJit.getJitRuntime());
-		delete &ct[x].getFirst();
-		percentage+=passo*2;
-		if(getDebugLevel()>=3)std::cout << "[LOG] -" << percentage << "%- Liberando Context N: " << ct[x].getSecond() << std::endl;
-	}
-	ct.clear();
+	percentage+=passo*contexts.size();
+	contexts.clear();
 	percentage+=passo;
 	if(getDebugLevel()>=2)std::cout << "[LOG] -" << percentage << "%- Liberado os Contexts!" << std::endl;
 
@@ -94,14 +88,14 @@ uint8 VirtualMachine::getDebugLevel(){
 
 
 inline uint32 VirtualMachine::runAllThread1Time(uint32 flags){
-	for(uint16 x=0;x<th.size();x++){
-		Thread &t=th[x].getFirst();
-		uint16 p=t.runInstruction(VET);
+	for (std::map<uint16,Thread>::iterator it=threads.begin(); it!=threads.end(); ++it){
+		Thread &t=it->second;
+		uint16 opcode = t.getNext16();
+		((Func)VET[opcode])(t);
 		if(t.isFinalized()){
 			flags|=t.isFinalized();
-			delete &th[x].getFirst();
-			th.erase(th.begin()+x);
-			if(getDebugLevel()>=2)std::cout << "[LOG] - Finalizada thread de numero: " << th[x].getSecond() << std::endl;
+			threads.erase(it);
+			if(getDebugLevel()>=2)std::cout << "[LOG] - Finalizada thread de numero: " << it->first << std::endl;
 			finalizeThread(flags);
 		}
 	}
@@ -117,7 +111,7 @@ uint32 VirtualMachine::run(){
 	try{
 		do{
 			flags=runAllThread1Time(flags);
-		}while(th.size()!=0);
+		}while(threads.size()>0);
 	}catch(VMException &e){
 		e.addToPath("VM_RUN");
 		vm_flags|=1<<VM_FLAG_EXCEPTION;
@@ -130,16 +124,17 @@ uint32 VirtualMachine::run(){
 
 uint32 VirtualMachine::runCommand(){
 	uint32 flags=0;
-	if(th.size()==0)return 1;
+	if(threads.size()==0)return 1;
 	try{
-		for(uint16 x=0;x<th.size();x++){
-			uint16 p=th[x].getFirst().runInstruction(VET);
-			if(getDebugLevel()>=1)std::cout << "[DEBUG] - EXE {thr:" << x <<",instrucao:" << "0x" << std::hex << p << "}"<< std::endl;
-			if(th[x].getFirst().isFinalized()){
-				if(th.size()==1)flags=th[x].getFirst().isFinalized();
-				if(getDebugLevel()>=3)std::cout << "[DEBUG] - CLOSED THREAD {id: " << th[x].getSecond() << ", flags: "<< th[x].getFirst().isFinalized() << "}" << std::endl;
-				delete &th[x].getFirst();
-				th.erase(th.begin()+x);
+		for (std::map<uint16,Thread>::iterator it=threads.begin(); it!=threads.end(); ++it){
+			Thread &t=it->second;
+			uint16 p = t.getNext16();
+			((Func)VET[p])(t);
+			if(getDebugLevel()>=1)std::cout << "[DEBUG] - EXE {thr:" << it->first <<",instrucao:" << "0x" << std::hex << p << "}"<< std::endl;
+			if(t.isFinalized()){
+				flags|=t.isFinalized();
+				threads.erase(it);
+				if(getDebugLevel()>=3)std::cout << "[DEBUG] - CLOSED THREAD {id: " << it->first << ", flags: "<< t.isFinalized() << "}" << std::endl;
 				finalizeThread(flags);
 			}
 		}
@@ -160,24 +155,25 @@ ManagerOpcodes& VirtualMachine::getManagerOpcodes(){
 }
 
 uint16 VirtualMachine::loadContext(uint8 *bytecode,uint32 tam){
+	uint16 id;
 	try{
-		ct.resize(ct.size()+1);
-		ct[ct.size()-1].setFirst(new Context());
-		ct[ct.size()-1].getFirst().prepare(++tamContex,bytecode,tam);
-		ct[ct.size()-1].setSecond(tamContex);
+		id = nextIdContext++;
+		contexts[id] = Context();
+		if(nextIdContext==0){
+			do{
+				nextIdContext++;
+			}while(contexts.find(nextIdContext)!=contexts.end());
+		}
 	}catch(VMException &e){
 		e.printError();
 		vm_flags|=1<<VM_FLAG_EXCEPTION;
 	}
-	if(getDebugLevel()>=2)std::cout << "[LOG] -" << ct[ct.size()-1].getFirst().printVisibleName() << "- Context carregado completamente." << std::endl;
-	return tamContex;
+	if(getDebugLevel()>=2)std::cout << "[LOG] -" << contexts[id].printVisibleName() << "- Context carregado completamente." << std::endl;
+	return id;
 }
 
 Context& VirtualMachine::getContext(uint16 id) {
-	for(uint16 x=0;x<ct.size();x++){
-		if(ct[x].getSecond()==id)return ct[x].getFirst();
-	}
-	return ct[0].getFirst();
+	return contexts[id];
 }
 
 void* VirtualMachine::alloc_resorce(uint32 tam){
@@ -217,31 +213,41 @@ void VirtualMachine::free_resorce(void* res){
 }
 
 uint16 VirtualMachine::checkContext(uint16 id){
-	for(uint16 x=0;x<ct.size();x++){
-		if(ct[x].getSecond()==id)return id;
-	}
-	return 0;
+	auto it = contexts.find(id);
+	if(it!=contexts.end())
+		return it->first;
+	else return 0;
 }
 
-void VirtualMachine::createThread(uint16 context,uint32 pos){
-	uint64 c=(uint64)~0;
-	for(uint64 x=0;x<ct.size();x++){
-		if(ct[x].getSecond()==context){
-			c=x;
-			break;
-		}
+#define PRINT_MESSAGE(type,str) {std::stringstream os;os << str;printMessage(type,os);}
+
+uint16 VirtualMachine::createThread(uint16 context,uint32 pos){
+	if(!checkContext(context)){
+		std::stringstream os;
+		os << "Não foi encontrado o Context de ID= " << context << " para a criação da thread.";
+		printMessage(OUT_ERROR,os);
+		return 0;
 	}
-	if(c==(uint64)~0){
-		std::cout << "[ERROR] - Não foi encontrado o Context de ID= " << tamThreads << " para a criação da thread." << std::endl;
-		return;
+	uint16 id = nextIdThread++;
+	threads[id] = Thread(this,&(contexts[context]),pos,id);
+	if(nextIdThread==0){
+		do{
+			nextIdThread++;
+		}while(threads.find(nextIdThread)!=threads.end());
 	}
-	th.resize(th.size()+1);
-	th[th.size()-1].setFirst(new Thread());
-	th[th.size()-1].getFirst().prepare(*this,ct[c].getFirst(),context,pos);
-	th[th.size()-1].setSecond(tamThreads);
-	if(getDebugLevel()>=2)std::cout << "[LOG] - Criado thread ID= " << tamThreads << std::endl;
-	tamThreads++;
+	{
+		std::stringstream os;
+		os << "[LOG] - Criado thread ID= " << id;
+		printMessage(OUT_INFO,os);
+	}
+
+	PRINT_MESSAGE(OUT_INFO,"[LOG] - Criado thread ID= " << id)
+	return id;
 }
+
+
+
+
 bool VirtualMachine::isRunning(){
 	return (vm_flags&(VM_FLAG_RUNNING));
 }
@@ -251,8 +257,83 @@ bool VirtualMachine::isExceptionCatched(){
 
 void VirtualMachine::finalize(){
 	vm_flags&=~(VM_FLAG_RUNNING);
-	if(vm_flags&(1<<VM_FLAG_EXCEPTION))std::cout << "[WARNING] ! A VM apresentou exceções durante sua execução !" << std::endl;
-	std::cout << "$$ Mensagens da execução da VM terminada. $$"<< std::endl;
+
+	if(vm_flags&(1<<VM_FLAG_EXCEPTION))
+		printMessage(OUT_WARNING, (char*)"!A VM apresentou exceções durante sua execução!");
+	printMessage(OUT_INFO, (char*)"$$ Mensagens da execução da VM terminada. $$");
 }
+
+
+void VirtualMachine::printMessage(uint8 type,char *str){
+	std::string s(str);
+	switch(type){
+	case OUT_INFO:
+		std::cout << "[INFO] - "<<s  << std::endl;
+		break;
+	case OUT_LOG:
+		std::cout << "[LOG] - "<<s  << std::endl;
+		break;
+	case OUT_ERROR:
+		std::cout << "[ERROR] - "<<s  << std::endl;
+		break;
+	case OUT_WARNING:
+		if(getDebugLevel()<1)return;
+		std::cout << "[WARNING] - "<<s << std::endl;
+		break;
+	case OUT_SUCESS:
+		if(getDebugLevel()<1)return;
+		std::cout << "[SUCESS] - "<<s << std::endl;
+		break;
+	case OUT_INFO_EXTRA:
+		if(getDebugLevel()<2)return;
+		std::cout << "[INFO] - "<<s << std::endl;
+		break;
+	case OUT_LOG_EXTRA:
+		if(getDebugLevel()<2)return;
+		std::cout << "[LOG] - "<<s << std::endl;
+		break;
+	case OUT_DEBUG:
+		if(getDebugLevel()<3)return;
+		std::cout << "[DEBUG] - "<<s << std::endl;
+		break;
+	}
+}
+
+void VirtualMachine::printMessage(uint8 type,std::stringstream& os){
+	std::string s = os.str();
+	switch(type){
+	case OUT_INFO:
+		std::cout << "[INFO] - "<<s  << std::endl;
+		break; // Awails show
+	case OUT_LOG:
+		std::cout << "[LOG] - "<<s  << std::endl;
+		break;
+	case OUT_ERROR:
+		std::cout << "[ERROR] - "<<s  << std::endl;
+		break;
+	case OUT_WARNING:
+		if(getDebugLevel()<1)return;
+		std::cout << "[WARNING] - "<<s << std::endl;
+		break;
+	case OUT_SUCESS:
+		if(getDebugLevel()<1)return;
+		std::cout << "[SUCESS] - "<<s << std::endl;
+		break;
+	case OUT_INFO_EXTRA:
+		if(getDebugLevel()<2)return;
+		std::cout << "[INFO] - "<<s << std::endl;
+		break;
+	case OUT_LOG_EXTRA:
+		if(getDebugLevel()<2)return;
+		std::cout << "[LOG] - "<<s << std::endl;
+		break;
+	case OUT_DEBUG:
+		if(getDebugLevel()<3)return;
+		std::cout << "[DEBUG] - "<<s << std::endl;
+		break;
+	}
+}
+
+
 
 

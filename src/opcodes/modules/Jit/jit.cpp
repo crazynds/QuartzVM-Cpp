@@ -92,14 +92,12 @@
 		if(t.checkUseCode(2))return;
 	}
 
-
+//Opcodes
 	uint64 create_jit(Thread &t,uint32 enter){
 		if(t.checkUseCode(2))return 0;
 		uint32 posInit=t.getPontCode();
-		{
-			uint16 *pt=(uint16*)&t.getContext().cod[posInit-2];
-			*pt=JIT_FLAG_EXECUTE;
-		}
+
+		t.getContext().set16InCode(posInit-2,JIT_FLAG_EXECUTE);
 
 		//Necessaries libs
 		JitRuntime& rt=t.getJitRuntime();
@@ -166,6 +164,7 @@
 		std::cout << "[WARING] - Esse comando tem propósitos apenas informativo, nunca deve ser executado. Reavaliar código!!" << std::endl;
 		if(t.checkUseCode(2))return;
 	}
+//End Opcodes
 
 	void laco_jit(Thread &t,CodeHolder *code){
 		JitContentsAuxiliar jcontent;
@@ -182,22 +181,19 @@
 		a.xor_(rbx,rbx);
 		Label reentrada=a.newLabel();
 		a.bind(reentrada);
-		std::vector<Dupla<Label,uint32>> *vt;
+		std::map<uint32,Label> *vt;
 		try{
-			vt=pre_check_jig(t,a);
+			vt=pre_check_jit(t,a,&jcontent.maxCode);
 		}catch(VMException &e){
 			e.addToPath("JIT_PRE_CHECK");
 			throw;
 		}
-		std::vector<Dupla<Label,uint32>> &v=*vt;
 		if(vt==0){ // Caso o pre_jit retornou zero, significa erro
 			//t.error_flags|=OVERLOAD_COD_ERROR_;
 			if(t.isFinalized())return;
 			throw VMException(_INTERNAL_ERRO_INVALID_FUNCIONALITY);
 		}else{
-			jcontent.maxCode=v[v.size()-1].getSecond();
 			jcontent.minCode=t.getPontCode();
-			v.erase(v.begin()+v.size()-1);
 		}
 		a.cmp(rbx,1);	//Estava dentro do JIT, entrou pela reentrada e deveria retornar para dentro do programa,
 		a.je(end);		//mas não encontrou ponto de retorno. Então vai ser mandado para o código original e buscar o local correto
@@ -217,27 +213,23 @@
 				a.nextState();
 				{
 					uint32 aux=t.getPontCode()-2;
-					for(uint32 x=0;x<v.size();x++){
-						if(v[x].getSecond()==aux){
-							a.clearRegisters();
-							a.bind(v[x].getFirst());
-							break;
-						}
+					auto it = vt->find(aux);
+					if(it != vt->end()){
+						a.clearRegisters();
+						a.bind(it->second);
+						break;
 					}
 				}
 				bool verif=false;
 				uint16 x=0;
 				while(!verif && x<t.getVirtualMachine().getManagerOpcodes().sizeModules())
-					verif=lmo[x++]->set_opcode_jit(jcontent,t,a,end,v);
+					verif=lmo[x++]->set_opcode_jit(jcontent,t,a,end,*vt);
 
 				if(!verif)
 					throw CodeException(t.getPontCode(),"JIT_LOOP_SET_COMAND",_ERROR_JIT_CREATE_ANY_COMAND_FOUND);
 				jcontent.opcode=t.getNext16();
 			}
 		}catch(VMException &e){
-			for(uint32 x=0;x<v.size();x++){
-				delete &v[x].getFirst();
-			}
 			delete vt;
 			e.addToPath("JIT_LOOP");
 			throw;
@@ -245,18 +237,15 @@
 		a.clearRegisters();
 		{
 			uint32 aux=t.getPontCode()-2;
-			for(uint32 x=0;x<v.size();x++){
-				if(v[x].getSecond()==aux){
-					a.bind(v[x].getFirst());
-					break;
-				}
+			auto it = vt->find(aux);
+			if(it != vt->end()){
+				a.clearRegisters();
+				a.bind(it->second);
+				break;
 			}
 		}
 		a.mov(eax,t.getPontCode()); // return values
 		a.bind(end);
-		for(uint32 x=0;x<v.size();x++){
-			delete &v[x].getFirst();
-		}
 		delete vt;
 	}
 

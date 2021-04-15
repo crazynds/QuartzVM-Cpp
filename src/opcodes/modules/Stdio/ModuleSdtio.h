@@ -23,8 +23,8 @@ public:
 		return "Stdio";
 	}
 	void setInterpretedOpcodes(ManagerOpcodes&);
-	bool check_jit(Thread &t,Assembler &a,std::vector<Dupla<Label,uint32>> &vector,uint16 comand);
-	bool set_opcode_jit(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,std::vector<Dupla<Label,uint32>> &v);
+	bool check_jit(Thread &t,Assembler &a,std::map<uint32,Label> &vector,uint16 comand);
+	bool set_opcode_jit(JitContentsAuxiliar jcontent,Thread &t, AssemblerJIT &a, Label &end,std::map<uint32,Label> &v);
 
 
 	uint16* getListOpcodes();

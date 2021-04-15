@@ -30,7 +30,7 @@ void jmp_ctx_c(Thread &t){
 	}
 #endif
 	Context &ct=t.getVirtualMachine().getContext(ctx);
-	t.changeContext(ct);
+	t.changeContext(&ct);
 	t.setPontCode(pon);
 	t.checkUseCode(2);
 }
@@ -48,7 +48,7 @@ void jmp_ctx_w(Thread &t){
 	}
 #endif
 	Context &ct=t.getVirtualMachine().getContext(ctx);
-	t.changeContext(ct);
+	t.changeContext(&ct);
 	t.setPontCode(pon);
 	t.checkUseCode(2);
 }

@@ -98,3 +98,5 @@ nv 2:
 -implementação de outros contextos.
 -leitura memoria out context (dados->dados) (Read);
 
+
+

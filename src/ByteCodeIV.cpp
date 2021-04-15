@@ -54,11 +54,7 @@ int main(int argc, char **argv) {
 	{
 		clock_t max=clock();
 		uint64 flag=0;
-		if(debug){
-			while(!flag){
-				flag=vm->runCommand();
-			}
-		}else flag=vm->run();
+		flag=vm->run();
 		cout<<"[INFO] - Duração total: "<< ( clock() - max )/(double)CLOCKS_PER_SEC << endl;
 	}
 
