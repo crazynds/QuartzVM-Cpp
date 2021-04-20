@@ -4,8 +4,12 @@
  * Created on: 10 de abr de 2019
  *   Author: lhlag
  */
+#include "../lib/IOMessages.h"
 #include "Thread.h"
 #include <iostream>
+
+
+#define PRINT_MESSAGE(type,str) {std::stringstream os;os << "(THREAD_ID=" << this->id << ")"<< str;printMessage(this->vt->getDebugLevel(),type,os);}
 
 
 Thread::Thread(VirtualMachine *v,Context *ct,uint32 pos,uint16 id):
@@ -98,7 +102,7 @@ void Thread::recoverPoint(){
 	if(ct->getCodContext()!=k){
 		if(vt->checkContext(k)==0){
 			error_flags|=INVALID_CHANGE_CONTEXT_;
-			std::cout << "[ERROR] - Erro ao retornar para um Context que não existe mais. (ID= " << k << ")" << std::endl;
+			PRINT_MESSAGE(OUT_ERROR,"Erro ao retornar para um Context que não existe mais");
 			return;
 		}
 		Context& c=vt->getContext(k);
@@ -114,7 +118,7 @@ void Thread::setPontCodeCtx(uint48 val){
 	if(ct->getCodContext()!=k){
 		if(vt->checkContext(k)==0){
 			error_flags|=INVALID_CHANGE_CONTEXT_;
-			std::cout << "[ERROR] - Erro ao retornar para um Context que não existe mais. (ID= " << k << ")" << std::endl;
+			PRINT_MESSAGE(OUT_ERROR,"Erro ao retornar para um Context que não existe mais");
 			return;
 		}
 		Context& c=vt->getContext(k);
@@ -141,52 +145,6 @@ uint8* Thread::getPointerMemCode(){
 	return mem.getPointerMem();
 }
 
-inline uint8 Thread::getNext8(){
-	return cod[cod_pointer++];
-}
-inline uint16 Thread::getNextTwo8(){
-	register uint16 x=*((uint16*)(&cod[cod_pointer]));
-	cod_pointer+=2;
-	return x;
-}
-inline uint16 Thread::getNext16(){
-	register uint16 x=*((uint16*)(&cod[cod_pointer]));
-	cod_pointer+=2;
-	return x;
-}
-inline uint32 Thread::getNextTwo16(){
-	register uint32 x=*((uint32*)(&cod[cod_pointer]));
-	cod_pointer+=4;
-	return x;
-}
-inline uint32 Thread::getNext32(){
-	register uint32 x=*((uint32*)(&cod[cod_pointer]));
-	cod_pointer+=4;
-	return x;
-}
-inline uint64 Thread::getNextTwo32(){
-	register uint64 x=*(uint64*)(&cod[cod_pointer]);
-	cod_pointer+=8;
-	return x;
-}
-inline uint48 Thread::getNext48(){
-	register uint48 x=*((uint48*)(&cod[cod_pointer]));
-	cod_pointer+=6;
-	return x;
-}
-inline uint64 Thread::getNext64(){
-	register uint64 x=*(uint64*)(&cod[cod_pointer]);
-	cod_pointer+=8;
-	return x;
-}
-
-inline uint8 Thread::checkUseCode(uint32 tam){
-	if(cod_pointer+tam > ct->getCodeDataSize()){
-		//error_flags|=OVERLOAD_COD_ERROR_;
-		throw CodeException(cod_pointer,"CHECK_CODE_THREAD",_OVERLOAD_CODE);
-	}
-	return error_flags;
-}
 
 void Thread::setPontCode(uint32 t){
 	cod_pointer=t;

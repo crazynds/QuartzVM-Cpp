@@ -64,9 +64,9 @@ bool ModuleJit::set_opcode_jit(JitContentsAuxiliar jcontent,Thread &t, Assembler
 
 void ModuleJit::setInterpretedOpcodes(ManagerOpcodes& man){
 	man.createOpcode(JIT_FLAG_START,(void*)init_jit);
-	man.createOpcode(JIT_FLAG_EXECUTE,execute_jit);
-	man.createOpcode(JIT_FLAG_ENTER_CODE,enter_jit);
-	man.createOpcode(JIT_FLAG_END,end_jit);
+	man.createOpcode(JIT_FLAG_EXECUTE,(void*)execute_jit);
+	man.createOpcode(JIT_FLAG_ENTER_CODE,(void*)enter_jit);
+	man.createOpcode(JIT_FLAG_END,(void*)end_jit);
 }
 
 

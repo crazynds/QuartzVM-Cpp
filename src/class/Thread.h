@@ -151,12 +151,69 @@
 			void setPontCode(uint32);
 			void setPontCodeCtx(uint48);
 
-			uint8 operator==(const Thread &t){
-				return (vt==t.vt && ct==t.ct && stack==t.stack);
+			bool operator==(const Thread &t){
+				return id==t.id;
 			}
 
 			JitRuntime& getJitRuntime();
 	};
+
+
+
+
+
+
+
+
+
+
+
+	inline uint8 Thread::getNext8(){
+		return cod[cod_pointer++];
+	}
+	inline uint16 Thread::getNextTwo8(){
+		register uint16 x=*((uint16*)(&cod[cod_pointer]));
+		cod_pointer+=2;
+		return x;
+	}
+	inline uint16 Thread::getNext16(){
+		register uint16 x=*((uint16*)(&cod[cod_pointer]));
+		cod_pointer+=2;
+		return x;
+	}
+	inline uint32 Thread::getNextTwo16(){
+		register uint32 x=*((uint32*)(&cod[cod_pointer]));
+		cod_pointer+=4;
+		return x;
+	}
+	inline uint32 Thread::getNext32(){
+		register uint32 x=*((uint32*)(&cod[cod_pointer]));
+		cod_pointer+=4;
+		return x;
+	}
+	inline uint64 Thread::getNextTwo32(){
+		register uint64 x=*(uint64*)(&cod[cod_pointer]);
+		cod_pointer+=8;
+		return x;
+	}
+	inline uint48 Thread::getNext48(){
+		register uint48 x=*((uint48*)(&cod[cod_pointer]));
+		cod_pointer+=6;
+		return x;
+	}
+	inline uint64 Thread::getNext64(){
+		register uint64 x=*(uint64*)(&cod[cod_pointer]);
+		cod_pointer+=8;
+		return x;
+	}
+
+	inline uint8 Thread::checkUseCode(uint32 tam){
+		if(cod_pointer+tam > ct->getCodeDataSize()){
+			//error_flags|=OVERLOAD_COD_ERROR_;
+			throw CodeException(cod_pointer,"CHECK_CODE_THREAD",_OVERLOAD_CODE);
+		}
+		return error_flags;
+	}
 
 
 #endif /* SRC_CLASS_THREAD_H_ */

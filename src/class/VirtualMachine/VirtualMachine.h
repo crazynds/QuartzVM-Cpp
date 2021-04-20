@@ -8,7 +8,7 @@
 #ifndef VIRTUALMACHINE_H_
 #define VIRTUALMACHINE_H_
 	#include "../../lib/Types.h"
-	//#include <vector>
+
 	#include <map>
 	#include "ManagerOpcodes.h"
 	#include "ManagerResources.h"
@@ -29,20 +29,6 @@
      *  - VM muito antiga para rodar determinado código
      *  - Falha interna da VM
      */
-
-
-	#define OUT_LOG 1
-	#define OUT_ERROR 2
-	#define OUT_INFO 3
-	//Debug definido em 1
-	#define OUT_SUCESS 4
-	#define OUT_WARNING 5
-	//Debug definido em 2
-	#define OUT_INFO_EXTRA 6
-	#define OUT_LOG_EXTRA 7
-	//Debug definido em 3
-	#define OUT_DEBUG 8
-
 
 
 	class Context;
@@ -77,6 +63,7 @@
 
 			uint32 runAllThread1Time(uint32);
 			void finalize();
+			void finalizeThread();
 		public:
 
 			VirtualMachine(uint8 = 0);
@@ -101,9 +88,6 @@
 			void free_resorce(void*);
 			void* realloc_resorce(void*,uint32);
 
-			void printMessage(uint8,char *);
-			void printMessage(uint8,std::stringstream&);
-
 			uint16 checkContext(uint16);
 			uint8 getDebugLevel();
 			Context& getContext(uint16);
@@ -112,6 +96,7 @@
 
 			ManagerOpcodes& getManagerOpcodes();
 	};
+
 
 
 #endif /* VIRTUALMACHINE_H_ */

@@ -7,6 +7,7 @@
 
 #ifndef Context_H_
 #define Context_H_
+
 	#include "../lib/Types.h"
 	#include <vector>
 	#include <map>
@@ -30,13 +31,11 @@
 
 	class Context{
 		private:
-			std::map<uint32,FuncJit> functions;
-			//std::vector<Dupla<FuncJit,uint32>> funcs;
+			VirtualMachine *vm;
 			uint16 id;
 
 			uint16 versao;
 			uint8 correcao;
-
 
 			uint64 devVersion;
 			char *nome_geral;
@@ -52,19 +51,23 @@
 			uint32 cod_len;
 
 
+			std::map<uint32,FuncJit> functions;
 
-			void prepare(uint16,uint8*,uint32);
+
+
+			void prepare(uint8*,uint32);
 
 		public:
 
 
 			Context(VirtualMachine*,uint16,uint8*,uint32);
+			Context();
 			~Context();
 
 			FuncJit& createFunction(uint32);
-			void clearFunctions(JitRuntime&);
+			void clearFunctions();
 
-			char printVisibleName();
+			std::string visibleName();
 
 			uint16 getCodContext();
 			FuncJit getFunction(uint32);

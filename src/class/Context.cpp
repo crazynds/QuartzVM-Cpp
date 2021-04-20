@@ -4,19 +4,44 @@
  *  Created on: 10 de abr de 2019
  *      Author: lhlag
  */
+#include "../lib/IOMessages.h"
 #include "Context.h"
 #include "../opcodes/WordCoder/VERSION.h"
 
+#define PRINT_MESSAGE(type,str) {std::stringstream os;os << "[" << visibleName() << "] - " << str;printMessage(vm->getDebugLevel(),type,os);}
 
-Context::Context(VirtualMachine* vm,uint16 codi,uint8* binaryCode,uint32 len){
-	mem=new uint8[MEMORY_BASE_CONTEXT*2];
-	max_mem=MEMORY_BASE_CONTEXT*2;
-	for(uint64 x=0;x<max_mem;x++){
-		mem[x]=0;
-	}
+
+Context::Context(VirtualMachine* vm,uint16 id,uint8* binaryCode,uint32 len){
+	mem=NULL;
+	max_mem=0;
+
+	this->id=id;
+	this->vm=vm;
+
 	cod=NULL;
 	cod_len=0;
+	versao=0;
+	correcao=0;
+	devVersion=0;
+	nome_visivel=NULL;
+	nome_geral=NULL;
+	try{
+		prepare(binaryCode,len);
+	}catch(VMException &e){
+		e.addToPath("CONTEXT_CONTRUCTOR");
+		throw;
+	}
+
+	PRINT_MESSAGE(OUT_LOG,"Context carregado completamente");
+}
+Context::Context(){
+	mem=NULL;
+	max_mem=0;
 	id=0;
+
+	this->vm=NULL;
+	cod=NULL;
+	cod_len=0;
 	versao=0;
 	correcao=0;
 	devVersion=0;
@@ -40,22 +65,24 @@ FuncJit Context::getFunction(uint32 mem){
 	else return 0;
 }
 
-void Context::clearFunctions(JitRuntime& rm){
+void Context::clearFunctions(){
+	JitRuntime& rm = vm->getManagerOpcodes().getJitRuntime();
 	for (auto it=functions.begin(); it!=functions.end(); ++it){
 		rm.release(it->second);
 	}
 	functions.clear();
 
 }
-char Context::printVisibleName(){
-	if(nome_visivel!=NULL)std::cout << "[" << nome_visivel;
-	else if(nome_geral!=NULL)std::cout << "[" << nome_geral;
-	else std::cout << "[CTX:"<< id;
-	return ']';
+std::string Context::visibleName(){
+	if(nome_visivel!=NULL)return std::string(nome_visivel);
+	else if(nome_geral!=NULL)return std::string(nome_geral);
+	return std::string("CTX:")+std::to_string(id);
 }
 
-void Context::prepare(uint16 codi,uint8 *binaryCode,uint32 len){
-	id=codi;
+void Context::prepare(uint8 *binaryCode,uint32 len){
+	mem=new uint8[MEMORY_BASE_CONTEXT+128];
+	max_mem=MEMORY_BASE_CONTEXT;
+	memset(mem,0,max_mem);
 	if(*((uint16*)binaryCode)==0){
 		uint8 *bck=binaryCode;
 		uint32 tam_header;
@@ -67,13 +94,13 @@ void Context::prepare(uint16 codi,uint8 *binaryCode,uint32 len){
 		tam_header=*((uint32*)binaryCode);
 		binaryCode+=4;
 		if(tam_header>=len-9){
-			std::cout << "[ERROR] -" << printVisibleName()<< "- Tamanho de cabeçalho invalido para o que foi passado no Context;" <<  std::endl;
+			PRINT_MESSAGE(OUT_ERROR,"Tamanho de cabeçalho invalido para o que foi passado no Context");
 		}else if(versao>VERSION_VM){
-			std::cout << "[ERROR] -" << printVisibleName()<< "- Carregado sorcecode de versão maior que a VM atual. Informações de cabeçalho não puderam ser adicionadas." << std::endl;
-			std::cout << "[ERROR] -" << printVisibleName()<< "- VM Version: " << VERSION_VM << " | Sorce Code Version: " << versao << std::endl;
+			PRINT_MESSAGE(OUT_ERROR,"Carregado sorcecode de versão maior que a VM atual. Por questões de segurança informações de cabeçalho não serão adicionadas");
+			PRINT_MESSAGE(OUT_ERROR,"VM Version: " << VERSION_VM << " | Sorce Code Version: " << versao);
 			len-=tam_header+9;
 		}else{
-			std::cout << "[INFO] -" << printVisibleName()<< "- Compatibilidade: " << versao << "V(" << uint32(correcao) << ")" << std::endl;
+			PRINT_MESSAGE(OUT_INFO,"Compatibilidade: " << versao << "V(" << uint32(correcao) << ")");
 			uint16 dados=*((uint16*)binaryCode);
 			binaryCode+=2;
 			while(dados-->0){
@@ -83,13 +110,13 @@ void Context::prepare(uint16 codi,uint8 *binaryCode,uint32 len){
 				case COD_DEV_VERSION:
 					devVersion=*((uint64*)binaryCode);
 					binaryCode+=8;
-					std::cout << "[INFO] -" << printVisibleName() << "- Versão Software: " << devVersion << std::endl;
+					PRINT_MESSAGE(OUT_INFO,"Versão Software: " << devVersion);
 					break;
 				case COD_NOME_GERAL:{
 					char *c=(char*)binaryCode;
 					uint32 auxt=strlen(c);
 					binaryCode+=auxt+1;
-					std::cout << "[INFO] -" << printVisibleName() << "- Nome completo: " << c << std::endl;
+					PRINT_MESSAGE(OUT_INFO,"Nome completo: " << c);
 					nome_geral=new char[auxt+1];
 					strcpy(nome_geral,c);
 					}break;
@@ -97,12 +124,12 @@ void Context::prepare(uint16 codi,uint8 *binaryCode,uint32 len){
 					char *c=(char*)binaryCode;
 					uint32 auxt=strlen(c);
 					binaryCode+=auxt+1;
-					std::cout << "[INFO] -" << printVisibleName() << "- Nome visivel: " << c << std::endl;
+					PRINT_MESSAGE(OUT_INFO,"Nome visivel: " << c);
 					nome_visivel=new char[auxt+1];
 					strcpy(nome_visivel,c);
 					}break;
 				default:
-					std::cout << "[ERROR] -" << printVisibleName()<< "- Código de cabeçalho não encontrado: " << l << std::endl;
+					PRINT_MESSAGE(OUT_INFO,"Código de cabeçalho não encontrado: " << l);
 				}
 
 			};
@@ -120,13 +147,13 @@ void Context::prepare(uint16 codi,uint8 *binaryCode,uint32 len){
 }
 
 
-inline void Context::set16InCode(uint32 pont,uint16 val){
+void Context::set16InCode(uint32 pont,uint16 val){
 	if(pont>=cod_len)return;
 	register uint16* x=((uint16*)(&cod[pont]));
 	*x=val;
 }
 
-inline void Context::set32InCode(uint32 pont,uint32 val){
+void Context::set32InCode(uint32 pont,uint32 val){
 	if(pont>=cod_len)return;
 	register uint32* x=((uint32*)(&cod[pont]));
 	*x=val;
@@ -147,7 +174,7 @@ uint32 Context::getCodeDataSize(){
 }
 
 Context::~Context(){
-	functions.clear();
+	clearFunctions();
 	delete[] cod;
 	delete[] mem;
 	if(nome_visivel!=NULL)delete[] nome_visivel;

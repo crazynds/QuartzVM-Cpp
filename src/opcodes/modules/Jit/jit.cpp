@@ -212,12 +212,10 @@
 			while(jcontent.opcode!=JIT_FLAG_END){
 				a.nextState();
 				{
-					uint32 aux=t.getPontCode()-2;
-					auto it = vt->find(aux);
+					auto it = vt->find(t.getPontCode()-2);
 					if(it != vt->end()){
 						a.clearRegisters();
 						a.bind(it->second);
-						break;
 					}
 				}
 				bool verif=false;
@@ -236,12 +234,10 @@
 		}
 		a.clearRegisters();
 		{
-			uint32 aux=t.getPontCode()-2;
-			auto it = vt->find(aux);
+			auto it = vt->find(t.getPontCode()-2);
 			if(it != vt->end()){
 				a.clearRegisters();
 				a.bind(it->second);
-				break;
 			}
 		}
 		a.mov(eax,t.getPontCode()); // return values

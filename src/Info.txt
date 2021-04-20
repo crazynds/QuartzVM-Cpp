@@ -1,3 +1,9 @@
+Requireds:
+
+REQUIRED_IO
+REQUIRED_ASMJIT
+REQUIRED_STDLIB
+
 Linguagem:
 
 Variaveis suportadas:

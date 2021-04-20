@@ -8,7 +8,6 @@
 #ifndef SRC_CLASS_VIRTUALMACHINE_MANAGEROPCODES_H_
 #define SRC_CLASS_VIRTUALMACHINE_MANAGEROPCODES_H_
 
-
 	#include "../../lib/Types.h"
 	#include "../../lib/asmjit.h"
 

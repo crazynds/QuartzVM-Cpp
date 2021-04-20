@@ -59,7 +59,6 @@ uint16* ModuleSdtio::getListOpcodes(){
 }
 
 void ModuleSdtio::setInterpretedOpcodes(ManagerOpcodes& man){
-	printf("\n|%d|",DEBUG_PRINT_OUT_MEM);
 	man.createOpcode(DEBUG_PRINT_OUT_MEM,(void*)test_func);
 	man.createOpcode(DEBUG_PRINT_OUT_RESORCE,(void*)print_alloc);
 	man.createOpcode(SLEEP_COMAND,(void*)sleep);

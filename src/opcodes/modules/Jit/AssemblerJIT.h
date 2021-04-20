@@ -8,8 +8,8 @@
 #ifndef SRC_LIB_ASSEMBLERJIT_H_
 #define SRC_LIB_ASSEMBLERJIT_H_
 
+	#include "../../../lib/asmjit.h"
 	#include "../../../lib/exception/VMException.h"
-
 	const Gp memory=rdi;
 	const Gp workspace=rsi;
 
