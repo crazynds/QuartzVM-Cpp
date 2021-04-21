@@ -126,7 +126,7 @@ void print_alloc(Thread &t){
 	uint8 *array=(uint8*)t.workspace[t.getNext8()];
 	uint32 tam=t.getNext32();
 	std::cout << "[DEBUG] - RESORC {" << (int16)array[0];
-	for(int p=1;p<tam;p++)std::cout << "," << (int16)array[p] ;
+	for(uint32 p=1;p<tam;p++)std::cout << "," << (int16)array[p] ;
 	std::cout << "}" << std::endl;
 }
 

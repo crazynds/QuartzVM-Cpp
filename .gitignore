@@ -37,5 +37,5 @@
 /test/
 # Eclipse settings
 /.settings/
-/.cproject
-/.project
+.cproject
+.project

@@ -284,7 +284,6 @@ bool ModuleMoviment::set_opcode_jit(JitContentsAuxiliar jcontent,Thread &t, Asse
 	case P_UINT48+MOV_M_W:{
 		uint64 mem=t.getNext48().toInt();
 		uint8 val=t.getNext8();
-		uint8 size=64;
 
 		bool has = a.hasWorkspace(val);
 		Gp wk2 = a.getRegisterWorkspace(64,val);
