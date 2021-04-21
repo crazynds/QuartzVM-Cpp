@@ -1,3 +1,20 @@
+## [0.2.0] - 20-04-2021
+### Added
+ - JIT is now have official suport for the most of commands
+ - Create template for customs commands in interpreted mode and JIT mode
+ - Now the default lang used in all files is the en (English)
+ - Now each virtual thread has its own thread via software and is executed separately (Start of parallelism :] !!)
+### Changed
+ - Context memory now is static in all program execution
+ - Asmjit library is loaded direct by the git comunity
+ - Increase modularization of all classes
+ - Most of the variables of Thread and VM are now private
+ - Increase speed of execution in all VM execution
+### Removed
+ - All static library of commands and other things
+### Fix
+ - Fixed all bugs that prevent normal code from running
+
 ## [0.1.1] - 17-06-2019
 ### Added
  - Atualização do wordcoder para utilização dinamica das chamadas das funções;

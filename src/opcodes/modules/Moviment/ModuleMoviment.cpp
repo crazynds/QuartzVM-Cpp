@@ -146,13 +146,13 @@ bool ModuleMoviment::check_jit(Thread &t,Assembler &a,std::map<uint32,Label> &ve
 		case P_UINT48+MOV_W_W:
 		case P_INT64+MOV_W_W:
 		case P_UINT64+MOV_W_W:
-			{if(t.checkUseCode(2))return 0;t.setPontCode(t.getPontCode()+2);}break;
+			{t.checkUseCode(2);t.setPontCode(t.getPontCode()+2);}break;
 		case P_INT16+MOV_W_C:
 		case P_UINT16+MOV_W_C:
-			{if(t.checkUseCode(3))return 0;t.setPontCode(t.getPontCode()+3);}break;
+			{t.checkUseCode(3);t.setPontCode(t.getPontCode()+3);}break;
 		case P_INT32+MOV_W_C:
 		case P_UINT32+MOV_W_C:
-			{if(t.checkUseCode(5))return 0;t.setPontCode(t.getPontCode()+5);}break;
+			{t.checkUseCode(5);t.setPontCode(t.getPontCode()+5);}break;
 		case P_INT48+MOV_W_C:
 		case P_UINT48+MOV_W_C:
 		case P_UINT8+MOV_M_C:
@@ -167,22 +167,22 @@ bool ModuleMoviment::check_jit(Thread &t,Assembler &a,std::map<uint32,Label> &ve
 		case P_UINT48+MOV_M_W:
 		case P_INT64+MOV_M_W:
 		case P_UINT64+MOV_M_W:
-			{if(t.checkUseCode(7))return 0;t.setPontCode(t.getPontCode()+7);}break;
+			{t.checkUseCode(7);t.setPontCode(t.getPontCode()+7);}break;
 		case P_UINT16+MOV_M_C:
 		case P_INT16+MOV_M_C:
-			{if(t.checkUseCode(8))return 0;t.setPontCode(t.getPontCode()+8);}break;
+			{t.checkUseCode(8);t.setPontCode(t.getPontCode()+8);}break;
 		case P_INT64+MOV_W_C:
 		case P_UINT64+MOV_W_C:
-			{if(t.checkUseCode(9))return 0;t.setPontCode(t.getPontCode()+9);}break;
+			{t.checkUseCode(9);t.setPontCode(t.getPontCode()+9);}break;
 		case P_UINT32+MOV_M_C:
 		case P_INT32+MOV_M_C:
-			{if(t.checkUseCode(10))return 0;t.setPontCode(t.getPontCode()+10);}break;
+			{t.checkUseCode(10);t.setPontCode(t.getPontCode()+10);}break;
 		case P_UINT48+MOV_M_C:
 		case P_INT48+MOV_M_C:
-			{if(t.checkUseCode(12))return 0;t.setPontCode(t.getPontCode()+12);}break;
+			{t.checkUseCode(12);t.setPontCode(t.getPontCode()+12);}break;
 		case P_UINT64+MOV_M_C:
 		case P_INT64+MOV_M_C:
-			{if(t.checkUseCode(14))return 0;t.setPontCode(t.getPontCode()+14);}break;
+			{t.checkUseCode(14);t.setPontCode(t.getPontCode()+14);}break;
 		default:
 			return false;
 	}

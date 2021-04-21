@@ -28,14 +28,14 @@
 		private:
 			uint8 *mem;
 			uint64 maxMem;
-			uint32 *erro_flags;
+			uint16 *erro_flags;
 		public:
 			MemoryAcess(){
 				mem= NULL;
 				maxMem = 0;
 				erro_flags = NULL;
 			}
-			MemoryAcess(Context *c,uint32 *err){
+			MemoryAcess(Context *c,uint16 *err){
 				mem=c->getMemoryDataDataPointer();
 				maxMem=c->getMemoryDataSize().toInt();
 				erro_flags=err;
@@ -67,9 +67,11 @@
 
 			VirtualMachine *vt;
 			Context *ct;
+
 			//Memorias de acesso;
 			const uint8 *cod;
 			uint32 code_len;
+			uint32 cod_pointer;
 
 			// stack
 		#ifdef THREAD_CUSTOM_STACK
@@ -80,7 +82,7 @@
 			std::stack<uint64> stack;
 		#endif
 
-			uint32 cod_pointer;
+			uint16 error_flags;
 
 
 
@@ -116,7 +118,6 @@
 			MemoryAcess mem;				//Gerencia o acesso a memoria;
 			uint64 workspace[257];  		//para não haver invasão de memoria;
 
-			uint32 error_flags;
 			uint8 compare_flags;
 
 
@@ -140,13 +141,19 @@
 			uint32 getNextTwo16();
 			uint64 getNextTwo32();
 
-			uint8 checkUseCode(uint32);
+			uint16 checkUseCode(uint32);
+			uint16 getErrorFlags(){
+				return error_flags;
+			}
+			void setErrorFlags(uint16 flag);
+
 			uint8* getPointerMemCode();
-			uint16 isFinalized();
 			uint32 getPontCode();
+
 			VirtualMachine& getVirtualMachine();
 			Context& getContext();
 
+			uint16 isFinalized();
 
 			void setPontCode(uint32);
 			void setPontCodeCtx(uint48);
@@ -207,7 +214,7 @@
 		return x;
 	}
 
-	inline uint8 Thread::checkUseCode(uint32 tam){
+	inline uint16 Thread::checkUseCode(uint32 tam){
 		if(cod_pointer+tam > ct->getCodeDataSize()){
 			//error_flags|=OVERLOAD_COD_ERROR_;
 			throw CodeException(cod_pointer,"CHECK_CODE_THREAD",_OVERLOAD_CODE);
@@ -215,5 +222,58 @@
 		return error_flags;
 	}
 
+	inline void Thread::setErrorFlags(uint16 flag){
+		switch(flag){
+		case RUNNING_:
+			error_flags^=RUNNING_;
+			break;
+		case OVERLOAD_MEM_ERROR_:
+			error_flags|=OVERLOAD_MEM_ERROR_;
+			break;
+		case MAX_LIMIT_STACK_:
+			error_flags|=MAX_LIMIT_STACK_;
+			break;
+		case INVALID_JMP_JIT_:
+			error_flags|=INVALID_JMP_JIT_;
+			break;
+		case INTERNAL_ERROR_ :
+			error_flags|=INTERNAL_ERROR_;
+			break;
+		case INVALID_CHANGE_CONTEXT_:
+			error_flags|=INVALID_CHANGE_CONTEXT_;
+			break;
+		case MIN_LIMIT_STACK_:
+			error_flags|=MIN_LIMIT_STACK_;
+			break;
+		}
+	}
+
+	inline VirtualMachine& Thread::getVirtualMachine(){
+		return *vt;
+	}
+
+	inline uint16 Thread::isFinalized(){
+		return error_flags;
+	}
+	inline uint8* Thread::getPointerMemCode(){
+		return mem.getPointerMem();
+	}
+
+
+	inline void Thread::setPontCode(uint32 t){
+		cod_pointer=t;
+	}
+	inline uint32 Thread::getPontCode(){
+		return cod_pointer;
+	}
+
+	inline Context& Thread::getContext(){
+		return *ct;
+	}
+
+
+	inline JitRuntime& Thread::getJitRuntime(){
+		return vt->getManagerOpcodes().getJitRuntime();
+	}
 
 #endif /* SRC_CLASS_THREAD_H_ */

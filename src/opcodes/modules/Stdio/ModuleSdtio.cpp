@@ -134,7 +134,7 @@ using namespace std;
 
 void print_out_char_w(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(3))return;
+	t.checkUseCode(3);
 #endif
 	uint8 aux=t.getNext8();
 	uint8 debg=t.getVirtualMachine().getDebugLevel();
@@ -143,7 +143,7 @@ void print_out_char_w(Thread &t){
 }
 void print_out_num_w(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(3))return;
+	t.checkUseCode(3);
 #endif
 	uint8 aux=t.getNext8();
 	uint8 debg=t.getVirtualMachine().getDebugLevel();
@@ -152,7 +152,7 @@ void print_out_num_w(Thread &t){
 }
 void print_out_string_mmw(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(3))return;
+	t.checkUseCode(3);
 #endif
 	uint8 aux=t.getNext8();
 	uint64 b=t.workspace[aux]&0x0000FFFFFFFFFFFF;
@@ -164,7 +164,7 @@ void print_out_string_mmw(Thread &t){
 }
 void print_out_string_m(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(3))return;
+	t.checkUseCode(3);
 #endif
 	uint64 b=t.getNext48().toInt();
 	uint8 *str=&t.mem[b];
@@ -174,7 +174,7 @@ void print_out_string_m(Thread &t){
 }
 void load_context_w_mw(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint8 pos=t.getNext8();
 	char *n;
@@ -191,13 +191,13 @@ void load_context_w_mw(Thread &t){
 }
 void get_context_id_w(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(3))return;
+	t.checkUseCode(3);
 #endif
 	t.workspace[t.getNext8()]=t.getContext().getCodContext();
 }
 void check_context_id_w(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(3))return;
+	t.checkUseCode(3);
 #endif
 	uint8 pos=t.getNext8();
 	t.workspace[pos]=t.getVirtualMachine().checkContext(uint16(t.workspace[pos]));

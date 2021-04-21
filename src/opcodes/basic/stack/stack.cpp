@@ -5,14 +5,14 @@
 
 void call_ctx_c(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(5))return;
+	t.checkUseCode(5);
 #endif
 	uint16 ctx=uint16(t.workspace[t.getNext8()]);
 	uint32 pon=t.getNext32();
 	t.savePoint();
 #ifndef _FAST_MODE
 	if(t.getVirtualMachine().checkContext(ctx)==0){
-		t.error_flags|=INVALID_CHANGE_CONTEXT_;
+		t.setErrorFlags(INVALID_CHANGE_CONTEXT_);
 		std::cout << "[ERROR] - Erro ao entrar em um Context inexistente. (ID= " << ctx << ")" << std::endl;
 		return;
 	}
@@ -25,14 +25,14 @@ void call_ctx_c(Thread &t){
 
 void call_ctx_w(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(2))return;
+	t.checkUseCode(2);
 #endif
 	uint16 ctx=uint16(t.workspace[t.getNext8()]);
 	uint32 pon=uint32(t.workspace[t.getNext8()]);
 	t.savePoint();
 #ifndef _FAST_MODE
 	if(t.getVirtualMachine().checkContext(ctx)==0){
-		t.error_flags|=INVALID_CHANGE_CONTEXT_;
+		t.setErrorFlags(INVALID_CHANGE_CONTEXT_);
 		std::cout << "[ERROR] - Erro ao entrar em um Context inexistente. (ID= " << ctx << ")" << std::endl;
 		return;
 	}
@@ -45,7 +45,7 @@ void call_ctx_w(Thread &t){
 
 void call_c(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint32 p=t.getNext32();
 	t.savePoint();
@@ -55,7 +55,7 @@ void call_c(Thread &t){
 
 void call_m(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(6))return;
+	t.checkUseCode(6);
 #endif
 	uint32 p=*((uint32*)&t.mem[t.getNext48().toInt()]);
 	t.savePoint();
@@ -64,7 +64,7 @@ void call_m(Thread &t){
 }
 void call_w(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(1))return;
+	t.checkUseCode(1);
 #endif
 	uint32 p=*((uint32*)&t.workspace[t.getNext8()]);
 	t.savePoint();
@@ -75,7 +75,7 @@ void call_w(Thread &t){
 void ret(Thread &t){
 	t.recoverPoint();
 #ifndef _FAST_MODE
-	if(t.checkUseCode(2))return;
+	t.checkUseCode(2);
 #endif
 }
 
@@ -84,13 +84,13 @@ void ret(Thread &t){
 
 void push_w(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(3))return;
+	t.checkUseCode(3);
 #endif
 	t.saveInStack(t.workspace[t.getNext8()]);
 }
 void push_c(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(10))return;
+	t.checkUseCode(10);
 #endif
 	t.saveInStack(t.getNext64());
 }
@@ -98,7 +98,7 @@ void push_c(Thread &t){
 
 void pop_w(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(3))return;
+	t.checkUseCode(3);
 #endif
 	t.workspace[t.getNext8()]=t.recoverInStack();
 }

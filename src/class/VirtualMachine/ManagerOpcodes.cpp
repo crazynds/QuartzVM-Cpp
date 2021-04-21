@@ -6,7 +6,6 @@
  */
 
 #include "ManagerOpcodes.h"
-#include <iostream>
 #include "../../opcodes/GeralComand.h"
 #include "../../opcodes/modules/GeneralModules.h"
 #include "../../opcodes/modules/LibraryModuleOpcode.h"
@@ -22,7 +21,7 @@ void setCmp(void **);
 
 void end_running(Thread &t){
 	//Define a flag running como off;
-	t.error_flags|=RUNNING_;
+	t.setErrorFlags(RUNNING_);
 }
 
 

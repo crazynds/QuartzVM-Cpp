@@ -60,10 +60,7 @@
 			void **recursos_alocados;
 			uint32 qtd_res;
 
-
-			uint32 runAllThread1Time(uint32);
 			void finalize();
-			void finalizeThread();
 		public:
 
 			VirtualMachine(uint8 = 0);
@@ -71,14 +68,13 @@
 
 
 			//Return flags on finalize
-			uint32 run();
+			uint16 run();
 			//Return flags on finalize
-			uint32 runCommand();
+			uint16 runCommand();
 
 
 			//Cria uma thread de execução passando como param o código do ctx e a posição de entrada.
 			uint16 createThread(uint16,uint32);
-			void deleteThread(uint16);
 			//Carrega um Context passando como param o bytecode e o tamanho
 			uint16 loadContext(uint8*,uint32);
 

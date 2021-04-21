@@ -15,7 +15,7 @@
 
 void alloc_res(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(7))return;
+	t.checkUseCode(7);
 #endif
 	uint8 pos = t.getNext8();
 	uint32 tam = t.getNext32();
@@ -23,14 +23,14 @@ void alloc_res(Thread &t){
 }
 void free_res(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(3))return;
+	t.checkUseCode(3);
 #endif
 	t.getVirtualMachine().free_resorce((void*)t.workspace[t.getNext8()]);
 }
 
 void alloc_dinamic_res(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint8 pos = t.getNext8();
 	uint32 tam = (uint32) t.workspace[t.getNext8()];
@@ -38,7 +38,7 @@ void alloc_dinamic_res(Thread &t){
 }
 void ralloc_dinamic_res(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint8 pos = t.getNext8();
 	uint32 tam = (uint32) t.workspace[t.getNext8()];
@@ -47,7 +47,7 @@ void ralloc_dinamic_res(Thread &t){
 
 void realloc_res(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(7))return;
+	t.checkUseCode(7);
 #endif
 	uint8 pos = t.getNext8();
 	uint32 tam = t.getNext32();

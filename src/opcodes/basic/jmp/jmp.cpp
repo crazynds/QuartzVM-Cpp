@@ -18,13 +18,13 @@
 
 void jmp_ctx_c(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(5))return;
+	t.checkUseCode(5);
 #endif
 	uint16 ctx=uint16(t.workspace[t.getNext8()]);
 	uint32 pon=t.getNext32();
 #ifndef _FAST_MODE
 	if(t.getVirtualMachine().checkContext(ctx)==0){
-		t.error_flags|=INVALID_CHANGE_CONTEXT_;
+		t.setErrorFlags(INVALID_CHANGE_CONTEXT_);
 		std::cout << "[ERROR] - Erro ao entrar em um Context inexistente. (ID= " << ctx << ")" << std::endl;
 		return;
 	}
@@ -36,13 +36,13 @@ void jmp_ctx_c(Thread &t){
 }
 void jmp_ctx_w(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(2))return;
+	t.checkUseCode(2);
 #endif
 	uint16 ctx=uint16(t.workspace[t.getNext8()]);
 	uint32 pon=uint32(t.workspace[t.getNext8()]);
 #ifndef _FAST_MODE
 	if(t.getVirtualMachine().checkContext(ctx)==0){
-		t.error_flags|=INVALID_CHANGE_CONTEXT_;
+		t.setErrorFlags(INVALID_CHANGE_CONTEXT_);
 		std::cout << "[ERROR] - Erro ao entrar em um Context inexistente. (ID= " << ctx << ")" << std::endl;
 		return;
 	}
@@ -55,11 +55,11 @@ void jmp_ctx_w(Thread &t){
 
 void jmp_c(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	t.setPontCode(t.getNext32());
 #ifndef _FAST_MODE
-	if(t.checkUseCode(2))return;
+	t.checkUseCode(2);
 #endif
 }
 
@@ -67,11 +67,11 @@ void jmp_c(Thread &t){
 
 void jmp_m(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(6))return;
+	t.checkUseCode(6);
 #endif
 	t.setPontCode(*((uint32*)&t.mem[t.getNext48().toInt()]));
 #ifndef _FAST_MODE
-	if(t.checkUseCode(2))return;
+	t.checkUseCode(2);
 #endif
 }
 
@@ -79,11 +79,11 @@ void jmp_m(Thread &t){
 
 void jmp_w(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(1))return;
+	t.checkUseCode(1);
 #endif
 	t.setPontCode(*((uint32*)&t.workspace[t.getNext8()]));
 #ifndef _FAST_MODE
-	if(t.checkUseCode(2))return;
+	t.checkUseCode(2);
 #endif
 }
 
@@ -104,7 +104,7 @@ void jmp_w(Thread &t){
 
 void cmp_m_c_ui8(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	register uint8 x=t.mem[t.getNext48().toInt()];
 	register uint8 p=t.getNext8();
@@ -116,7 +116,7 @@ void cmp_m_c_ui8(Thread &t){
 }
 void cmp_m_c_ui16(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(10))return;
+	t.checkUseCode(10);
 #endif
 	register uint16 x=*((uint16*)&t.mem[t.getNext48().toInt()]);
 	register uint16 p=t.getNext16();
@@ -127,7 +127,7 @@ void cmp_m_c_ui16(Thread &t){
 }
 void cmp_m_c_ui32(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(12))return;
+	t.checkUseCode(12);
 #endif
 	register uint32 x=*((uint32*)&t.mem[t.getNext48().toInt()]);
 	register uint32 p=t.getNext32();
@@ -138,7 +138,7 @@ void cmp_m_c_ui32(Thread &t){
 }
 void cmp_m_c_ui48(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(14))return;
+	t.checkUseCode(14);
 #endif
 	register uint64 x=((uint48*)&t.mem[t.getNext48().toInt()])->toInt();
 	register uint64 p=t.getNext48().toInt();
@@ -149,7 +149,7 @@ void cmp_m_c_ui48(Thread &t){
 }
 void cmp_m_c_ui64(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(16))return;
+	t.checkUseCode(16);
 #endif
 	register uint64 x=*((uint64*)&t.mem[t.getNext48().toInt()]);
 	register uint64 p=t.getNext64();
@@ -161,7 +161,7 @@ void cmp_m_c_ui64(Thread &t){
 
 void cmp_m_m_ui8(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(14))return;
+	t.checkUseCode(14);
 #endif
 	register uint8 x=t.mem[t.getNext48().toInt()];
 	register uint8 p=t.mem[t.getNext48().toInt()];
@@ -172,7 +172,7 @@ void cmp_m_m_ui8(Thread &t){
 }
 void cmp_m_m_ui16(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(14))return;
+	t.checkUseCode(14);
 #endif
 	register uint16 x=*((uint16*)&t.mem[t.getNext48().toInt()]);
 	register uint16 p=*((uint16*)&t.mem[t.getNext48().toInt()]);
@@ -183,7 +183,7 @@ void cmp_m_m_ui16(Thread &t){
 }
 void cmp_m_m_ui32(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(14))return;
+	t.checkUseCode(14);
 #endif
 	register uint32 x=*((uint32*)&t.mem[t.getNext48().toInt()]);
 	register uint32 p=*((uint32*)&t.mem[t.getNext48().toInt()]);
@@ -194,7 +194,7 @@ void cmp_m_m_ui32(Thread &t){
 }
 void cmp_m_m_ui48(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(14))return;
+	t.checkUseCode(14);
 #endif
 	register uint64 x=((uint48*)&t.mem[t.getNext48().toInt()])->toInt();
 	register uint64 p=((uint48*)&t.mem[t.getNext48().toInt()])->toInt();
@@ -205,7 +205,7 @@ void cmp_m_m_ui48(Thread &t){
 }
 void cmp_m_m_ui64(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(14))return;
+	t.checkUseCode(14);
 #endif
 	register uint64 x=*((uint64*)&t.mem[t.getNext48().toInt()]);
 	register uint64 p=*((uint64*)&t.mem[t.getNext48().toInt()]);
@@ -217,7 +217,7 @@ void cmp_m_m_ui64(Thread &t){
 
 void cmp_m_w_ui8(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	register uint8 x=t.mem[t.getNext48().toInt()];
 	register uint8 p=t.workspace[t.getNext8()];
@@ -228,7 +228,7 @@ void cmp_m_w_ui8(Thread &t){
 }
 void cmp_m_w_ui16(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	register uint16 x=*((uint16*)&t.mem[t.getNext48().toInt()]);
 	register uint16 p=*((uint16*)&t.workspace[t.getNext8()]);
@@ -239,7 +239,7 @@ void cmp_m_w_ui16(Thread &t){
 }
 void cmp_m_w_ui32(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	register uint32 x=*((uint32*)&t.mem[t.getNext48().toInt()]);
 	register uint32 p=*((uint32*)&t.workspace[t.getNext8()]);
@@ -250,7 +250,7 @@ void cmp_m_w_ui32(Thread &t){
 }
 void cmp_m_w_ui48(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	register uint64 x=((uint48*)&t.mem[t.getNext48().toInt()])->toInt();
 	register uint64 p=((uint48*)&t.workspace[t.getNext8()])->toInt();
@@ -261,7 +261,7 @@ void cmp_m_w_ui48(Thread &t){
 }
 void cmp_m_w_ui64(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	register uint64 x=*((uint64*)&t.mem[t.getNext48().toInt()]);
 	register uint64 p=*((uint64*)&t.workspace[t.getNext8()]);
@@ -274,7 +274,7 @@ void cmp_m_w_ui64(Thread &t){
 
 void cmp_w_c_ui8(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	register uint8 x=t.workspace[t.getNext8()];
 	register uint8 p=t.getNext8();
@@ -285,7 +285,7 @@ void cmp_w_c_ui8(Thread &t){
 }
 void cmp_w_c_ui16(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(5))return;
+	t.checkUseCode(5);
 #endif
 	register uint16 x=*((uint16*)&t.workspace[t.getNext8()]);
 	register uint16 p=t.getNext16();
@@ -296,7 +296,7 @@ void cmp_w_c_ui16(Thread &t){
 }
 void cmp_w_c_ui32(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(7))return;
+	t.checkUseCode(7);
 #endif
 	register uint32 x=*((uint32*)&t.workspace[t.getNext8()]);
 	register uint32 p=t.getNext32();
@@ -307,7 +307,7 @@ void cmp_w_c_ui32(Thread &t){
 }
 void cmp_w_c_ui48(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	register uint64 x=((uint48*)&t.workspace[t.getNext8()])->toInt();
 	register uint64 p=t.getNext48().toInt();
@@ -318,7 +318,7 @@ void cmp_w_c_ui48(Thread &t){
 }
 void cmp_w_c_ui64(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(11))return;
+	t.checkUseCode(11);
 #endif
 	register uint64 x=*((uint64*)&t.workspace[t.getNext8()]);
 	register uint64 p=t.getNext64();
@@ -330,7 +330,7 @@ void cmp_w_c_ui64(Thread &t){
 
 void cmp_w_m_ui8(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	register uint8 x=t.workspace[t.getNext8()];
 	register uint8 p=t.mem[t.getNext48().toInt()];
@@ -341,7 +341,7 @@ void cmp_w_m_ui8(Thread &t){
 }
 void cmp_w_m_ui16(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	register uint16 x=*((uint16*)&t.workspace[t.getNext8()]);
 	register uint16 p=*((uint16*)&t.mem[t.getNext48().toInt()]);
@@ -352,7 +352,7 @@ void cmp_w_m_ui16(Thread &t){
 }
 void cmp_w_m_ui32(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	register uint32 x=*((uint32*)&t.workspace[t.getNext8()]);
 	register uint32 p=*((uint32*)&t.mem[t.getNext48().toInt()]);
@@ -363,7 +363,7 @@ void cmp_w_m_ui32(Thread &t){
 }
 void cmp_w_m_ui48(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	register uint64 x=((uint48*)&t.workspace[t.getNext8()])->toInt();
 	register uint64 p=((uint48*)&t.mem[t.getNext48().toInt()])->toInt();
@@ -374,7 +374,7 @@ void cmp_w_m_ui48(Thread &t){
 }
 void cmp_w_m_ui64(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	register uint64 x=*((uint64*)&t.workspace[t.getNext8()]);
 	register uint64 p=*((uint64*)&t.mem[t.getNext48().toInt()]);
@@ -386,7 +386,7 @@ void cmp_w_m_ui64(Thread &t){
 
 void cmp_w_w_ui8(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	register uint8 x=t.workspace[t.getNext8()];
 	register uint8 p=t.workspace[t.getNext8()];
@@ -397,7 +397,7 @@ void cmp_w_w_ui8(Thread &t){
 }
 void cmp_w_w_ui16(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	register uint16 x=*((uint16*)&t.workspace[t.getNext8()]);
 	register uint16 p=*((uint16*)&t.workspace[t.getNext8()]);
@@ -408,7 +408,7 @@ void cmp_w_w_ui16(Thread &t){
 }
 void cmp_w_w_ui32(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	register uint32 x=*((uint32*)&t.workspace[t.getNext8()]);
 	register uint32 p=*((uint32*)&t.workspace[t.getNext8()]);
@@ -419,7 +419,7 @@ void cmp_w_w_ui32(Thread &t){
 }
 void cmp_w_w_ui48(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	register uint64 x=((uint48*)&t.workspace[t.getNext8()])->toInt();
 	register uint64 p=((uint48*)&t.workspace[t.getNext8()])->toInt();
@@ -430,7 +430,7 @@ void cmp_w_w_ui48(Thread &t){
 }
 void cmp_w_w_ui64(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	register uint64 x=*((uint64*)&t.workspace[t.getNext8()]);
 	register uint64 p=*((uint64*)&t.workspace[t.getNext8()]);
@@ -443,7 +443,7 @@ void cmp_w_w_ui64(Thread &t){
 
 void cmp_m_c_i8(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	register int8 x=t.mem[t.getNext48().toInt()];
 	register int8 p=t.getNext8();
@@ -454,7 +454,7 @@ void cmp_m_c_i8(Thread &t){
 }
 void cmp_m_c_i16(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(10))return;
+	t.checkUseCode(10);
 #endif
 	register int16 x=*((int16*)&t.mem[t.getNext48().toInt()]);
 	register int16 p=t.getNext16();
@@ -465,7 +465,7 @@ void cmp_m_c_i16(Thread &t){
 }
 void cmp_m_c_i32(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(12))return;
+	t.checkUseCode(12);
 #endif
 	register int32 x=*((int32*)&t.mem[t.getNext48().toInt()]);
 	register int32 p=t.getNext32();
@@ -476,7 +476,7 @@ void cmp_m_c_i32(Thread &t){
 }
 void cmp_m_c_i48(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(14))return;
+	t.checkUseCode(14);
 #endif
 	register int64 x=((int48*)&t.mem[t.getNext48().toInt()])->toInt();
 	register int64 p=t.getNext48().toInt();
@@ -487,7 +487,7 @@ void cmp_m_c_i48(Thread &t){
 }
 void cmp_m_c_i64(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(16))return;
+	t.checkUseCode(16);
 #endif
 	register int64 x=*((int64*)&t.mem[t.getNext48().toInt()]);
 	register int64 p=t.getNext64();
@@ -499,7 +499,7 @@ void cmp_m_c_i64(Thread &t){
 
 void cmp_m_m_i8(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(14))return;
+	t.checkUseCode(14);
 #endif
 	register int8 x=t.mem[t.getNext48().toInt()];
 	register int8 p=t.mem[t.getNext48().toInt()];
@@ -510,7 +510,7 @@ void cmp_m_m_i8(Thread &t){
 }
 void cmp_m_m_i16(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(14))return;
+	t.checkUseCode(14);
 #endif
 	register int16 x=*((int16*)&t.mem[t.getNext48().toInt()]);
 	register int16 p=*((int16*)&t.mem[t.getNext48().toInt()]);
@@ -521,7 +521,7 @@ void cmp_m_m_i16(Thread &t){
 }
 void cmp_m_m_i32(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(14))return;
+	t.checkUseCode(14);
 #endif
 	register int32 x=*((int32*)&t.mem[t.getNext48().toInt()]);
 	register int32 p=*((int32*)&t.mem[t.getNext48().toInt()]);
@@ -532,7 +532,7 @@ void cmp_m_m_i32(Thread &t){
 }
 void cmp_m_m_i48(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(14))return;
+	t.checkUseCode(14);
 #endif
 	register int64 x=((int48*)&t.mem[t.getNext48().toInt()])->toInt();
 	register int64 p=((int48*)&t.mem[t.getNext48().toInt()])->toInt();
@@ -543,7 +543,7 @@ void cmp_m_m_i48(Thread &t){
 }
 void cmp_m_m_i64(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(14))return;
+	t.checkUseCode(14);
 #endif
 	register int64 x=*((int64*)&t.mem[t.getNext48().toInt()]);
 	register int64 p=*((int64*)&t.mem[t.getNext48().toInt()]);
@@ -555,7 +555,7 @@ void cmp_m_m_i64(Thread &t){
 
 void cmp_m_w_i8(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	register int8 x=t.mem[t.getNext48().toInt()];
 	register int8 p=t.workspace[t.getNext8()];
@@ -566,7 +566,7 @@ void cmp_m_w_i8(Thread &t){
 }
 void cmp_m_w_i16(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	register int16 x=*((int16*)&t.mem[t.getNext48().toInt()]);
 	register int16 p=*((int16*)&t.workspace[t.getNext8()]);
@@ -577,7 +577,7 @@ void cmp_m_w_i16(Thread &t){
 }
 void cmp_m_w_i32(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	register int32 x=*((int32*)&t.mem[t.getNext48().toInt()]);
 	register int32 p=*((int32*)&t.workspace[t.getNext8()]);
@@ -588,7 +588,7 @@ void cmp_m_w_i32(Thread &t){
 }
 void cmp_m_w_i48(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	register int64 x=((int48*)&t.mem[t.getNext48().toInt()])->toInt();
 	register int64 p=((int48*)&t.workspace[t.getNext8()])->toInt();
@@ -599,7 +599,7 @@ void cmp_m_w_i48(Thread &t){
 }
 void cmp_m_w_i64(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	register int64 x=*((int64*)&t.mem[t.getNext48().toInt()]);
 	register int64 p=*((int64*)&t.workspace[t.getNext8()]);
@@ -612,7 +612,7 @@ void cmp_m_w_i64(Thread &t){
 
 void cmp_w_c_i8(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	std::cout<< "Chegou aqui";
 
@@ -625,7 +625,7 @@ void cmp_w_c_i8(Thread &t){
 }
 void cmp_w_c_i16(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(5))return;
+	t.checkUseCode(5);
 #endif
 	register int16 x=*((int16*)&t.workspace[t.getNext8()]);
 	register int16 p=t.getNext16();
@@ -636,7 +636,7 @@ void cmp_w_c_i16(Thread &t){
 }
 void cmp_w_c_i32(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(7))return;
+	t.checkUseCode(7);
 #endif
 	register int32 x=*((int32*)&t.workspace[t.getNext8()]);
 	register int32 p=t.getNext32();
@@ -647,7 +647,7 @@ void cmp_w_c_i32(Thread &t){
 }
 void cmp_w_c_i48(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	register int64 x=((int48*)&t.workspace[t.getNext8()])->toInt();
 	register int64 p=t.getNext48().toInt();
@@ -658,7 +658,7 @@ void cmp_w_c_i48(Thread &t){
 }
 void cmp_w_c_i64(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(11))return;
+	t.checkUseCode(11);
 #endif
 	register int64 x=*((int64*)&t.workspace[t.getNext8()]);
 	register int64 p=t.getNext64();
@@ -670,7 +670,7 @@ void cmp_w_c_i64(Thread &t){
 
 void cmp_w_m_i8(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	register int8 x=t.workspace[t.getNext8()];
 	register int8 p=t.mem[t.getNext48().toInt()];
@@ -681,7 +681,7 @@ void cmp_w_m_i8(Thread &t){
 }
 void cmp_w_m_i16(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	register int16 x=*((int16*)&t.workspace[t.getNext8()]);
 	register int16 p=*((int16*)&t.mem[t.getNext48().toInt()]);
@@ -692,7 +692,7 @@ void cmp_w_m_i16(Thread &t){
 }
 void cmp_w_m_i32(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	register int32 x=*((int32*)&t.workspace[t.getNext8()]);
 	register int32 p=*((int32*)&t.mem[t.getNext48().toInt()]);
@@ -703,7 +703,7 @@ void cmp_w_m_i32(Thread &t){
 }
 void cmp_w_m_i48(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	register int64 x=((int48*)&t.workspace[t.getNext8()])->toInt();
 	register int64 p=((int48*)&t.mem[t.getNext48().toInt()])->toInt();
@@ -714,7 +714,7 @@ void cmp_w_m_i48(Thread &t){
 }
 void cmp_w_m_i64(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	register int64 x=*((int64*)&t.workspace[t.getNext8()]);
 	register int64 p=*((int64*)&t.mem[t.getNext48().toInt()]);
@@ -726,7 +726,7 @@ void cmp_w_m_i64(Thread &t){
 
 void cmp_w_w_i8(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	register int8 x=t.workspace[t.getNext8()];
 	register int8 p=t.workspace[t.getNext8()];
@@ -737,7 +737,7 @@ void cmp_w_w_i8(Thread &t){
 }
 void cmp_w_w_i16(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	register int16 x=*((int16*)&t.workspace[t.getNext8()]);
 	register int16 p=*((int16*)&t.workspace[t.getNext8()]);
@@ -748,7 +748,7 @@ void cmp_w_w_i16(Thread &t){
 }
 void cmp_w_w_i32(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	register int32 x=*((int32*)&t.workspace[t.getNext8()]);
 	register int32 p=*((int32*)&t.workspace[t.getNext8()]);
@@ -759,7 +759,7 @@ void cmp_w_w_i32(Thread &t){
 }
 void cmp_w_w_i48(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	register int64 x=((int48*)&t.workspace[t.getNext8()])->toInt();
 	register int64 p=((int48*)&t.workspace[t.getNext8()])->toInt();
@@ -770,7 +770,7 @@ void cmp_w_w_i48(Thread &t){
 }
 void cmp_w_w_i64(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	register int64 x=*((int64*)&t.workspace[t.getNext8()]);
 	register int64 p=*((int64*)&t.workspace[t.getNext8()]);
@@ -782,7 +782,7 @@ void cmp_w_w_i64(Thread &t){
 
 void jmp_c_ma(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	register uint32 p=t.getNext32();
 	if(t.compare_flags&MAIOR)t.setPontCode(p);
@@ -793,7 +793,7 @@ void jmp_c_ma(Thread &t){
 }
 void jmp_c_me(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	register uint32 p=t.getNext32();
 	if(t.compare_flags&MENOR)t.setPontCode(p);
@@ -804,7 +804,7 @@ void jmp_c_me(Thread &t){
 }
 void jmp_c_ig(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	register uint32 p=t.getNext32();
 	if(t.compare_flags&IGUAL)t.setPontCode(p);
@@ -815,7 +815,7 @@ void jmp_c_ig(Thread &t){
 }
 void jmp_c_di(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	register uint32 p=t.getNext32();
 	if(!(t.compare_flags&IGUAL))t.setPontCode(p);
@@ -826,7 +826,7 @@ void jmp_c_di(Thread &t){
 }
 void jmp_c_ma_ig(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(1))return;
+	t.checkUseCode(1);
 #endif
 	register uint32 p=t.getNext32();
 	if(t.compare_flags&(IGUAL|MAIOR))t.setPontCode(p);
@@ -837,7 +837,7 @@ void jmp_c_ma_ig(Thread &t){
 }
 void jmp_c_me_ig(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(1))return;
+	t.checkUseCode(1);
 #endif
 	register uint32 p=t.getNext32();
 	if(t.compare_flags&(IGUAL|MENOR) ){
@@ -852,7 +852,7 @@ void jmp_c_me_ig(Thread &t){
 
 void jmp_m_ma(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(6))return;
+	t.checkUseCode(6);
 #endif
 	register uint32 p=*((uint32*)&t.mem[t.getNext48().toInt()]);
 	if(t.compare_flags&MAIOR)t.setPontCode(p);
@@ -863,7 +863,7 @@ void jmp_m_ma(Thread &t){
 }
 void jmp_m_me(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(6))return;
+	t.checkUseCode(6);
 #endif
 	register uint32 p=*((uint32*)&t.mem[t.getNext48().toInt()]);
 	if(t.compare_flags&MENOR)t.setPontCode(p);
@@ -874,7 +874,7 @@ void jmp_m_me(Thread &t){
 }
 void jmp_m_ig(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(6))return;
+	t.checkUseCode(6);
 #endif
 	register uint32 p=*((uint32*)&t.mem[t.getNext48().toInt()]);
 	if(t.compare_flags&IGUAL)t.setPontCode(p);
@@ -885,7 +885,7 @@ void jmp_m_ig(Thread &t){
 }
 void jmp_m_di(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(6))return;
+	t.checkUseCode(6);
 #endif
 	register uint32 p=*((uint32*)&t.mem[t.getNext48().toInt()]);
 	if(!(t.compare_flags&IGUAL))t.setPontCode(p);
@@ -896,7 +896,7 @@ void jmp_m_di(Thread &t){
 }
 void jmp_m_ma_ig(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(1))return;
+	t.checkUseCode(1);
 #endif
 	register uint32 p=*((uint32*)&t.mem[t.getNext48().toInt()]);
 	if(t.compare_flags&(IGUAL|MAIOR))t.setPontCode(p);
@@ -907,7 +907,7 @@ void jmp_m_ma_ig(Thread &t){
 }
 void jmp_m_me_ig(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(1))return;
+	t.checkUseCode(1);
 #endif
 	register uint32 p=*((uint32*)&t.mem[t.getNext48().toInt()]);
 	if(t.compare_flags&(IGUAL|MENOR) )t.setPontCode(p);
@@ -920,7 +920,7 @@ void jmp_m_me_ig(Thread &t){
 
 void jmp_w_ma(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(1))return;
+	t.checkUseCode(1);
 #endif
 	register uint32 p=*((uint32*)&t.workspace[t.getNext8()]);
 	if(t.compare_flags&MAIOR)t.setPontCode(p);
@@ -931,7 +931,7 @@ void jmp_w_ma(Thread &t){
 }
 void jmp_w_me(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(1))return;
+	t.checkUseCode(1);
 #endif
 	register uint32 p=*((uint32*)&t.workspace[t.getNext8()]);
 	if(t.compare_flags&MENOR)t.setPontCode(p);
@@ -942,7 +942,7 @@ void jmp_w_me(Thread &t){
 }
 void jmp_w_ig(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(1))return;
+	t.checkUseCode(1);
 #endif
 	register uint32 p=*((uint32*)&t.workspace[t.getNext8()]);
 	if(t.compare_flags&IGUAL)t.setPontCode(p);
@@ -953,7 +953,7 @@ void jmp_w_ig(Thread &t){
 }
 void jmp_w_di(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(6))return;
+	t.checkUseCode(6);
 #endif
 	register uint32 p=*((uint32*)&t.workspace[t.getNext48().toInt()]);
 	if(!(t.compare_flags&IGUAL))t.setPontCode(p);
@@ -964,7 +964,7 @@ void jmp_w_di(Thread &t){
 }
 void jmp_w_ma_ig(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(1))return;
+	t.checkUseCode(1);
 #endif
 	register uint32 p=*((uint32*)&t.workspace[t.getNext8()]);
 	if(t.compare_flags&(IGUAL|MAIOR))t.setPontCode(p);
@@ -975,7 +975,7 @@ void jmp_w_ma_ig(Thread &t){
 }
 void jmp_w_me_ig(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(1))return;
+	t.checkUseCode(1);
 #endif
 	register uint32 p=*((uint32*)&t.workspace[t.getNext8()]);
 	if(t.compare_flags&(IGUAL|MENOR)){

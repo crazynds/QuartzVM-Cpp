@@ -10,8 +10,13 @@
 #include "../Thread.h"
 #include "../Context.h"
 
+#include <vector>
+#include <future>
+#include <chrono>
+
 
 #define PRINT_MESSAGE(type,str) {std::stringstream os;os << str;printMessage(getDebugLevel(),type,os);}
+#define PRINT_MESSAGE2(type,str) {std::stringstream os;os << str;printMessage(debugLevel,type,os);}
 
 
 
@@ -37,54 +42,39 @@ VirtualMachine::VirtualMachine(uint8 debug):
 }
 
 VirtualMachine::~VirtualMachine(){
-	PRINT_MESSAGE(OUT_LOG,"0%- Desligando virtual machine!");
 
 	double percentage=0;
 
-	PRINT_MESSAGE(OUT_LOG, percentage << "%- Calculado todas as porcentagem!");
+	PRINT_MESSAGE(OUT_LOG," |"<<  percentage << "%| Desligando virtual machine!");
 
-	double unclear = threads.size()+1+4+qtd_res+1+contexts.size();
-	double passo = 94/unclear;
-	percentage+=5;
+	double unclear = (threads.size()+1)+contexts.size()+4+qtd_res+1;
+	double passo = 95/unclear;
+	percentage+=4;
+	PRINT_MESSAGE(OUT_LOG," |"<<  percentage << "%| Calculado todas as porcentagem!");
 
-	percentage+=passo*threads.size();
+	percentage+=passo*(threads.size()+1);
 	threads.clear();
-	percentage+=passo;
-	PRINT_MESSAGE(OUT_LOG, percentage << "%- Liberado todas as threads!");
+	PRINT_MESSAGE(OUT_LOG," |"<<  percentage << "%| Liberado todas as threads!");
 
 	percentage+=passo*4;
 	manJit.releaseOpcodesJit();
-	PRINT_MESSAGE(OUT_LOG, percentage << "%- Liberado todas as instruções!");
+	PRINT_MESSAGE(OUT_LOG," |"<<  percentage << "%| Liberado todas as instruções!");
 
 	for(uint16 x=0;x<qtd_res;x++){
 		free(recursos_alocados[x]);
 		percentage+=passo;
-		PRINT_MESSAGE(OUT_LOG_EXTRA, percentage << "%- Liberando alocação N: " << x);
+		PRINT_MESSAGE(OUT_LOG_EXTRA," |"<<  percentage << "%| Liberando alocação N: " << x);
 	}
 	free(recursos_alocados);
 	percentage+=passo;
-	PRINT_MESSAGE(OUT_LOG, percentage << "%- Liberado todas as alocações dinamicas!");
+	PRINT_MESSAGE(OUT_LOG," |"<<  percentage << "%| Liberado todas as alocações dinamicas!");
 
 	percentage+=passo*contexts.size();
 	contexts.clear();
-	percentage+=passo;
-	PRINT_MESSAGE(OUT_LOG, percentage << "%- Liberado os Contexts!");
+	PRINT_MESSAGE(OUT_LOG, " |"<<  percentage << "%| Liberado os Contexts!");
 
 	PRINT_MESSAGE(OUT_LOG," |100%| Maquina virtual liberada completamente");
 	PRINT_MESSAGE(OUT_LOG,"Maquina virtual desligada!");
-}
-
-void VirtualMachine::finalizeThread(){
-	if(vm_flags&RUNNING_)PRINT_MESSAGE(OUT_LOG,"Finalizado apos chamada de finalização!");
-	//if(flag&OVERLOAD_COD_ERROR_)PRINT_MESSAGE(OUT_ERROR,"Erro overload na memoria do codigo!");
-	if(vm_flags&OVERLOAD_MEM_ERROR_)PRINT_MESSAGE(OUT_ERROR,"Erro overload na memoria usavel!");
-	if(vm_flags&MAX_LIMIT_STACK_)PRINT_MESSAGE(OUT_ERROR,"Erro memoria máxima de stack possivel atingido!");
-	//if(flag&NO_OPCODE_COMMAND_)PRINT_MESSAGE(OUT_ERROR,"Erro nenhum opcode encontrado correspondente!");
-	//if(flag&INVALID_OPCODE_JIT_)PRINT_MESSAGE(OUT_ERROR,"Erro, opcode para transformação JIT invalido!");
-	if(vm_flags&INTERNAL_ERROR_)PRINT_MESSAGE(OUT_ERROR,"Erro interno do programa, mantenha as bibliotecas atualizadas para evitar esse erro novamente.");
-	if(vm_flags&INVALID_JMP_JIT_)PRINT_MESSAGE(OUT_ERROR,"Erro ao tentar entrar dentro de código JIT sem flag de entrada.");
-	if(vm_flags&INVALID_CHANGE_CONTEXT_)PRINT_MESSAGE(OUT_ERROR,"Acesso a um Context inesistente ou que não existe mais.");
-	if(vm_flags&MIN_LIMIT_STACK_)PRINT_MESSAGE(OUT_ERROR,"Erro na tentativa de leitura de valor na stack vazia!");
 }
 
 uint8 VirtualMachine::getDebugLevel(){
@@ -92,43 +82,70 @@ uint8 VirtualMachine::getDebugLevel(){
 }
 
 
-inline uint32 VirtualMachine::runAllThread1Time(uint32 flags){
-	for (std::map<uint16,Thread>::iterator it=threads.begin(); it!=threads.end(); ++it){
-		Thread &t=it->second;
-		uint16 opcode = t.getNext16();
-		((Func)VET[opcode])(t);
-		if(t.isFinalized()){
-			flags|=t.isFinalized();
-			threads.erase(it);
-			PRINT_MESSAGE(OUT_LOG_EXTRA,"Finalizada thread de numero: " << it->first);
-			finalizeThread();
+void finalizeThread(uint16 flags,uint8 debugLevel){
+	if(flags&RUNNING_)PRINT_MESSAGE2(OUT_LOG,"Finalizado apos chamada de finalização!");
+	//if(flag&OVERLOAD_COD_ERROR_)PRINT_MESSAGE2(OUT_ERROR,"Erro overload na memoria do codigo!");
+	if(flags&OVERLOAD_MEM_ERROR_)PRINT_MESSAGE2(OUT_ERROR,"Erro overload na memoria usavel!");
+	if(flags&MAX_LIMIT_STACK_)PRINT_MESSAGE2(OUT_ERROR,"Erro memoria máxima de stack possivel atingido!");
+	//if(flag&NO_OPCODE_COMMAND_)PRINT_MESSAGE2(OUT_ERROR,"Erro nenhum opcode encontrado correspondente!");
+	//if(flag&INVALID_OPCODE_JIT_)PRINT_MESSAGE2(OUT_ERROR,"Erro, opcode para transformação JIT invalido!");
+	if(flags&INTERNAL_ERROR_)PRINT_MESSAGE2(OUT_ERROR,"Erro interno do programa, mantenha as bibliotecas atualizadas para evitar esse erro novamente.");
+	if(flags&INVALID_JMP_JIT_)PRINT_MESSAGE2(OUT_ERROR,"Erro ao tentar entrar dentro de código JIT sem flag de entrada.");
+	if(flags&INVALID_CHANGE_CONTEXT_)PRINT_MESSAGE2(OUT_ERROR,"Acesso a um Context inesistente ou que não existe mais.");
+	if(flags&MIN_LIMIT_STACK_)PRINT_MESSAGE2(OUT_ERROR,"Erro na tentativa de leitura de valor na stack vazia!");
+}
+
+uint16 runThread(Thread *t,void** COMANDS){
+	try{
+		while(!t->isFinalized()){
+			uint16 opcode = t->getNext16();
+			((Func)COMANDS[opcode])(*t);
 		}
+	}catch(VMException &e){
+		e.addToPath("VM_RUN");
+		t->setErrorFlags(INTERNAL_ERROR_);
+		e.printError();
 	}
-	return flags;
+	finalizeThread(t->isFinalized(),t->getVirtualMachine().getDebugLevel());
+	return t->isFinalized();
 }
 
 
-
-uint32 VirtualMachine::run(){
-	uint32 flags=0;
+uint16 VirtualMachine::run(){
+	uint16 flags=0;
 	PRINT_MESSAGE(OUT_INFO_EXTRA,"Executando maquina virtual!");
 	PRINT_MESSAGE(OUT_LOG, "$$ A partir daqui, todas as mensagem serão referente a execução da VM. $$");
-	try{
-		do{
-			flags=runAllThread1Time(flags);
-		}while(threads.size()>0);
-	}catch(VMException &e){
-		e.addToPath("VM_RUN");
-		vm_flags|=1<<VM_FLAG_EXCEPTION;
-		flags|=INTERNAL_ERROR_;
-		e.printError();
+
+	std::map<uint16,std::future<uint16>> futures;
+	const std::chrono::milliseconds span (25);
+
+	for(auto it=threads.begin(); it!=threads.end(); ++it){
+		Thread &t=it->second;
+		t.setErrorFlags(RUNNING_);
+		futures[it->first]=std::async(runThread,&t,VET);
 	}
+	while(threads.size()>0){
+		for(auto it = futures.begin(); it!=futures.end(); ++it){
+			auto &future = it->second;
+			uint16 id = it->first;
+			if(future.wait_for(span)!=std::future_status::timeout){
+				auto it = threads.find(id);
+				if(it==threads.end())
+					continue;
+				if(it->second.isFinalized()&INTERNAL_ERROR_){
+					vm_flags|=1<<VM_FLAG_EXCEPTION;
+				}
+				threads.erase(it);
+			}
+		}
+	}
+
 	finalize();
 	return flags;
 }
 
-uint32 VirtualMachine::runCommand(){
-	uint32 flags=0;
+uint16 VirtualMachine::runCommand(){
+	uint16 flags=0;
 	if(threads.size()==0)return 1;
 	try{
 		for (std::map<uint16,Thread>::iterator it=threads.begin(); it!=threads.end(); ++it){
@@ -141,7 +158,7 @@ uint32 VirtualMachine::runCommand(){
 				flags|=t.isFinalized();
 				threads.erase(it);
 				PRINT_MESSAGE(OUT_DEBUG,"CLOSED THREAD {id: " << it->first << ", flags: "<< t.isFinalized() << "}");
-				finalizeThread();
+				finalizeThread(flags,getDebugLevel());
 			}
 		}
 	}catch(VMException &e){
@@ -244,7 +261,6 @@ uint16 VirtualMachine::createThread(uint16 context,uint32 pos){
 	PRINT_MESSAGE(OUT_INFO,"Criado thread ID= " << id)
 	return id;
 }
-
 
 
 

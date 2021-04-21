@@ -22,7 +22,7 @@
 
 void soma_m_c_ui8(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint64 x=t.getNext48().toInt();
 	uint8 y=t.getNext8();
@@ -30,28 +30,28 @@ void soma_m_c_ui8(Thread &t){
 }
 void soma_m_c_ui16(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(10))return;
+	t.checkUseCode(10);
 #endif
 	uint16 *x=(uint16*)&t.mem[t.getNext48().toInt()];
 	*x+=t.getNext16();
 }
 void soma_m_c_ui32(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(12))return;
+	t.checkUseCode(12);
 #endif
 	uint32 *x=(uint32*)&t.mem[t.getNext48().toInt()];
 	*x+=t.getNext32();
 }
 void soma_m_c_ui48(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(14))return;
+	t.checkUseCode(14);
 #endif
 	uint48 *x=(uint48*)&t.mem[t.getNext48().toInt()];
 	*x+=t.getNext48();
 }
 void soma_m_c_ui64(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(16))return;
+	t.checkUseCode(16);
 #endif
 	uint64 *x=(uint64*)&t.mem[t.getNext48().toInt()];
 	*x+=t.getNext64();
@@ -59,7 +59,7 @@ void soma_m_c_ui64(Thread &t){
 
 void sub_m_c_ui8(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint64 x=t.getNext48().toInt();
 	uint8 y=t.getNext8();
@@ -67,28 +67,28 @@ void sub_m_c_ui8(Thread &t){
 }
 void sub_m_c_ui16(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(10))return;
+	t.checkUseCode(10);
 #endif
 	uint16 *x=(uint16*)&t.mem[t.getNext48().toInt()];
 	*x-=t.getNext16();
 }
 void sub_m_c_ui32(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(12))return;
+	t.checkUseCode(12);
 #endif
 	uint32 *x=(uint32*)&t.mem[t.getNext48().toInt()];
 	*x-=t.getNext32();
 }
 void sub_m_c_ui48(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(14))return;
+	t.checkUseCode(14);
 #endif
 	uint48 *x=(uint48*)&t.mem[t.getNext48().toInt()];
 	*x-=t.getNext48();
 }
 void sub_m_c_ui64(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(16))return;
+	t.checkUseCode(16);
 #endif
 	uint64 *x=(uint64*)&t.mem[t.getNext48().toInt()];
 	*x-=t.getNext64();
@@ -96,7 +96,7 @@ void sub_m_c_ui64(Thread &t){
 
 void mul_m_c_ui8(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint64 x=t.getNext48().toInt();
 	uint8 y=t.getNext8();
@@ -104,28 +104,28 @@ void mul_m_c_ui8(Thread &t){
 }
 void mul_m_c_ui16(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(10))return;
+	t.checkUseCode(10);
 #endif
 	uint16 *x=(uint16*)&t.mem[t.getNext48().toInt()];
 	*x*=t.getNext16();
 }
 void mul_m_c_ui32(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(12))return;
+	t.checkUseCode(12);
 #endif
 	uint32 *x=(uint32*)&t.mem[t.getNext48().toInt()];
 	*x*=t.getNext32();
 }
 void mul_m_c_ui48(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(14))return;
+	t.checkUseCode(14);
 #endif
 	uint48 *x=(uint48*)&t.mem[t.getNext48().toInt()];
 	*x*=t.getNext48();
 }
 void mul_m_c_ui64(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(16))return;
+	t.checkUseCode(16);
 #endif
 	uint64 *x=(uint64*)&t.mem[t.getNext48().toInt()];
 	*x*=t.getNext64();
@@ -133,7 +133,7 @@ void mul_m_c_ui64(Thread &t){
 
 void div_m_c_ui8(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint64 x=t.getNext48().toInt();
 	uint8 y=t.getNext8();
@@ -141,28 +141,28 @@ void div_m_c_ui8(Thread &t){
 }
 void div_m_c_ui16(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(10))return;
+	t.checkUseCode(10);
 #endif
 	uint16 *x=(uint16*)&t.mem[t.getNext48().toInt()];
 	*x/=t.getNext16();
 }
 void div_m_c_ui32(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(12))return;
+	t.checkUseCode(12);
 #endif
 	uint32 *x=(uint32*)&t.mem[t.getNext48().toInt()];
 	*x/=t.getNext32();
 }
 void div_m_c_ui48(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(14))return;
+	t.checkUseCode(14);
 #endif
 	uint48 *x=(uint48*)&t.mem[t.getNext48().toInt()];
 	*x/=t.getNext48();
 }
 void div_m_c_ui64(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(16))return;
+	t.checkUseCode(16);
 #endif
 	uint64 *x=(uint64*)&t.mem[t.getNext48().toInt()];
 	*x/=t.getNext64();
@@ -170,7 +170,7 @@ void div_m_c_ui64(Thread &t){
 
 void mod_m_c_ui8(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint64 x=t.getNext48().toInt();
 	uint8 y=t.getNext8();
@@ -178,28 +178,28 @@ void mod_m_c_ui8(Thread &t){
 }
 void mod_m_c_ui16(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(10))return;
+	t.checkUseCode(10);
 #endif
 	uint16 *x=(uint16*)&t.mem[t.getNext48().toInt()];
 	*x%=t.getNext16();
 }
 void mod_m_c_ui32(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(12))return;
+	t.checkUseCode(12);
 #endif
 	uint32 *x=(uint32*)&t.mem[t.getNext48().toInt()];
 	*x%=t.getNext32();
 }
 void mod_m_c_ui48(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(14))return;
+	t.checkUseCode(14);
 #endif
 	uint48 *x=(uint48*)&t.mem[t.getNext48().toInt()];
 	*x%=t.getNext48();
 }
 void mod_m_c_ui64(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(16))return;
+	t.checkUseCode(16);
 #endif
 	uint64 *x=(uint64*)&t.mem[t.getNext48().toInt()];
 	*x%=t.getNext64();
@@ -216,35 +216,35 @@ void mod_m_c_ui64(Thread &t){
 
 void soma_w_c_ui8(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint8 *x=(uint8*)&t.workspace[t.getNext8()];
 	*x+=t.getNext8();
 }
 void soma_w_c_ui16(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(5))return;
+	t.checkUseCode(5);
 #endif
 	uint16 *x=(uint16*)&t.workspace[t.getNext8()];
 	*x+=t.getNext16();
 }
 void soma_w_c_ui32(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(7))return;
+	t.checkUseCode(7);
 #endif
 	uint32 *x=(uint32*)&t.workspace[t.getNext8()];
 	*x+=t.getNext32();
 }
 void soma_w_c_ui48(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint48 *x=(uint48*)&t.workspace[t.getNext8()];
 	*x+=t.getNext48();
 }
 void soma_w_c_ui64(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(11))return;
+	t.checkUseCode(11);
 #endif
 	uint8 x=t.getNext8();
 	t.workspace[x]+=t.getNext64();
@@ -252,35 +252,35 @@ void soma_w_c_ui64(Thread &t){
 
 void sub_w_c_ui8(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint8 *x=(uint8*)&t.workspace[t.getNext8()];
 	*x-=t.getNext8();
 }
 void sub_w_c_ui16(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(5))return;
+	t.checkUseCode(5);
 #endif
 	uint16 *x=(uint16*)&t.workspace[t.getNext8()];
 	*x-=t.getNext16();
 }
 void sub_w_c_ui32(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(7))return;
+	t.checkUseCode(7);
 #endif
 	uint32 *x=(uint32*)&t.workspace[t.getNext8()];
 	*x-=t.getNext32();
 }
 void sub_w_c_ui48(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint48 *x=(uint48*)&t.workspace[t.getNext8()];
 	*x-=t.getNext48();
 }
 void sub_w_c_ui64(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(11))return;
+	t.checkUseCode(11);
 #endif
 	uint8 x=t.getNext8();
 	t.workspace[x]-=t.getNext64();
@@ -288,35 +288,35 @@ void sub_w_c_ui64(Thread &t){
 
 void mul_w_c_ui8(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint8 *x=(uint8*)&t.workspace[t.getNext8()];
 	*x*=t.getNext8();
 }
 void mul_w_c_ui16(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(5))return;
+	t.checkUseCode(5);
 #endif
 	uint16 *x=(uint16*)&t.workspace[t.getNext8()];
 	*x*=t.getNext16();
 }
 void mul_w_c_ui32(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(7))return;
+	t.checkUseCode(7);
 #endif
 	uint32 *x=(uint32*)&t.workspace[t.getNext8()];
 	*x*=t.getNext32();
 }
 void mul_w_c_ui48(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint48 *x=(uint48*)&t.workspace[t.getNext8()];
 	*x*=t.getNext48();
 }
 void mul_w_c_ui64(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(11))return;
+	t.checkUseCode(11);
 #endif
 	uint8 x=t.getNext8();
 	t.workspace[x]*=t.getNext64();
@@ -324,35 +324,35 @@ void mul_w_c_ui64(Thread &t){
 
 void div_w_c_ui8(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint8 *x=(uint8*)&t.workspace[t.getNext8()];
 	*x/=t.getNext8();
 }
 void div_w_c_ui16(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(5))return;
+	t.checkUseCode(5);
 #endif
 	uint16 *x=(uint16*)&t.workspace[t.getNext8()];
 	*x/=t.getNext16();
 }
 void div_w_c_ui32(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(7))return;
+	t.checkUseCode(7);
 #endif
 	uint32 *x=(uint32*)&t.workspace[t.getNext8()];
 	*x/=t.getNext32();
 }
 void div_w_c_ui48(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint48 *x=(uint48*)&t.workspace[t.getNext8()];
 	*x/=t.getNext48();
 }
 void div_w_c_ui64(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(11))return;
+	t.checkUseCode(11);
 #endif
 	uint8 x=t.getNext8();
 	t.workspace[x]/=t.getNext64();
@@ -360,35 +360,35 @@ void div_w_c_ui64(Thread &t){
 
 void mod_w_c_ui8(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint8 *x=(uint8*)&t.workspace[t.getNext8()];
 	*x%=t.getNext8();
 }
 void mod_w_c_ui16(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(5))return;
+	t.checkUseCode(5);
 #endif
 	uint16 *x=(uint16*)&t.workspace[t.getNext8()];
 	*x%=t.getNext16();
 }
 void mod_w_c_ui32(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(7))return;
+	t.checkUseCode(7);
 #endif
 	uint32 *x=(uint32*)&t.workspace[t.getNext8()];
 	*x%=t.getNext32();
 }
 void mod_w_c_ui48(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint48 *x=(uint48*)&t.workspace[t.getNext8()];
 	*x%=t.getNext48();
 }
 void mod_w_c_ui64(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(11))return;
+	t.checkUseCode(11);
 #endif
 	uint8 x=t.getNext8();
 	t.workspace[x]%=t.getNext64();
@@ -405,35 +405,35 @@ void mod_w_c_ui64(Thread &t){
 
 void soma_w_m_ui8(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint8 *x=(uint8*)&t.workspace[t.getNext8()];
 	*x+=t.mem[t.getNext48().toInt()];
 }
 void soma_w_m_ui16(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint16 *x=(uint16*)&t.workspace[t.getNext8()];
 	*x+=*((uint16*)&t.mem[t.getNext48().toInt()]);
 }
 void soma_w_m_ui32(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint32 *x=(uint32*)&t.workspace[t.getNext8()];
 	*x+=*((uint32*)&t.mem[t.getNext48().toInt()]);
 }
 void soma_w_m_ui48(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint48 *x=(uint48*)&t.workspace[t.getNext8()];
 	*x+=*((uint48*)&t.mem[t.getNext48().toInt()]);
 }
 void soma_w_m_ui64(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint8 x=t.getNext8();
 	t.workspace[x]+=*((uint64*)&t.mem[t.getNext48().toInt()]);
@@ -441,35 +441,35 @@ void soma_w_m_ui64(Thread &t){
 
 void sub_w_m_ui8(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint8 *x=(uint8*)&t.workspace[t.getNext8()];
 	*x-=t.mem[t.getNext48().toInt()];
 }
 void sub_w_m_ui16(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint16 *x=(uint16*)&t.workspace[t.getNext8()];
 	*x-=*((uint16*)&t.mem[t.getNext48().toInt()]);
 }
 void sub_w_m_ui32(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint32 *x=(uint32*)&t.workspace[t.getNext8()];
 	*x-=*((uint32*)&t.mem[t.getNext48().toInt()]);
 }
 void sub_w_m_ui48(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint48 *x=(uint48*)&t.workspace[t.getNext8()];
 	*x-=*((uint48*)&t.mem[t.getNext48().toInt()]);
 }
 void sub_w_m_ui64(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint8 x=t.getNext8();
 	t.workspace[x]-=*((uint64*)&t.mem[t.getNext48().toInt()]);
@@ -477,35 +477,35 @@ void sub_w_m_ui64(Thread &t){
 
 void mul_w_m_ui8(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint8 *x=(uint8*)&t.workspace[t.getNext8()];
 	*x*=t.mem[t.getNext48().toInt()];
 }
 void mul_w_m_ui16(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint16 *x=(uint16*)&t.workspace[t.getNext8()];
 	*x*=*((uint16*)&t.mem[t.getNext48().toInt()]);
 }
 void mul_w_m_ui32(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint32 *x=(uint32*)&t.workspace[t.getNext8()];
 	*x*=*((uint32*)&t.mem[t.getNext48().toInt()]);
 }
 void mul_w_m_ui48(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint48 *x=(uint48*)&t.workspace[t.getNext8()];
 	*x*=*((uint48*)&t.mem[t.getNext48().toInt()]);
 }
 void mul_w_m_ui64(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint8 x=t.getNext8();
 	t.workspace[x]*=*((uint64*)&t.mem[t.getNext48().toInt()]);
@@ -513,35 +513,35 @@ void mul_w_m_ui64(Thread &t){
 
 void div_w_m_ui8(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint8 *x=(uint8*)&t.workspace[t.getNext8()];
 	*x/=t.mem[t.getNext48().toInt()];
 }
 void div_w_m_ui16(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint16 *x=(uint16*)&t.workspace[t.getNext8()];
 	*x/=*((uint16*)&t.mem[t.getNext48().toInt()]);
 }
 void div_w_m_ui32(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint32 *x=(uint32*)&t.workspace[t.getNext8()];
 	*x/=*((uint32*)&t.mem[t.getNext48().toInt()]);
 }
 void div_w_m_ui48(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint48 *x=(uint48*)&t.workspace[t.getNext8()];
 	*x/=*((uint48*)&t.mem[t.getNext48().toInt()]);
 }
 void div_w_m_ui64(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint8 x=t.getNext8();
 	t.workspace[x]/=*((uint64*)&t.mem[t.getNext48().toInt()]);
@@ -549,35 +549,35 @@ void div_w_m_ui64(Thread &t){
 
 void mod_w_m_ui8(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint8 *x=(uint8*)&t.workspace[t.getNext8()];
 	*x%=t.mem[t.getNext48().toInt()];
 }
 void mod_w_m_ui16(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint16 *x=(uint16*)&t.workspace[t.getNext8()];
 	*x%=*((uint16*)&t.mem[t.getNext48().toInt()]);
 }
 void mod_w_m_ui32(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint32 *x=(uint32*)&t.workspace[t.getNext8()];
 	*x%=*((uint32*)&t.mem[t.getNext48().toInt()]);
 }
 void mod_w_m_ui48(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint48 *x=(uint48*)&t.workspace[t.getNext8()];
 	*x%=*((uint48*)&t.mem[t.getNext48().toInt()]);
 }
 void mod_w_m_ui64(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(9))return;
+	t.checkUseCode(9);
 #endif
 	uint8 x=t.getNext8();
 	t.workspace[x]%=*((uint64*)&t.mem[t.getNext48().toInt()]);
@@ -593,35 +593,35 @@ void mod_w_m_ui64(Thread &t){
 
 void soma_w_w_ui8(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint8 *x=(uint8*)&t.workspace[t.getNext8()];
 	*x+=t.workspace[t.getNext8()];
 }
 void soma_w_w_ui16(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint16 *x=(uint16*)&t.workspace[t.getNext8()];
 	*x+=*((uint16*)&t.workspace[t.getNext8()]);
 }
 void soma_w_w_ui32(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint32 *x=(uint32*)&t.workspace[t.getNext8()];
 	*x+=*((uint32*)&t.workspace[t.getNext8()]);
 }
 void soma_w_w_ui48(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint48 *x=(uint48*)&t.workspace[t.getNext8()];
 	*x+=*((uint48*)&t.workspace[t.getNext8()]);
 }
 void soma_w_w_ui64(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint8 x=t.getNext8();
 	t.workspace[x]+=t.workspace[t.getNext8()];
@@ -629,35 +629,35 @@ void soma_w_w_ui64(Thread &t){
 
 void sub_w_w_ui8(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint8 *x=(uint8*)&t.workspace[t.getNext8()];
 	*x-=t.workspace[t.getNext8()];
 }
 void sub_w_w_ui16(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint16 *x=(uint16*)&t.workspace[t.getNext8()];
 	*x-=*((uint16*)&t.workspace[t.getNext8()]);
 }
 void sub_w_w_ui32(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint32 *x=(uint32*)&t.workspace[t.getNext8()];
 	*x-=*((uint32*)&t.workspace[t.getNext8()]);
 }
 void sub_w_w_ui48(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint48 *x=(uint48*)&t.workspace[t.getNext8()];
 	*x-=*((uint48*)&t.workspace[t.getNext8()]);
 }
 void sub_w_w_ui64(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint8 x=t.getNext8();
 	t.workspace[x]-=t.workspace[t.getNext8()];
@@ -665,35 +665,35 @@ void sub_w_w_ui64(Thread &t){
 
 void mul_w_w_ui8(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint8 *x=(uint8*)&t.workspace[t.getNext8()];
 	*x*=t.workspace[t.getNext8()];
 }
 void mul_w_w_ui16(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint16 *x=(uint16*)&t.workspace[t.getNext8()];
 	*x*=*((uint16*)&t.workspace[t.getNext8()]);
 }
 void mul_w_w_ui32(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint32 *x=(uint32*)&t.workspace[t.getNext8()];
 	*x*=*((uint32*)&t.workspace[t.getNext8()]);
 }
 void mul_w_w_ui48(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint48 *x=(uint48*)&t.workspace[t.getNext8()];
 	*x*=*((uint48*)&t.workspace[t.getNext8()]);
 }
 void mul_w_w_ui64(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint8 x=t.getNext8();
 	t.workspace[x]*=t.workspace[t.getNext8()];
@@ -701,35 +701,35 @@ void mul_w_w_ui64(Thread &t){
 
 void div_w_w_ui8(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint8 *x=(uint8*)&t.workspace[t.getNext8()];
 	*x/=t.workspace[t.getNext8()];
 }
 void div_w_w_ui16(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint16 *x=(uint16*)&t.workspace[t.getNext8()];
 	*x/=*((uint16*)&t.workspace[t.getNext8()]);
 }
 void div_w_w_ui32(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint32 *x=(uint32*)&t.workspace[t.getNext8()];
 	*x/=*((uint32*)&t.workspace[t.getNext8()]);
 }
 void div_w_w_ui48(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint48 *x=(uint48*)&t.workspace[t.getNext8()];
 	*x/=*((uint48*)&t.workspace[t.getNext8()]);
 }
 void div_w_w_ui64(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint8 x=t.getNext8();
 	t.workspace[x]/=t.workspace[t.getNext8()];
@@ -737,35 +737,35 @@ void div_w_w_ui64(Thread &t){
 
 void mod_w_w_ui8(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint8 *x=(uint8*)&t.workspace[t.getNext8()];
 	*x%=t.workspace[t.getNext8()];
 }
 void mod_w_w_ui16(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint16 *x=(uint16*)&t.workspace[t.getNext8()];
 	*x%=*((uint16*)&t.workspace[t.getNext8()]);
 }
 void mod_w_w_ui32(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint32 *x=(uint32*)&t.workspace[t.getNext8()];
 	*x%=*((uint32*)&t.workspace[t.getNext8()]);
 }
 void mod_w_w_ui48(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint48 *x=(uint48*)&t.workspace[t.getNext8()];
 	*x%=*((uint48*)&t.workspace[t.getNext8()]);
 }
 void mod_w_w_ui64(Thread &t){
 #ifndef _FAST_MODE
-	if(t.checkUseCode(4))return;
+	t.checkUseCode(4);
 #endif
 	uint8 x=t.getNext8();
 	t.workspace[x]%=t.workspace[t.getNext8()];

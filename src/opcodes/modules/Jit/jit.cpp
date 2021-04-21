@@ -30,7 +30,7 @@
 		uint16 flags=result>>48;
 		switch(flags){
 		case ERROR_JMP_ENTER_JIT_STATE:{
-			t.error_flags|=INVALID_JMP_JIT_;
+			t.setErrorFlags(INVALID_JMP_JIT_);
 			uint16 ctx=(uint16)(result>>32);
 			if(ctx==0){
 				t.setPontCode((uint32)result);
@@ -48,10 +48,10 @@
 			}
 		}break;
 		}
-		if(t.checkUseCode(2))return;
+		t.checkUseCode(2);
 	}
 	void enter_jit(Thread &t){
-		if(t.checkUseCode(4))return;
+		t.checkUseCode(4);
 		uint32 pos=t.getNext32();
 		uint32 enter=t.getPontCode();
 		FuncJit fn=t.getContext().getFunction(pos);
@@ -71,7 +71,7 @@
 		uint16 flags=result>>48;
 		switch(flags){
 		case ERROR_JMP_ENTER_JIT_STATE:{
-			t.error_flags|=INVALID_JMP_JIT_;
+			t.setErrorFlags(INVALID_JMP_JIT_);
 			uint16 ctx=(uint16)(result>>32);
 			if(ctx==0){
 				t.setPontCode((uint32)result);
@@ -89,12 +89,12 @@
 			}
 		}break;
 		}
-		if(t.checkUseCode(2))return;
+		t.checkUseCode(2);
 	}
 
 //Opcodes
 	uint64 create_jit(Thread &t,uint32 enter){
-		if(t.checkUseCode(2))return 0;
+		t.checkUseCode(2);
 		uint32 posInit=t.getPontCode();
 
 		t.getContext().set16InCode(posInit-2,JIT_FLAG_EXECUTE);
@@ -138,7 +138,7 @@
 		uint16 flags=result>>48;
 		switch(flags){
 		case ERROR_JMP_ENTER_JIT_STATE:{
-			t.error_flags|=INVALID_JMP_JIT_;
+			t.setErrorFlags(INVALID_JMP_JIT_);
 			uint16 ctx=(uint16)(result>>32);
 			if(ctx==0){
 				t.setPontCode((uint32)result);
@@ -156,13 +156,13 @@
 			}
 		}break;
 		}
-		if(t.checkUseCode(2))return;
+		t.checkUseCode(2);
 	}
 
 	void end_jit(Thread &t){
 		std::cout << "[WARING] - Executou o fim: " << t.getPontCode() << std::endl;
 		std::cout << "[WARING] - Esse comando tem propósitos apenas informativo, nunca deve ser executado. Reavaliar código!!" << std::endl;
-		if(t.checkUseCode(2))return;
+		t.checkUseCode(2);
 	}
 //End Opcodes
 

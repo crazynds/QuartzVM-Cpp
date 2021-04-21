@@ -6,7 +6,6 @@
  */
 #include "../lib/IOMessages.h"
 #include "Thread.h"
-#include <iostream>
 
 
 #define PRINT_MESSAGE(type,str) {std::stringstream os;os << "(THREAD_ID=" << this->id << ")"<< str;printMessage(this->vt->getDebugLevel(),type,os);}
@@ -21,7 +20,7 @@ mem(ct,&error_flags){
 	cod_pointer=pos;
 	code_len = ct->getCodeDataSize();
 
-	error_flags&=~((uint16)1);
+	error_flags&=(uint32)1;
 	compare_flags=0;
 #ifdef THREAD_CUSTOM_STACK
 	stack_pointer=0;
@@ -134,30 +133,3 @@ void Thread::changeContext(Context *c,uint32 pos){
 	this->ct=c;
 }
 
-VirtualMachine& Thread::getVirtualMachine(){
-	return *vt;
-}
-
-uint16 Thread::isFinalized(){
-	return error_flags;
-}
-uint8* Thread::getPointerMemCode(){
-	return mem.getPointerMem();
-}
-
-
-void Thread::setPontCode(uint32 t){
-	cod_pointer=t;
-}
-uint32 Thread::getPontCode(){
-	return cod_pointer;
-}
-
-Context& Thread::getContext(){
-	return *ct;
-}
-
-
-JitRuntime& Thread::getJitRuntime(){
-	return vt->getManagerOpcodes().getJitRuntime();
-}

@@ -30,8 +30,12 @@
 *.exe
 *.out
 *.app
-
+*.bat
 
 /bin/
 /doc/
 /test/
+# Eclipse settings
+/.settings/
+/.cproject
+/.project
