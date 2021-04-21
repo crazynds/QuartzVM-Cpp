@@ -39,3 +39,4 @@
 /.settings/
 .cproject
 .project
+/build/
