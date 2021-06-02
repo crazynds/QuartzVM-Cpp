@@ -7,4 +7,4 @@ In its advantages compared to existing languages or even established virtual mac
 - High hardware control (registers, cache, instructions, customized interruptions, etc.)
 - Assembly-like language (NASM syntax)
 - Modularization of commands to be executed, making the code smaller and more optimized as the VM grows.
-  - Standardized opcodes, thus keeping codes from previous versions compatible with new versions of Quartz. 
+- Standardized opcodes, thus keeping codes from previous versions compatible with new versions of Quartz. 
